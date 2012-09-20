@@ -10,7 +10,7 @@
 
 class Landscape : public GLObject {
 public:
-    Landscape(QGLContext *context,  TerraGen * generator, QVector2D resolution = QVector2D(256, 256));
+    Landscape(TextureManager *context,  TerraGen * generator, QVector2D resolution = QVector2D(256, 256));
     virtual ~Landscape();
 
     virtual void regenerateTerrain();

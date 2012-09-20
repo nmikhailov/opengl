@@ -4,7 +4,7 @@ TextureManager::TextureManager(QGLWidget *widget) {
     m_widget = widget;
 }
 
-void TextureManager::~TextureManager() {
+TextureManager::~TextureManager() {
 }
 
 GLuint TextureManager::loadTexture(const QImage &img) {

@@ -3,7 +3,7 @@
 
 #include "landscape.h"
 
-Landscape::Landscape(QGLContext * context, TerraGen *generator, QVector2D res) : GLObject(context){
+Landscape::Landscape(TextureManager * context, TerraGen *generator, QVector2D res) : GLObject(context){
     m_generator = generator;
 
     m_is_cached = false;
@@ -77,7 +77,7 @@ void Landscape::_draw() const {
     gen_colors_index();
 
     // TEXTURES
-    GLuint  tex = m_context->bindTexture(QPixmap(":/images/side1.png"), GL_TEXTURE_2D);
+    GLuint  tex = m_texman->loadTexture(QPixmap(":/images/side1.png").toImage());
 
     //GLuint  tex = bindTexture(QPixmap(":/images/363_tile_Grass.jpg"), GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, tex);

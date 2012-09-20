@@ -3,7 +3,9 @@
 
 #include <QtGui>
 #include <QGLWidget>
+
 #include "objects/landscape.h"
+#include "texturemanager.h"
 
 class GLWidget : public QGLWidget
 {
@@ -35,6 +37,7 @@ protected:
     void keyPressEvent(QKeyEvent *);
 
 private:
+    TextureManager *m_texman;
     QColor clearColor;
     QPoint lastPos;
     int xRot;

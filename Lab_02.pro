@@ -40,3 +40,20 @@ FORMS    += mainwindow.ui
 
 RESOURCES += \
     resources.qrc
+
+
+
+ParentDirectory = "/tmp/qt/$$Target"
+
+RCC_DIR = "$$ParentDirectory/Build\RCCFiles"
+UI_DIR = "$$ParentDirectory/Build/UICFiles"
+MOC_DIR = "$$ParentDirectory/Build/MOCFiles"
+OBJECTS_DIR = "$$ParentDirectory/Build/ObjFiles"
+
+CONFIG(debug, debug|release) {
+    DESTDIR = "$$ParentDirectory/debug"
+}
+CONFIG(release, debug|release) {
+    DESTDIR = "$$ParentDirectory/release"
+}
+

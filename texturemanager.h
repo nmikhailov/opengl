@@ -7,7 +7,7 @@
 class TextureManager {
 public:
     TextureManager(QGLWidget * widget);
-    virtual void ~TextureManager();
+    virtual ~TextureManager();
 
     GLuint loadTexture(const QImage & img);
     void unloadTexture(GLuint id);

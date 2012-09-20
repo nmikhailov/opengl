@@ -4,10 +4,12 @@
 #include <QGLContext>
 #include <QVector3D>
 
+#include "texturemanager.h"
+
 class GLObject
 {
 public:
-    GLObject(QGLContext * context);
+    GLObject(TextureManager * context);
     virtual ~GLObject();
 
     virtual void draw() const;
@@ -25,7 +27,7 @@ public:
 
 protected:
     QVector3D m_position, m_rotation, m_scale;
-    QGLContext * m_context;
+    TextureManager * m_texman;
 
     virtual void _draw() const = 0;
 };

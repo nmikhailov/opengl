@@ -2,11 +2,11 @@
 #include "globject.h"
 
 
-GLObject::GLObject(QGLContext *context) {
+GLObject::GLObject(TextureManager *context) {
     m_position = QVector3D(0, 0, 0);
     m_scale = QVector3D(1, 1, 1);
     m_rotation = QVector3D(0, 0, 0);
-    m_context = context;
+    m_texman = context;
 }
 
 GLObject::~GLObject() {

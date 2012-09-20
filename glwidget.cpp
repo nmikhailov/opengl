@@ -22,6 +22,7 @@ GLWidget::GLWidget(QWidget *parent, QGLWidget *shareWidget)
     yRot = 0;
     zRot = 0;
 
+    m_texman = new TextureManager(this);
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
@@ -59,9 +60,8 @@ void GLWidget::initializeGL() {
     glEnable(GL_TEXTURE_2D);
 
 
-    m_landscape = new Landscape(context(), new RandomTerraGen());
-    context()->bindTexture();
-    bindTexture();
+    m_landscape = new Landscape(m_texman, new RandomTerraGen());
+
     //m_landscape = new Landscape(200, 200, new DiamondSquareGen(), QVector3D(1, 1, 2));
     m_landscape->enableColoring(new HueColoringModel());
     //m_landscape->enableColoring(new HeightColorModel());
