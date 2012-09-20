@@ -1,9 +1,11 @@
+#include <sstream>
+#include <iostream>
+
+#include <Qt>
 #include <QtGui>
 #include <QtOpenGL>
-#include <sstream>
+
 #include <GL/glu.h>
-#include <QGLContext>
-#include <iostream>
 
 #include "glwidget.h"
 #include "terragen/randomterragen.h"
@@ -27,6 +29,9 @@ GLWidget::GLWidget(QWidget *parent, QGLWidget *shareWidget)
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
     timer->start(20);
+
+    setFocusPolicy(Qt::StrongFocus);
+    setFocus();
 }
 
 GLWidget::~GLWidget() {
@@ -53,20 +58,19 @@ void GLWidget::setClearColor(const QColor &color) {
 }
 
 void GLWidget::initializeGL() {
-    //makeObject();
-
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
-
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     m_landscape = new Landscape(m_texman, new RandomTerraGen());
 
     //m_landscape = new Landscape(200, 200, new DiamondSquareGen(), QVector3D(1, 1, 2));
-    m_landscape->enableColoring(new HueColoringModel());
+    // m_landscape->enableColoring(new HueColoringModel());
     //m_landscape->enableColoring(new HeightColorModel());
     //m_landscape->setPosition(QVector3D(0, 0, -0.5));
-   // m_landscape->setScale(QVector3D(1.5, 1.5, 1));
+    // m_landscape->setScale(QVector3D(1.5, 1.5, 1));
 }
 
 QString GLWidget::getStatus() const {
@@ -76,6 +80,10 @@ QString GLWidget::getStatus() const {
         status += "Coloring model: " + m_landscape->coloring()->name() + "; ";
     else
         status += "Coloring off; ";
+    if(m_landscape->texturing())
+        status += "Textures on; ";
+    else
+        status += "Textures off; ";
 
     return status;
 }
@@ -94,9 +102,12 @@ void GLWidget::paintGL() {
 
     m_status = getStatus();
 
+    //auto x = new Landscape(m_texman, (TerraGen*)m_landscape->generator());
+   // x->setPosition(QVector3D(0, 2, -1));
+   // x->draw();
     m_landscape->draw();
 
-    renderText(10, 10, m_status);
+    renderText(0, 10, m_status);
 }
 
 void GLWidget::resizeGL(int width, int height) {
@@ -131,7 +142,19 @@ void GLWidget::mouseReleaseEvent(QMouseEvent * /* event */) {
     emit clicked();
 }
 
-void GLWidget::keyPressEvent(QKeyEvent *) {
+void GLWidget::keyPressEvent(QKeyEvent * event) {
+    if(event->key() == Qt::Key_T) {
+        m_landscape->setTexturing(!m_landscape->texturing());
+    } else if(event->key() == Qt::Key_C) {
+
+        if(m_landscape->isColoringOn()) {
+            m_landscape->disableColoring();
+        } else {
+            m_landscape->enableColoring(new HueColoringModel());
+        }
+    } else if(event->key() == Qt::Key_Escape) {
+        QApplication::exit();
+    }
 
     updateGL();
 }

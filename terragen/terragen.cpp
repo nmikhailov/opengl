@@ -12,7 +12,7 @@ TerraGen::~TerraGen() {
     //
 }
 
-TerraGen::TTerrain TerraGen::get() const {
+const TerraGen::TTerrain &TerraGen::get() const {
     if(!m_updated)
         gen();
     return m_terrain;

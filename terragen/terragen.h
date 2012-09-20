@@ -13,7 +13,7 @@ public:
 
     typedef std::vector<std::vector<double> > TTerrain;
 
-    virtual TTerrain get() const;
+    virtual const TTerrain &get() const;
     virtual void gen() const;
     virtual QString name() const = 0;
 

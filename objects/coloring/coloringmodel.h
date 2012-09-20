@@ -1,7 +1,7 @@
 #ifndef COLORINGMODEL_H
 #define COLORINGMODEL_H
 
-#import <QColor>
+#include <QColor>
 
 class ColoringModel {
 public:

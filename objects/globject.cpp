@@ -13,6 +13,7 @@ GLObject::~GLObject() {
 }
 
 void GLObject::draw() const {
+    glPushMatrix();
     glRotated(m_rotation.x(), 1, 0, 0);
     glRotated(m_rotation.y(), 0, 1, 0);
     glRotated(m_rotation.z(), 0, 0, 1);
@@ -20,8 +21,7 @@ void GLObject::draw() const {
     glScaled(m_scale.x(), m_scale.y(), m_scale.z());
 
     glTranslated(m_position.x(), m_position.y(), m_position.z());
-    //
-    glPushMatrix();
+
     _draw();
     glPopMatrix();
 }

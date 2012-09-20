@@ -1,5 +1,7 @@
 #include <iostream>
+
 #include <QtOpenGL>
+#include <GL/glu.h>
 
 #include "landscape.h"
 
@@ -8,6 +10,7 @@ Landscape::Landscape(TextureManager * context, TerraGen *generator, QVector2D re
 
     m_is_cached = false;
     m_is_cached_colors = false;
+    m_is_cached_texture = false;
 
     setResolution(res);
 }
@@ -18,6 +21,9 @@ Landscape::~Landscape() {
     delete m_cache_vertex;
     delete m_cache_index;
     delete m_cache_colors;
+    for(int i = 0; i < 3; i++) {
+        delete m_cache_textures[i];
+    }
 }
 
 bool Landscape::isColoringOn() const {
@@ -67,68 +73,63 @@ void Landscape::setResolution(const QVector2D &res) {
     }
 }
 
+bool Landscape::texturing() const {
+    return m_texturing;
+}
+
+void Landscape::setTexturing(bool val) {
+    if(m_texturing != val) {
+        m_texturing = val;
+        m_is_cached_texture = false;
+    }
+}
+
 void Landscape::regenerateTerrain() {
     m_generator->gen();
 }
 
 void Landscape::_draw() const {
     int width = m_generator->width(), height = m_generator->height();
-    gen_vertex_index();
-    gen_colors_index();
-
-    // TEXTURES
-    GLuint  tex = m_texman->loadTexture(QPixmap(":/images/side1.png").toImage());
-
-    //GLuint  tex = bindTexture(QPixmap(":/images/363_tile_Grass.jpg"), GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, tex);
-
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 600, 600, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
-    //gluBuild2DMipmaps(GL_TEXTURE_2D, 4, 600, 600, GL_RGBA, GL_UNSIGNED_BYTE, tex);
-    //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-   // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-    //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    //glTexImage2D(GL_TEXTURE_2D, 0, 4, 10, 10, 0, GL_RGBA, , );
-
-    GLfloat * flo = new GLfloat[width * height * 2];
-
-    for (int i = 0, p = 0; i < height; i++) {
-        for (int j = 0; j < width; j++, p += 2) {
-            flo[p + 0] = (double) i / height;
-            flo[p + 1] = (double) j / width;
-        }
-    }
-
-
-    // TEXTURES
+    genVertexIndex();
+    genColorsIndex();
+    genTextureIndex();
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_DOUBLE, 0, m_cache_vertex);
-    glTexCoordPointer(2, GL_FLOAT, 0, flo);
+
+    if(m_texturing) {
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glTexCoordPointer(2, GL_DOUBLE, 0, m_cache_textures[0]);
+
+        glBindTexture(GL_TEXTURE_2D, m_cache_texid[0]);
+    } else {
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 
     if(m_coloring){
         glEnableClientState(GL_COLOR_ARRAY);
         glColorPointer(3, GL_DOUBLE, 0, m_cache_colors);
     }
-
+    glColor3f(1.0, 1.0, 1.0);
     glDrawElements(GL_TRIANGLES, (width - 1) * (height - 1) * 6, GL_UNSIGNED_INT,
                    m_cache_index);
 
     if(m_coloring)
         glDisableClientState(GL_COLOR_ARRAY);
-    glDisableClientState(GL_VERTEX_ARRAY);
 
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    if(m_texturing) {
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    }
+    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void Landscape::gen_vertex_index() const {
+void Landscape::genVertexIndex() const {
     int width = m_generator->width(), height = m_generator->height();
 
-    if(!m_is_cached)
+    if(!m_is_cached) {
         m_is_cached_colors = false;
+        m_is_cached_texture = false;
+    }
 
     if(!m_is_cached) {
         delete m_cache_vertex;
@@ -167,7 +168,7 @@ void Landscape::gen_vertex_index() const {
     }
 }
 
-void Landscape::gen_colors_index() const {
+void Landscape::genColorsIndex() const {
     int width = m_generator->width(), height = m_generator->height();
 
     if(!m_is_cached_colors && m_coloring) {
@@ -190,3 +191,57 @@ void Landscape::gen_colors_index() const {
         m_is_cached_colors = true;
     }
 }
+
+void Landscape::genTextureIndex() const {
+    int width = m_generator->width(), height = m_generator->height();
+
+    if(!m_is_cached_texture && m_texturing) {
+        delete m_cache_textures[0];
+        delete m_cache_textures[1];
+        delete m_cache_textures[2];
+
+        // TEXTURES
+        //QImage img = QPixmap(":/images/side1.png").toImage();
+        QImage img = QImage(":/images/grass.png");
+        for(int i = 0; i < img.height(); i++) {
+            for(int j = 0; j < img.width(); j++) {
+                QRgb color = img.pixel(i, j);
+
+                int mi = i * ((double) m_generator->height() / img.height());
+                int mj = j * ((double) m_generator->width() / img.width());
+
+                double h = m_generator->get()[mi][mj];
+                //color.setAlphaF(0.5);
+                color = qRgba(qRed(color), qGreen(color), qBlue(color), (int)((1 - h) * 256.));
+
+                img.setPixel(i, j, color);
+            }
+        }
+        m_cache_texid[0] = m_texman->loadTexture(img);
+        //    glAlphaFunc(GL_EQUAL,   0.1f);
+        //    glAlphaFunc(GL_LESS,	1.0f);
+
+        //glBindTexture(GL_TEXTURE_2D, tex);
+
+
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 600, 600, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
+        //gluBuild2DMipmaps(GL_TEXTURE_2D, 4, 600, 600, GL_RGBA, GL_UNSIGNED_BYTE, tex);
+        //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+        m_cache_textures[0] = new GLdouble[width * height * 2];
+
+        for (int i = 0, p = 0; i < height; i++) {
+            for (int j = 0; j < width; j++, p += 2) {
+                m_cache_textures[0][p + 0] = (double) i / height;
+                m_cache_textures[0][p + 1] = (double) j / width;
+            }
+        }
+
+        m_is_cached_texture = true;
+    }
+}
+

@@ -34,7 +34,7 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
-    void keyPressEvent(QKeyEvent *);
+    void keyPressEvent(QKeyEvent *event);
 
 private:
     TextureManager *m_texman;
