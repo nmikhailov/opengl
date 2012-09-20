@@ -1,0 +1,42 @@
+#-------------------------------------------------
+#
+# Project created by QtCreator 2012-09-18T17:01:09
+#
+#-------------------------------------------------
+
+QT       += core gui opengl
+LIBS    += -lGLU
+QMAKE_CXXFLAGS += -std=c++11
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+TARGET = Lab_02
+TEMPLATE = app
+
+
+SOURCES += main.cpp\
+        mainwindow.cpp \
+    glwidget.cpp \
+    terragen/terragen.cpp \
+    terragen/randomterragen.cpp \
+    objects/globject.cpp \
+    objects/landscape.cpp \
+    terragen/diamondsquaregen.cpp \
+    terragen/spheregen.cpp \
+    texturemanager.cpp
+
+HEADERS  += mainwindow.h \
+    glwidget.h \
+    terragen/terragen.h \
+    terragen/randomterragen.h \
+    objects/globject.h \
+    objects/landscape.h \
+    objects/coloring/coloringmodel.h \
+    terragen/diamondsquaregen.h \
+    terragen/spheregen.h \
+    texturemanager.h
+
+FORMS    += mainwindow.ui
+
+RESOURCES += \
+    resources.qrc
