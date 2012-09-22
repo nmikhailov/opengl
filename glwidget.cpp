@@ -11,11 +11,7 @@
 #include "terragen/randomterragen.h"
 #include "terragen/diamondsquaregen.h"
 
-QVector3D lookFrom(0.0, -3.0, 3.0);
-QVector3D transform(0, 0, 0);
-
-const int width = 200;
-const int width2 = width;
+QVector3D lookFrom(0.0, -1.5, 1.5);
 
 GLWidget::GLWidget(QWidget *parent, QGLWidget *shareWidget)
     : QGLWidget(parent, shareWidget) {
@@ -32,6 +28,10 @@ GLWidget::GLWidget(QWidget *parent, QGLWidget *shareWidget)
 
     setFocusPolicy(Qt::StrongFocus);
     setFocus();
+
+    m_cmodels.push_back(nullptr);
+    m_cmodels.push_back(new HueColoringModel());
+    m_cmodels.push_back(new HeightColoringModel());
 }
 
 GLWidget::~GLWidget() {
@@ -63,8 +63,12 @@ void GLWidget::initializeGL() {
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
 
     m_landscape = new Landscape(m_texman, new RandomTerraGen());
+    m_landscape->setColoringModel(new HueColoringModel());
+    //m_landscape->setColoring(true);
+    m_landscape->setTexturing(true);
 
     //m_landscape = new Landscape(200, 200, new DiamondSquareGen(), QVector3D(1, 1, 2));
     // m_landscape->enableColoring(new HueColoringModel());
@@ -76,8 +80,8 @@ void GLWidget::initializeGL() {
 QString GLWidget::getStatus() const {
     QString status = "";
     status += "Generator: " + m_landscape->generator()->name() + "; ";
-    if(m_landscape->isColoringOn())
-        status += "Coloring model: " + m_landscape->coloring()->name() + "; ";
+    if(m_landscape->coloring())
+        status += "Coloring model: " + m_landscape->coloringModel()->name() + "; ";
     else
         status += "Coloring off; ";
     if(m_landscape->texturing())
@@ -98,7 +102,7 @@ void GLWidget::paintGL() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    gluLookAt(0, -1.5, 1.5, 0.0, 0.0, 0, 0.0, 1.0, 0.0);
+    gluLookAt(lookFrom.x(), lookFrom.y(), lookFrom.z(), 0.0, 0.0, 0, 0.0, 1.0, 0.0);
 
     m_status = getStatus();
 
@@ -146,17 +150,29 @@ void GLWidget::keyPressEvent(QKeyEvent * event) {
     if(event->key() == Qt::Key_T) {
         m_landscape->setTexturing(!m_landscape->texturing());
     } else if(event->key() == Qt::Key_C) {
-
-        if(m_landscape->isColoringOn()) {
-            m_landscape->disableColoring();
+        if(m_cmodels[0] == nullptr) {
+            m_landscape->setColoring(false);
         } else {
-            m_landscape->enableColoring(new HueColoringModel());
+            m_landscape->setColoring(true);
+            m_landscape->setColoringModel(m_cmodels[0]);
         }
+
+        m_cmodels.push_back(m_cmodels.front());
+        m_cmodels.pop_front();
+
+    } else if(event->key() == Qt::Key_G) {
+        //m_landscape->
     } else if(event->key() == Qt::Key_Escape) {
         QApplication::exit();
     }
 
     updateGL();
+}
+
+void GLWidget::wheelEvent(QWheelEvent *event) {
+    double d = lookFrom.y() + (event->delta() * 1e-3);
+    lookFrom.setY(d);
+    lookFrom.setZ(-d);
 }
 
 void GLWidget::rotateOneStep() {

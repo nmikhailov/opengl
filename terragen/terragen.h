@@ -2,10 +2,12 @@
 #define TERRAGEN_H
 
 #include <vector>
-#include <QString>
 
-class TerraGen
-{
+#include <QString>
+#include <QObject>
+
+class TerraGen : public QObject {
+    Q_OBJECT
 public:
     TerraGen();
     TerraGen(int width, int height);
@@ -14,7 +16,7 @@ public:
     typedef std::vector<std::vector<double> > TTerrain;
 
     virtual const TTerrain &get() const;
-    virtual void gen() const;
+    virtual void gen();
     virtual QString name() const = 0;
 
     // Getters / setters
@@ -37,7 +39,8 @@ protected:
     mutable bool m_updated;
     mutable TTerrain m_terrain;
 
-
+signals:
+    void terrainChanged();
 };
 
 #endif // TERRAGEN_H

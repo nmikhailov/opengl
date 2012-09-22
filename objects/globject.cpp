@@ -13,6 +13,8 @@ GLObject::~GLObject() {
 }
 
 void GLObject::draw() const {
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     glPushMatrix();
     glRotated(m_rotation.x(), 1, 0, 0);
     glRotated(m_rotation.y(), 0, 1, 0);

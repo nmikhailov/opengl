@@ -3,11 +3,12 @@
 
 #include <QGLContext>
 #include <QVector3D>
+#include <QObject>
 
 #include "texturemanager.h"
 
-class GLObject
-{
+class GLObject : public QObject {
+    Q_OBJECT
 public:
     GLObject(TextureManager * context);
     virtual ~GLObject();

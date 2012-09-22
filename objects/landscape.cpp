@@ -7,6 +7,7 @@
 
 Landscape::Landscape(TextureManager * context, TerraGen *generator, QVector2D res) : GLObject(context){
     m_generator = generator;
+    connect(m_generator, SIGNAL(terrainChanged()), this, SLOT(terrainChanged()));
 
     m_is_cached = false;
     m_is_cached_colors = false;
@@ -16,8 +17,7 @@ Landscape::Landscape(TextureManager * context, TerraGen *generator, QVector2D re
 }
 
 Landscape::~Landscape() {
-    delete m_generator;
-    delete m_cm;
+//    delete m_cm;
     delete m_cache_vertex;
     delete m_cache_index;
     delete m_cache_colors;
@@ -26,24 +26,22 @@ Landscape::~Landscape() {
     }
 }
 
-bool Landscape::isColoringOn() const {
+bool Landscape::coloring() const {
     return m_coloring;
 }
 
-const ColoringModel *Landscape::coloring() const {
+const ColoringModel *Landscape::coloringModel() const {
     return m_cm;
 }
 
-void Landscape::disableColoring() {
-    m_coloring = false;
-    m_is_cached_colors = false;
+void Landscape::setColoring(bool val) {
+    m_coloring = val;
 }
 
-void Landscape::enableColoring(ColoringModel *cm) {
-    delete m_cm;
+void Landscape::setColoringModel(ColoringModel *cm) {
+  //  delete m_cm;
 
     m_cm = cm;
-    m_coloring = true;
     m_is_cached_colors = false;
 }
 
@@ -52,7 +50,8 @@ const TerraGen *Landscape::generator() const {
 }
 
 void Landscape::setGenerator(TerraGen *generator) {
-    delete m_generator;
+    disconnect(m_generator, SIGNAL(terrainChanged()), this, SLOT(terrainChanged()));
+    connect(generator, SIGNAL(terrainChanged()), this, SLOT(terrainChanged()));
 
     m_generator = generator;
     m_is_cached = false;
@@ -98,12 +97,50 @@ void Landscape::_draw() const {
     glVertexPointer(3, GL_DOUBLE, 0, m_cache_vertex);
 
     if(m_texturing) {
+        //glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        //glTexCoordPointer(2, GL_DOUBLE, 0, m_cache_textures[0]);
+
+        //glBindTexture(GL_TEXTURE_2D, m_cache_texid[0]);
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        //glClientActiveTexture(GL_TEXTURE0);
+        //glBindTexture(GL_TEXTURE_2D, m_cache_texid[0]);
+        //glTexCoordPointer(2, GL_FLOAT, 0, m_cache_textures[0]);
+
+
+        ///glClientActiveTextureARB(GL_TEXTURE1_ARB);
+        //glTexCoordPointer(2, GL_FLOAT, 0, m_cache_textures[1]);
+        //glBindTexture(GL_TEXTURE_2D, m_cache_texid[1]);
+
+        //glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // TEX 1
+        glActiveTexture(GL_TEXTURE0);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, m_cache_texid[0]);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glTexCoordPointer(2, GL_DOUBLE, 0, m_cache_textures[0]);
 
-        glBindTexture(GL_TEXTURE_2D, m_cache_texid[0]);
-    } else {
-        glBindTexture(GL_TEXTURE_2D, 0);
+
+        //glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_EXT);
+        //glTexEnvf (GL_TEXTURE_ENV, GL_COMBINE_RGB_EXT, GL_REPLACE);
+
+
+        // TEX 2
+        glActiveTexture(GL_TEXTURE1);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, m_cache_texid[1]);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glTexCoordPointer(2, GL_DOUBLE, 0, m_cache_textures[1]);
+
+
+
     }
 
     if(m_coloring){
@@ -203,21 +240,47 @@ void Landscape::genTextureIndex() const {
         // TEXTURES
         //QImage img = QPixmap(":/images/side1.png").toImage();
         QImage img = QImage(":/images/grass.png");
-        for(int i = 0; i < img.height(); i++) {
-            for(int j = 0; j < img.width(); j++) {
+        for(int i = 0; i < img.width(); i++) {
+            for(int j = 0; j < img.height(); j++) {
                 QRgb color = img.pixel(i, j);
 
-                int mi = i * ((double) m_generator->height() / img.height());
-                int mj = j * ((double) m_generator->width() / img.width());
+                int mi = i * ((double) m_generator->width() / img.width());
+                int mj = j * ((double) m_generator->height() / img.height());
 
                 double h = m_generator->get()[mi][mj];
                 //color.setAlphaF(0.5);
-                color = qRgba(qRed(color), qGreen(color), qBlue(color), (int)((1 - h) * 256.));
+                double cf = (1 - h);
+                if(cf > 0.7)
+                    cf = 1;
+                else if(cf < 0.3)
+                    cf = 0;
+                color = qRgba(qRed(color), qGreen(color), qBlue(color), (int)(cf * 255));
 
                 img.setPixel(i, j, color);
             }
         }
+
+
         m_cache_texid[0] = m_texman->loadTexture(img);
+
+        img = QImage(":/images/rock.png");
+        for(int i = 0; i < img.width(); i++) {
+            for(int j = 0; j < img.height(); j++) {
+                QRgb color = img.pixel(i, j);
+
+                int mi = i * ((double) m_generator->width() / img.width());
+                int mj = j * ((double) m_generator->height() / img.height());
+
+                double h = m_generator->get()[mi][mj];
+                //color.setAlphaF(0.5);
+                double cf = h;
+
+                color = qRgba(qRed(color), qGreen(color), qBlue(color), (int)(cf * 255));
+
+                img.setPixel(i, j, color);
+            }
+        }
+        m_cache_texid[1] = m_texman->loadTexture(img);
         //    glAlphaFunc(GL_EQUAL,   0.1f);
         //    glAlphaFunc(GL_LESS,	1.0f);
 
@@ -241,7 +304,20 @@ void Landscape::genTextureIndex() const {
             }
         }
 
+        m_cache_textures[1] = new GLdouble[width * height * 2];
+
+        for (int i = 0, p = 0; i < height; i++) {
+            for (int j = 0; j < width; j++, p += 2) {
+                m_cache_textures[1][p + 0] = (double) i / height;
+                m_cache_textures[1][p + 1] = (double) j / width;
+            }
+        }
+
         m_is_cached_texture = true;
     }
+}
+
+void Landscape::terrainChanged() {
+    m_is_cached = false;
 }
 

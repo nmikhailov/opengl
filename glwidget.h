@@ -3,6 +3,7 @@
 
 #include <QtGui>
 #include <QGLWidget>
+#include <deque>
 
 #include "objects/landscape.h"
 #include "texturemanager.h"
@@ -35,8 +36,10 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
+    void wheelEvent(QWheelEvent *);
 
 private:
+    std::deque<ColoringModel*> m_cmodels;
     TextureManager *m_texman;
     QColor clearColor;
     QPoint lastPos;

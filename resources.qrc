@@ -8,5 +8,7 @@
         <file>images/side6.png</file>
         <file>images/363_tile_Grass.jpg</file>
         <file>images/grass.png</file>
+        <file>images/ice.png</file>
+        <file>images/rock.png</file>
     </qresource>
 </RCC>

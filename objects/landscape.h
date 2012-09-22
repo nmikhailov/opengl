@@ -16,10 +16,11 @@ public:
     virtual void regenerateTerrain();
 
     // Getters / setters
-    virtual bool isColoringOn() const;
-    virtual const ColoringModel * coloring() const;
-    virtual void disableColoring();
-    virtual void enableColoring(ColoringModel * cm);
+    virtual bool coloring() const;
+    virtual void setColoring(bool val);
+
+    virtual const ColoringModel * coloringModel() const;
+    virtual void setColoringModel(ColoringModel * cm);
 
     virtual const TerraGen* generator() const;
     virtual void setGenerator(TerraGen * generator);
@@ -52,6 +53,9 @@ protected:
     virtual void genVertexIndex() const;
     virtual void genColorsIndex() const;
     virtual void genTextureIndex() const;
+
+public slots:
+    void terrainChanged();
 };
 
 #endif // LANDSCAPE_H

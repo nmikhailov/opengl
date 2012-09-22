@@ -21,7 +21,7 @@ public:
     }
 };
 
-class HeightColorModel : public ColoringModel {
+class HeightColoringModel : public ColoringModel {
     virtual QColor operator()(double val) const {
         if(val > 0.9) {
             return QColor::fromHsvF(0, 0, 0.9 * val);

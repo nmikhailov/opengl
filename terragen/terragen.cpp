@@ -13,15 +13,20 @@ TerraGen::~TerraGen() {
 }
 
 const TerraGen::TTerrain &TerraGen::get() const {
-    if(!m_updated)
-        gen();
+    if(!m_updated) {
+        m_terrain = TerraGen::TTerrain(width(), std::vector<double>(height(), 0));
+        _gen();
+        m_updated = true;
+    }
     return m_terrain;
 }
 
-void TerraGen::gen() const {
+void TerraGen::gen() {
     m_terrain = TerraGen::TTerrain(width(), std::vector<double>(height(), 0));
     _gen();
     m_updated = true;
+
+    emit terrainChanged();
 }
 
 int TerraGen::height() const {
@@ -32,6 +37,7 @@ void TerraGen::setHeight(int h) {
     if(m_height != h)
         m_updated = false;
     m_height = h;
+    emit terrainChanged();
 }
 
 int TerraGen::width() const {
@@ -42,6 +48,7 @@ void TerraGen::setWidth(int w) {
     if(m_width != w)
         m_updated = false;
     m_width = w;
+    emit terrainChanged();
 }
 
 void TerraGen::init(int w, int h) {
