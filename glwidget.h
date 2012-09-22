@@ -5,6 +5,7 @@
 #include <QGLWidget>
 #include <deque>
 
+#include "objects/camera.h"
 #include "objects/landscape.h"
 #include "texturemanager.h"
 
@@ -39,6 +40,8 @@ protected:
     void wheelEvent(QWheelEvent *);
 
 private:
+    Camera *m_camera;
+
     std::deque<ColoringModel*> m_cmodels;
     TextureManager *m_texman;
     QColor clearColor;
@@ -50,7 +53,6 @@ private:
     QString m_status;
 
     Landscape* m_landscape;
-    double m_ar;
 };
 
 #endif

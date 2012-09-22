@@ -97,50 +97,10 @@ void Landscape::_draw() const {
     glVertexPointer(3, GL_DOUBLE, 0, m_cache_vertex);
 
     if(m_texturing) {
-        //glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        //glTexCoordPointer(2, GL_DOUBLE, 0, m_cache_textures[0]);
-
-        //glBindTexture(GL_TEXTURE_2D, m_cache_texid[0]);
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-        //glClientActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_2D, m_cache_texid[0]);
-        //glTexCoordPointer(2, GL_FLOAT, 0, m_cache_textures[0]);
-
-
-        ///glClientActiveTextureARB(GL_TEXTURE1_ARB);
-        //glTexCoordPointer(2, GL_FLOAT, 0, m_cache_textures[1]);
-        //glBindTexture(GL_TEXTURE_2D, m_cache_texid[1]);
-
-        //glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        // TEX 1
-        glActiveTexture(GL_TEXTURE0);
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, m_cache_texid[0]);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glTexCoordPointer(2, GL_DOUBLE, 0, m_cache_textures[0]);
 
-
-        //glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_EXT);
-        //glTexEnvf (GL_TEXTURE_ENV, GL_COMBINE_RGB_EXT, GL_REPLACE);
-
-
-        // TEX 2
-        glActiveTexture(GL_TEXTURE1);
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, m_cache_texid[1]);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glTexCoordPointer(2, GL_DOUBLE, 0, m_cache_textures[1]);
-
-
-
+        glBindTexture(GL_TEXTURE_2D, m_cache_texid[0]);
     }
 
     if(m_coloring){

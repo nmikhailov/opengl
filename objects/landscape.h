@@ -9,6 +9,7 @@
 #include "terragen/randomterragen.h"
 
 class Landscape : public GLObject {
+    Q_OBJECT
 public:
     Landscape(TextureManager *context,  TerraGen * generator, QVector2D resolution = QVector2D(256, 256));
     virtual ~Landscape();

@@ -11,8 +11,6 @@
 #include "terragen/randomterragen.h"
 #include "terragen/diamondsquaregen.h"
 
-QVector3D lookFrom(0.0, -1.5, 1.5);
-
 GLWidget::GLWidget(QWidget *parent, QGLWidget *shareWidget)
     : QGLWidget(parent, shareWidget) {
     clearColor = Qt::black;
@@ -59,11 +57,13 @@ void GLWidget::setClearColor(const QColor &color) {
 
 void GLWidget::initializeGL() {
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+//    glEnable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
+
+    m_camera = new Camera(QVector3D(0, -1.5, 1.5));
 
     m_landscape = new Landscape(m_texman, new RandomTerraGen());
     m_landscape->setColoringModel(new HueColoringModel());
@@ -96,19 +96,9 @@ void GLWidget::paintGL() {
     qglClearColor(clearColor);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(45.0f, m_ar, 0.1f, 100000.0f);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    gluLookAt(lookFrom.x(), lookFrom.y(), lookFrom.z(), 0.0, 0.0, 0, 0.0, 1.0, 0.0);
-
+    m_camera->apply();
     m_status = getStatus();
 
-    //auto x = new Landscape(m_texman, (TerraGen*)m_landscape->generator());
-   // x->setPosition(QVector3D(0, 2, -1));
-   // x->draw();
     m_landscape->draw();
 
     renderText(0, 10, m_status);
@@ -116,15 +106,10 @@ void GLWidget::paintGL() {
 
 void GLWidget::resizeGL(int width, int height) {
     int w = width, h = height;
-    m_ar = (double) w / (double) h;
+    double ar = (double) w / (double) h;
 
     glViewport(0, 0, (GLsizei) w, (GLsizei) h);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-
-    gluPerspective(45.0f, m_ar, 0.1f, 100.0f);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    m_camera->setAspectRatio(ar);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {
@@ -170,9 +155,11 @@ void GLWidget::keyPressEvent(QKeyEvent * event) {
 }
 
 void GLWidget::wheelEvent(QWheelEvent *event) {
+    QVector3D lookFrom = m_camera->position();
     double d = lookFrom.y() + (event->delta() * 1e-3);
     lookFrom.setY(d);
     lookFrom.setZ(-d);
+    m_camera->setPosition(lookFrom);
 }
 
 void GLWidget::rotateOneStep() {
