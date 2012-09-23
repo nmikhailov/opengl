@@ -149,14 +149,10 @@ void GLWidget::nextTerraGen() {
 
 void GLWidget::keyPressEvent(QKeyEvent * event) {
     switch (event->key()) {
-    case Qt::Key_T: { m_landscape->setTexturing(!m_landscape->texturing()); };
-        break;
-    case Qt::Key_C: { nextColoring(); };
-        break;
-    case Qt::Key_G: { nextTerraGen(); };
-        break;
-    case Qt::Key_Escape: { QApplication::exit(); };
-        break;
+    case Qt::Key_T: m_landscape->setTexturing(!m_landscape->texturing()); break;
+    case Qt::Key_C: nextColoring(); break;
+    case Qt::Key_G: nextTerraGen(); break;
+    case Qt::Key_Escape: QApplication::exit(); break;
     };
 
     updateGL();
