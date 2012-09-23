@@ -39,6 +39,9 @@ protected:
     void keyPressEvent(QKeyEvent *event);
     void wheelEvent(QWheelEvent *);
 
+    void nextColoring();
+    void nextTerraGen();
+
 private:
     Camera *m_camera;
 

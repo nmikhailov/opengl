@@ -128,28 +128,36 @@ void GLWidget::mouseReleaseEvent(QMouseEvent * /* event */) {
     emit clicked();
 }
 
-void GLWidget::keyPressEvent(QKeyEvent * event) {
-    if(event->key() == Qt::Key_T) {
-        m_landscape->setTexturing(!m_landscape->texturing());
-    } else if(event->key() == Qt::Key_C) {
-        if(m_cmodels[0] == nullptr) {
-            m_landscape->setColoring(false);
-        } else {
-            m_landscape->setColoring(true);
-            m_landscape->setColoringModel(m_cmodels[0]);
-        }
-
-        m_cmodels.push_back(m_cmodels.front());
-        m_cmodels.pop_front();
-
-    } else if(event->key() == Qt::Key_G) {
-        m_landscape->setGenerator(m_generators.front());
-
-        m_generators.push_back(m_generators.front());
-        m_generators.pop_front();
-    } else if(event->key() == Qt::Key_Escape) {
-        QApplication::exit();
+void GLWidget::nextColoring() {
+    if(m_cmodels[0] == nullptr) {
+        m_landscape->setColoring(false);
+    } else {
+        m_landscape->setColoring(true);
+        m_landscape->setColoringModel(m_cmodels[0]);
     }
+
+    m_cmodels.push_back(m_cmodels.front());
+    m_cmodels.pop_front();
+}
+
+void GLWidget::nextTerraGen() {
+    m_landscape->setGenerator(m_generators.front());
+
+    m_generators.push_back(m_generators.front());
+    m_generators.pop_front();
+}
+
+void GLWidget::keyPressEvent(QKeyEvent * event) {
+    switch (event->key()) {
+    case Qt::Key_T: { m_landscape->setTexturing(!m_landscape->texturing()); };
+        break;
+    case Qt::Key_C: { nextColoring(); };
+        break;
+    case Qt::Key_G: { nextTerraGen(); };
+        break;
+    case Qt::Key_Escape: { QApplication::exit(); };
+        break;
+    };
 
     updateGL();
 }
