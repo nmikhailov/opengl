@@ -56,11 +56,10 @@ void GLWidget::setClearColor(const QColor &color) {
 }
 
 void GLWidget::initializeGL() {
-    glEnable(GL_DEPTH_TEST);
 //    glEnable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
 
     m_camera = new Camera(QVector3D(0, -1.5, 1.5));

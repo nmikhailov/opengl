@@ -97,17 +97,77 @@ void Landscape::_draw() const {
     glVertexPointer(3, GL_DOUBLE, 0, m_cache_vertex);
 
     if(m_texturing) {
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glTexCoordPointer(2, GL_DOUBLE, 0, m_cache_textures[0]);
+//        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+//        glTexCoordPointer(2, GL_DOUBLE, 0, m_cache_textures[1]);
 
+//        glBindTexture(GL_TEXTURE_2D, m_cache_texid[1]);
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        //glClientActiveTexture(GL_TEXTURE0);
+        //glBindTexture(GL_TEXTURE_2D, m_cache_texid[0]);
+        //glTexCoordPointer(2, GL_FLOAT, 0, m_cache_textures[0]);
+
+
+        ///glClientActiveTextureARB(GL_TEXTURE1_ARB);
+        //glTexCoordPointer(2, GL_FLOAT, 0, m_cache_textures[1]);
+        //glBindTexture(GL_TEXTURE_2D, m_cache_texid[1]);
+
+        //glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+
+
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // TEX 1
+
+        glActiveTexture(GL_TEXTURE0);
+        glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, m_cache_texid[0]);
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+        //glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
+        //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+        // TEX 2
+        glActiveTexture(GL_TEXTURE1);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, m_cache_texid[1]);
+        //glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
+        //glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
+
+        //glTexEnvf(GL_TEXTURE_ENV, GL_RGBA, GL_MODULATE);
+
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+         glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_INTERPOLATE);   //Interpolate RGB with RGB
+         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_PREVIOUS);
+         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_TEXTURE);
+         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_PREVIOUS);
+         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
+         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB, GL_SRC_COLOR);
+         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB, GL_SRC_ALPHA);
+         //------------------------
+         glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_INTERPOLATE);   //Interpolate ALPHA with ALPHA
+         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA, GL_PREVIOUS);
+         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA, GL_TEXTURE);
+         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_ALPHA, GL_PREVIOUS);
+         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, GL_SRC_ALPHA);
+         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA, GL_SRC_ALPHA);
+         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA, GL_SRC_ALPHA);
+
+        for(int i = 0; i < 2; i++) {
+            glClientActiveTexture(i == 0 ? GL_TEXTURE0 : GL_TEXTURE1);
+            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+            glTexCoordPointer(2, GL_DOUBLE, 0, m_cache_textures[i]);
+        }
     }
 
     if(m_coloring){
         glEnableClientState(GL_COLOR_ARRAY);
         glColorPointer(3, GL_DOUBLE, 0, m_cache_colors);
     }
-    glColor3f(1.0, 1.0, 1.0);
+    //glColor3f(1.0, 1.0, 1.0);
     glDrawElements(GL_TRIANGLES, (width - 1) * (height - 1) * 6, GL_UNSIGNED_INT,
                    m_cache_index);
 
@@ -199,77 +259,44 @@ void Landscape::genTextureIndex() const {
 
         // TEXTURES
         //QImage img = QPixmap(":/images/side1.png").toImage();
-        QImage img = QImage(":/images/grass.png");
-        for(int i = 0; i < img.width(); i++) {
-            for(int j = 0; j < img.height(); j++) {
-                QRgb color = img.pixel(i, j);
+        QString tex_path[] = {"grass.png", "rock.png"};
 
-                int mi = i * ((double) m_generator->width() / img.width());
-                int mj = j * ((double) m_generator->height() / img.height());
+        for(int tex_id = 0; tex_id < 2; tex_id++) {
+            QImage img = QImage(":/images/" + tex_path[tex_id]);
 
-                double h = m_generator->get()[mi][mj];
-                //color.setAlphaF(0.5);
-                double cf = (1 - h);
-                if(cf > 0.7)
-                    cf = 1;
-                else if(cf < 0.3)
-                    cf = 0;
-                color = qRgba(qRed(color), qGreen(color), qBlue(color), (int)(cf * 255));
+            for(int i = 0; i < img.width(); i++) {
+                for(int j = 0; j < img.height(); j++) {
+                    QRgb color = img.pixel(i, j);
 
-                img.setPixel(i, j, color);
+                    int mi = i * ((double) m_generator->width() / img.width());
+                    int mj = j * ((double) m_generator->height() / img.height());
+
+                    double h = m_generator->get()[mi][mj];
+                    double cf = h;
+                    if(tex_id == 0) {
+                        cf = 1 - h;
+                    } else if(tex_id == 1){
+                        cf = h;
+                    } else {
+
+                    }
+
+                    color = qRgba(qRed(color), qGreen(color), qBlue(color), (int)(cf * 255));
+
+                    img.setPixel(i, j, color);
+                }
             }
-        }
 
 
-        m_cache_texid[0] = m_texman->loadTexture(img);
+            m_cache_texid[tex_id] = m_texman->loadTexture(img);
 
-        img = QImage(":/images/rock.png");
-        for(int i = 0; i < img.width(); i++) {
-            for(int j = 0; j < img.height(); j++) {
-                QRgb color = img.pixel(i, j);
+            m_cache_textures[tex_id] = new GLdouble[width * height * 2];
 
-                int mi = i * ((double) m_generator->width() / img.width());
-                int mj = j * ((double) m_generator->height() / img.height());
-
-                double h = m_generator->get()[mi][mj];
-                //color.setAlphaF(0.5);
-                double cf = h;
-
-                color = qRgba(qRed(color), qGreen(color), qBlue(color), (int)(cf * 255));
-
-                img.setPixel(i, j, color);
-            }
-        }
-        m_cache_texid[1] = m_texman->loadTexture(img);
-        //    glAlphaFunc(GL_EQUAL,   0.1f);
-        //    glAlphaFunc(GL_LESS,	1.0f);
-
-        //glBindTexture(GL_TEXTURE_2D, tex);
-
-
-        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 600, 600, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
-        //gluBuild2DMipmaps(GL_TEXTURE_2D, 4, 600, 600, GL_RGBA, GL_UNSIGNED_BYTE, tex);
-        //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
-        m_cache_textures[0] = new GLdouble[width * height * 2];
-
-        for (int i = 0, p = 0; i < height; i++) {
-            for (int j = 0; j < width; j++, p += 2) {
-                m_cache_textures[0][p + 0] = (double) i / height;
-                m_cache_textures[0][p + 1] = (double) j / width;
-            }
-        }
-
-        m_cache_textures[1] = new GLdouble[width * height * 2];
-
-        for (int i = 0, p = 0; i < height; i++) {
-            for (int j = 0; j < width; j++, p += 2) {
-                m_cache_textures[1][p + 0] = (double) i / height;
-                m_cache_textures[1][p + 1] = (double) j / width;
+            for (int i = 0, p = 0; i < height; i++) {
+                for (int j = 0; j < width; j++, p += 2) {
+                    m_cache_textures[tex_id][p + 0] = (double) i / height;
+                    m_cache_textures[tex_id][p + 1] = (double) j / width;
+                }
             }
         }
 
