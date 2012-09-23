@@ -10,12 +10,8 @@ double sqr(double a) {
     return a * a;
 }
 
-SphereGen::SphereGen() {
-    init(1, 1);
-}
-
-SphereGen::SphereGen(int w, int h) {
-    init(w, h);
+SphereGen::SphereGen(int width, int height) {
+    init(width, height);
 }
 
 void SphereGen::_gen() const {
@@ -35,7 +31,7 @@ void SphereGen::_gen() const {
     for(int x = 0; x < height(); x++) {
         for(int y = 0; y < width(); y++) {
             double val = 0;
-            for(int i = 0; i < spheres.size(); i++) {
+            for(uint i = 0; i < spheres.size(); i++) {
                 QVector3D q = spheres[i];
                 double cur = sqr(q.z()) - (sqr(q.x() - y) + sqr(q.y() - x));
                 if(cur > 0)

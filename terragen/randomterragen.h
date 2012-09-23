@@ -5,8 +5,8 @@
 class RandomTerraGen : public TerraGen
 {
 public:
-    RandomTerraGen();
-    RandomTerraGen(int w, int h);
+    //RandomTerraGen();
+    RandomTerraGen(int width=1, int height=1);
 
     virtual ~RandomTerraGen();
     virtual QString name() const;

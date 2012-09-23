@@ -2,12 +2,8 @@
 #include <random>
 
 
-RandomTerraGen::RandomTerraGen() {
-    init(1, 1);
-}
-
-RandomTerraGen::RandomTerraGen(int w, int h) {
-    init(w, h);
+RandomTerraGen::RandomTerraGen(int width, int height) {
+    init(width, height);
 }
 
 RandomTerraGen::~RandomTerraGen() {

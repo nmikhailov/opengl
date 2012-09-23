@@ -6,8 +6,7 @@
 class SphereGen : public TerraGen {
     Q_OBJECT
 public:
-    SphereGen();
-    SphereGen(int w, int h);
+    SphereGen(int width=1, int height=1);
     virtual ~SphereGen() {}
 
     virtual QString name() const {

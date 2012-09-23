@@ -9,8 +9,7 @@
 class TerraGen : public QObject {
     Q_OBJECT
 public:
-    TerraGen();
-    TerraGen(int width, int height);
+    TerraGen(int width=1, int height=1);
     virtual ~TerraGen();
 
     typedef std::vector<std::vector<double> > TTerrain;

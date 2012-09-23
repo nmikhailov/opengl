@@ -1,13 +1,11 @@
 #include "diamondsquaregen.h"
 #include <iostream>
 
+DiamondSquareGen::DiamondSquareGen(int width, int height) {
+    init(width, height);
+}
+
 DiamondSquareGen::~DiamondSquareGen() {
-}
-
-DiamondSquareGen::DiamondSquareGen() {
-}
-
-DiamondSquareGen::DiamondSquareGen(int w, int h) : TerraGen(w, h) {
 }
 
 

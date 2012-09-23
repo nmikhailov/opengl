@@ -7,8 +7,7 @@
 class DiamondSquareGen : public TerraGen {
     Q_OBJECT
 public:
-    DiamondSquareGen();
-    DiamondSquareGen(int w, int h);
+    DiamondSquareGen(int width=1, int height=1);
     virtual ~DiamondSquareGen();
 
     virtual QString name() const {

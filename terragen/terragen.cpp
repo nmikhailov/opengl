@@ -1,9 +1,5 @@
 #include "terragen.h"
 
-TerraGen::TerraGen() {
-    init(1, 1);
-}
-
 TerraGen::TerraGen(int width, int height) {
     init(width, height);
 }
