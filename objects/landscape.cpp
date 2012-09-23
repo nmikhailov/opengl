@@ -5,15 +5,13 @@
 
 #include "landscape.h"
 
-Landscape::Landscape(TextureManager * context, TerraGen *generator, QVector2D res) : GLObject(context){
+Landscape::Landscape(TextureManager * context, TerraGen *generator) : GLObject(context){
     m_generator = generator;
     connect(m_generator, SIGNAL(terrainChanged()), this, SLOT(terrainChanged()));
 
     m_is_cached = false;
     m_is_cached_colors = false;
     m_is_cached_texture = false;
-
-    setResolution(res);
 }
 
 Landscape::~Landscape() {
@@ -55,21 +53,6 @@ void Landscape::setGenerator(TerraGen *generator) {
 
     m_generator = generator;
     m_is_cached = false;
-
-    setResolution(resolution());
-}
-
-QVector2D Landscape::resolution() const {
-    return m_resolution;
-}
-
-void Landscape::setResolution(const QVector2D &res) {
-    if(m_resolution != res) {
-        m_resolution = res;
-        m_generator->setHeight(res.x());
-        m_generator->setWidth(res.y());
-        m_is_cached = false;
-    }
 }
 
 bool Landscape::texturing() const {
@@ -261,6 +244,7 @@ void Landscape::genTextureIndex() const {
 }
 
 void Landscape::terrainChanged() {
+    qDebug() << "changed";
     m_is_cached = false;
 }
 

@@ -11,7 +11,7 @@
 class Landscape : public GLObject {
     Q_OBJECT
 public:
-    Landscape(TextureManager *context,  TerraGen * generator, QVector2D resolution = QVector2D(256, 256));
+    Landscape(TextureManager *context,  TerraGen * generator);
     virtual ~Landscape();
 
     virtual void regenerateTerrain();
@@ -26,15 +26,11 @@ public:
     virtual const TerraGen* generator() const;
     virtual void setGenerator(TerraGen * generator);
 
-    virtual QVector2D resolution() const;
-    virtual void setResolution(const QVector2D &res);
-
     virtual bool texturing() const;
     virtual void setTexturing(bool val);
 private:
     TerraGen * m_generator = nullptr;
     ColoringModel * m_cm = nullptr;
-    QVector2D m_resolution;
 
     bool m_coloring = false;
     bool m_texturing = false;
