@@ -97,67 +97,36 @@ void Landscape::_draw() const {
     glVertexPointer(3, GL_DOUBLE, 0, m_cache_vertex);
 
     if(m_texturing) {
-//        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-//        glTexCoordPointer(2, GL_DOUBLE, 0, m_cache_textures[1]);
-
-//        glBindTexture(GL_TEXTURE_2D, m_cache_texid[1]);
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-        //glClientActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_2D, m_cache_texid[0]);
-        //glTexCoordPointer(2, GL_FLOAT, 0, m_cache_textures[0]);
-
-
-        ///glClientActiveTextureARB(GL_TEXTURE1_ARB);
-        //glTexCoordPointer(2, GL_FLOAT, 0, m_cache_textures[1]);
-        //glBindTexture(GL_TEXTURE_2D, m_cache_texid[1]);
-
-        //glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-
-
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
         // TEX 1
-
         glActiveTexture(GL_TEXTURE0);
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, m_cache_texid[0]);
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-        //glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
-        //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
         // TEX 2
         glActiveTexture(GL_TEXTURE1);
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, m_cache_texid[1]);
-        //glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
-        //glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
-
-        //glTexEnvf(GL_TEXTURE_ENV, GL_RGBA, GL_MODULATE);
 
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
-         glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_INTERPOLATE);   //Interpolate RGB with RGB
-         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_PREVIOUS);
-         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_TEXTURE);
-         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_PREVIOUS);
-         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
-         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB, GL_SRC_COLOR);
-         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB, GL_SRC_ALPHA);
-         //------------------------
-         glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_INTERPOLATE);   //Interpolate ALPHA with ALPHA
-         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA, GL_PREVIOUS);
-         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA, GL_TEXTURE);
-         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_ALPHA, GL_PREVIOUS);
-         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, GL_SRC_ALPHA);
-         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA, GL_SRC_ALPHA);
-         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA, GL_SRC_ALPHA);
+        glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_INTERPOLATE);   //Interpolate RGB with RGB
+        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_PREVIOUS);
+        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_TEXTURE);
+        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_PREVIOUS);
+        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
+        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB, GL_SRC_COLOR);
+        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB, GL_SRC_ALPHA);
+        //------------------------
+        glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_INTERPOLATE);   //Interpolate ALPHA with ALPHA
+        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA, GL_PREVIOUS);
+        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA, GL_TEXTURE);
+        glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_ALPHA, GL_PREVIOUS);
+        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, GL_SRC_ALPHA);
+        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA, GL_SRC_ALPHA);
+        glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA, GL_SRC_ALPHA);
 
         for(int i = 0; i < 2; i++) {
-            glClientActiveTexture(i == 0 ? GL_TEXTURE0 : GL_TEXTURE1);
+            glClientActiveTexture(GL_TEXTURE0 + i);
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glTexCoordPointer(2, GL_DOUBLE, 0, m_cache_textures[i]);
         }
@@ -257,8 +226,6 @@ void Landscape::genTextureIndex() const {
         delete m_cache_textures[1];
         delete m_cache_textures[2];
 
-        // TEXTURES
-        //QImage img = QPixmap(":/images/side1.png").toImage();
         QString tex_path[] = {"grass.png", "rock.png"};
 
         for(int tex_id = 0; tex_id < 2; tex_id++) {
@@ -289,7 +256,6 @@ void Landscape::genTextureIndex() const {
 
 
             m_cache_texid[tex_id] = m_texman->loadTexture(img);
-
             m_cache_textures[tex_id] = new GLdouble[width * height * 2];
 
             for (int i = 0, p = 0; i < height; i++) {
