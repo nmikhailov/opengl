@@ -4,6 +4,12 @@
 DiamondSquareGen::~DiamondSquareGen() {
 }
 
+DiamondSquareGen::DiamondSquareGen() {
+}
+
+DiamondSquareGen::DiamondSquareGen(int w, int h) : TerraGen(w, h) {
+}
+
 
 void DiamondSquareGen::_gen() const {
     std::mt19937 gen;

@@ -62,10 +62,6 @@ void TerraGen::flatter_cross(int n) const {
     static const int dy[] = { 1, -1, 0, 0 };
     static const int dsz = sizeof(dx) / sizeof(int);
 
-    //if(!m_updated)
-    //    generate();
-
-
     TTerrain tmp;
 
     for (int inters = 0; inters < n; inters++) {
@@ -89,10 +85,6 @@ void TerraGen::flatter_cross(int n) const {
 }
 
 void TerraGen::flatter_sqrt(int n) const {
-    //if(!m_updated)
-    //    generate();
-
-
     double sq = 1. / n;
 
     for (int inters = 0; inters < n; inters++) {

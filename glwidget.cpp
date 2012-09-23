@@ -31,6 +31,10 @@ GLWidget::GLWidget(QWidget *parent, QGLWidget *shareWidget)
     m_cmodels.push_back(nullptr);
     m_cmodels.push_back(new HueColoringModel());
     m_cmodels.push_back(new HeightColoringModel());
+
+    m_generators.push_back(new RandomTerraGen(256, 256));
+    m_generators.push_back(new DiamondSquareGen(256, 256));
+    m_generators.push_back(new SphereGen(256, 256));
 }
 
 GLWidget::~GLWidget() {
@@ -57,25 +61,17 @@ void GLWidget::setClearColor(const QColor &color) {
 }
 
 void GLWidget::initializeGL() {
-//    glEnable(GL_CULL_FACE);
-     glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     m_camera = new Camera(QVector3D(0, -1.5, 1.5));
 
-    m_landscape = new Landscape(m_texman, new SphereGen());
-    m_landscape->setColoringModel(new HueColoringModel());
-    //m_landscape->setColoring(true);
+    m_landscape = new Landscape(m_texman, m_generators.back());
+    m_landscape->setColoringModel(m_cmodels.back());
+
     m_landscape->setTexturing(true);
     m_landscape->setScale(QVector3D(1, 1, 0.25));
-
-    //m_landscape = new Landscape(200, 200, new DiamondSquareGen(), QVector3D(1, 1, 2));
-    // m_landscape->enableColoring(new HueColoringModel());
-    //m_landscape->enableColoring(new HeightColorModel());
-    //m_landscape->setPosition(QVector3D(0, 0, -0.5));
-    // m_landscape->setScale(QVector3D(1.5, 1.5, 1));
 }
 
 QString GLWidget::getStatus() const {
@@ -147,7 +143,10 @@ void GLWidget::keyPressEvent(QKeyEvent * event) {
         m_cmodels.pop_front();
 
     } else if(event->key() == Qt::Key_G) {
-        //m_landscape->
+        m_landscape->setGenerator(m_generators.front());
+
+        m_generators.push_back(m_generators.front());
+        m_generators.pop_front();
     } else if(event->key() == Qt::Key_Escape) {
         QApplication::exit();
     }

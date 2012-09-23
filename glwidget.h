@@ -43,6 +43,8 @@ private:
     Camera *m_camera;
 
     std::deque<ColoringModel*> m_cmodels;
+    std::deque<TerraGen*> m_generators;
+
     TextureManager *m_texman;
     QColor clearColor;
     QPoint lastPos;
