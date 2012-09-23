@@ -48,6 +48,8 @@ private:
     mutable GLdouble * m_cache_textures[3] = {nullptr, nullptr, nullptr};
 
     mutable GLuint m_cache_texid[3] = {0, 0, 0};
+
+    std::vector<QString> m_texfiles = {"grass.png", "rock.png", "ice.png"};
 protected:
     virtual void _draw() const;
 

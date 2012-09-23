@@ -97,7 +97,7 @@ void Landscape::_draw() const {
     glVertexPointer(3, GL_DOUBLE, 0, m_cache_vertex);
 
     if(m_texturing) {
-        for(int i = 0; i < 3; i++) {
+        for(size_t i = 0; i < m_texfiles.size(); i++) {
             glActiveTexture(GL_TEXTURE0 + i);
             glEnable(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D, m_cache_texid[i]);
@@ -109,10 +109,15 @@ void Landscape::_draw() const {
         }
 
 
-        for(int i = 0; i < 3; i++) {
+        for(size_t i = 0; i < m_texfiles.size(); i++) {
             glClientActiveTexture(GL_TEXTURE0 + i);
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glTexCoordPointer(2, GL_DOUBLE, 0, m_cache_textures[i]);
+        }
+    } else {
+        for(size_t i = 0; i < m_texfiles.size(); i++) {
+            glActiveTexture(GL_TEXTURE0 + i);
+            glBindTexture(GL_TEXTURE_2D, 0);
         }
     }
 
@@ -210,10 +215,8 @@ void Landscape::genTextureIndex() const {
         delete m_cache_textures[1];
         delete m_cache_textures[2];
 
-        QString tex_path[] = {"grass.png", "rock.png", "ice.png"};
-
-        for(int tex_id = 0; tex_id < 3; tex_id++) {
-            QImage img = QImage(":/images/" + tex_path[tex_id]);
+        for(size_t tex_id = 0; tex_id < m_texfiles.size(); tex_id++) {
+            QImage img = QImage(":/images/" + m_texfiles[tex_id]);
 
             for(int i = 0; i < img.width(); i++) {
                 for(int j = 0; j < img.height(); j++) {
