@@ -4,8 +4,8 @@
 #include <QString>
 #include "terragen.h"
 
-class DiamondSquareGen : public TerraGen
-{
+class DiamondSquareGen : public TerraGen {
+    Q_OBJECT
 public:
     virtual ~DiamondSquareGen();
 

@@ -10,6 +10,7 @@
 #include "glwidget.h"
 #include "terragen/randomterragen.h"
 #include "terragen/diamondsquaregen.h"
+#include "terragen/spheregen.h"
 
 GLWidget::GLWidget(QWidget *parent, QGLWidget *shareWidget)
     : QGLWidget(parent, shareWidget) {
@@ -57,17 +58,18 @@ void GLWidget::setClearColor(const QColor &color) {
 
 void GLWidget::initializeGL() {
 //    glEnable(GL_CULL_FACE);
+     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_DEPTH_TEST);
 
     m_camera = new Camera(QVector3D(0, -1.5, 1.5));
 
-    m_landscape = new Landscape(m_texman, new RandomTerraGen());
+    m_landscape = new Landscape(m_texman, new SphereGen());
     m_landscape->setColoringModel(new HueColoringModel());
     //m_landscape->setColoring(true);
     m_landscape->setTexturing(true);
+    m_landscape->setScale(QVector3D(1, 1, 0.25));
 
     //m_landscape = new Landscape(200, 200, new DiamondSquareGen(), QVector3D(1, 1, 2));
     // m_landscape->enableColoring(new HueColoringModel());

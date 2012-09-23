@@ -6,9 +6,8 @@
         <file>images/side4.png</file>
         <file>images/side5.png</file>
         <file>images/side6.png</file>
-        <file>images/363_tile_Grass.jpg</file>
         <file>images/grass.png</file>
-        <file>images/ice.png</file>
         <file>images/rock.png</file>
+        <file>images/ice.png</file>
     </qresource>
 </RCC>

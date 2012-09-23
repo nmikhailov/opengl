@@ -45,7 +45,7 @@ RESOURCES += \
 
 
 
-ParentDirectory = "/tmp/qt/lab_02"
+ParentDirectory = "/tmp/qt/lab_22"
 
 RCC_DIR = "$$ParentDirectory/Build/RCCFiles"
 UI_DIR = "$$ParentDirectory/Build/UICFiles"

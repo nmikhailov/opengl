@@ -15,8 +15,8 @@ void DiamondSquareGen::_gen() const {
     m_terrain[height() - 1][width() - 1] = 0;
     fn(0, width() - 1, 0, height() - 1, 10);
 
-    flatter_sqrt(2);
-    flatter_cross(15);
+    //flatter_sqrt(2);
+    flatter_cross(20);
 
     normalize();
 }
@@ -36,17 +36,15 @@ void DiamondSquareGen::fn(int l, int r, int b, int t, int iter) const {
     int midX = (t + b) / 2;
     int midY = (l + r) / 2;
 
-    m_terrain[midX][l] = (A + C) / 2. + rand() % (abs(r - l)) / (double)(100. * width());
-    m_terrain[midX][r] = (B + D) / 2. + rand() % (abs(r - l)) / (double)(100. * width());
+    m_terrain[midX][l] = (A + C) / 2.;
+    m_terrain[midX][r] = (B + D) / 2.;
 
-    m_terrain[t][midY] = (A + B) / 2. + rand() % (abs(r - l)) / (double)(100. * width());
-    m_terrain[b][midY] = (C + D) / 2. + rand() % (abs(r - l)) / (double)(100. * width());
+    m_terrain[t][midY] = (A + B) / 2.;
+    m_terrain[b][midY] = (C + D) / 2.;
 
 
-    double ad = rand() % (abs(r - l)) / (double)(500. * width());
+    double ad = rand() % (abs(r - l));
 
-    std::cout << "in " << ad << std::endl;
-    std::cout.flush();
 
     m_terrain[midX][midY] = (A + B + C + D) / 4. + ad;
 
