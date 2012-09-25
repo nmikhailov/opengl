@@ -78,7 +78,7 @@ void GLWidget::initializeGL() {
     m_landscape->setScale(QVector3D(1, 1, 0.25));
 
     m_model = new ObjModel("/home/nsl/Study/s07/graphics/qt_labs/Lab_02/models/f-16.obj", m_texman);
-    m_model->setPosition(QVector3D(0, 1, 0));
+    m_model->setPosition(QVector3D(0, 0, 0));
     m_model->setRotation(QVector3D(90, 0, 0));
 }
 
@@ -128,7 +128,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event) {
 
     if (event->buttons() & Qt::LeftButton) {
         m_landscape->rotateBy(0.5 * dy, 0.5 * dx, 0);
-        m_model->rotateBy(0.5 * dy, 0.5 * dx, 0);
+        m_model->rotateBy(0.5 * dy, 0, -0.5 * dx);
         updateGL();
     }
 

@@ -13,8 +13,6 @@ public:
     explicit ObjModel(const char* filename, TextureManager* context);
     ~ObjModel();
 
-    virtual void draw() const;
-
 protected:
     virtual void _draw() const;
 
