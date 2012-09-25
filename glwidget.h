@@ -9,6 +9,8 @@
 #include "objects/landscape.h"
 #include "texturemanager.h"
 
+class Model;
+
 class GLWidget : public QGLWidget
 {
     Q_OBJECT
@@ -58,6 +60,7 @@ private:
     QString m_status;
 
     Landscape* m_landscape;
+    Model* m_model;
 };
 
 #endif

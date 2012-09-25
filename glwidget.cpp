@@ -11,6 +11,7 @@
 #include "terragen/randomterragen.h"
 #include "terragen/diamondsquaregen.h"
 #include "terragen/spheregen.h"
+#include "model/objmodel.h"
 
 GLWidget::GLWidget(QWidget *parent, QGLWidget *shareWidget)
     : QGLWidget(parent, shareWidget) {
@@ -38,6 +39,9 @@ GLWidget::GLWidget(QWidget *parent, QGLWidget *shareWidget)
 }
 
 GLWidget::~GLWidget() {
+    delete m_camera;
+    delete m_landscape;
+    delete m_model;
 }
 
 QSize GLWidget::minimumSizeHint() const {
@@ -65,13 +69,17 @@ void GLWidget::initializeGL() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
 
-    m_camera = new Camera(QVector3D(0, -1.5, 1.5));
+    m_camera = new Camera(QVector3D(1, -2, 2));
 
     m_landscape = new Landscape(m_texman, m_generators.back());
     m_landscape->setColoringModel(m_cmodels.back());
 
     m_landscape->setTexturing(true);
     m_landscape->setScale(QVector3D(1, 1, 0.25));
+
+    m_model = new ObjModel("/home/zaquest/projects/cgi/opengl/models/f-16.obj", m_texman);
+    m_model->setPosition(QVector3D(0, 1, 0));
+    m_model->setRotation(QVector3D(90, 0, 0));
 }
 
 QString GLWidget::getStatus() const {
@@ -97,6 +105,7 @@ void GLWidget::paintGL() {
     m_status = getStatus();
 
     m_landscape->draw();
+    m_model->draw();
 
     renderText(0, 10, m_status);
 }
@@ -119,8 +128,10 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event) {
 
     if (event->buttons() & Qt::LeftButton) {
         m_landscape->rotateBy(0.5 * dy, 0.5 * dx, 0);
+        m_model->rotateBy(0.5 * dy, 0.5 * dx, 0);
         updateGL();
     }
+
     lastPos = event->pos();
 }
 
@@ -168,5 +179,6 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
 
 void GLWidget::rotateOneStep() {
     m_landscape->rotateBy(0, 0, 0.1);
+    m_model->rotateBy(0, 0.1, 0);
     updateGL();
 }

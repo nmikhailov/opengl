@@ -24,7 +24,10 @@ SOURCES += main.cpp\
     terragen/diamondsquaregen.cpp \
     terragen/spheregen.cpp \
     texturemanager.cpp \
-    objects/camera.cpp
+    objects/camera.cpp \
+    model/model.cpp \
+    model/objmodel.cpp \
+    model/glm.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
@@ -36,7 +39,10 @@ HEADERS  += mainwindow.h \
     terragen/diamondsquaregen.h \
     terragen/spheregen.h \
     texturemanager.h \
-    objects/camera.h
+    objects/camera.h \
+    model/model.h \
+    model/objmodel.h \
+    model/glm.h
 
 FORMS    += mainwindow.ui
 
