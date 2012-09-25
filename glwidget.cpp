@@ -65,13 +65,13 @@ void GLWidget::initializeGL() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
 
-    m_camera = new Camera(QVector3D(0, -1.5, 1.5));
+    m_camera = new Camera(QVector3D(0, 1.5, -1.5));
 
     m_landscape = new Landscape(m_texman, m_generators.back());
     m_landscape->setColoringModel(m_cmodels.back());
 
     m_landscape->setTexturing(true);
-    m_landscape->setScale(QVector3D(1, 1, 0.25));
+    m_landscape->setScale(QVector3D(1, 0.25, 1));
 }
 
 QString GLWidget::getStatus() const {
@@ -118,7 +118,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event) {
     int dy = event->y() - lastPos.y();
 
     if (event->buttons() & Qt::LeftButton) {
-        m_landscape->rotateBy(0.5 * dy, 0.5 * dx, 0);
+        m_landscape->rotateBy(-0.5 * dy, 0, 0.5 * dx);
         updateGL();
     }
     lastPos = event->pos();
@@ -167,6 +167,6 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
 }
 
 void GLWidget::rotateOneStep() {
-    m_landscape->rotateBy(0, 0, 0.1);
+    m_landscape->rotateBy(0, 0.1, 0);
     updateGL();
 }

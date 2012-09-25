@@ -147,9 +147,9 @@ GLdouble* Landscape::genVertexes() const {
             double ex = (j - height / 2.) / height;
             double ey = (i - width / 2.) / width;
 
-            m_cache_vertex[p + 0] = ey;
-            m_cache_vertex[p + 1] = ex;
-            m_cache_vertex[p + 2] = terr[i][j] - 0.5;
+            m_cache_vertex[p + 0] = ex;
+            m_cache_vertex[p + 1] = terr[i][j] - 0.5;
+            m_cache_vertex[p + 2] = ey;
         }
     }
 
