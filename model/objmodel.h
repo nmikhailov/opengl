@@ -10,7 +10,7 @@ class ObjModel : public Model {
     Q_OBJECT
 
 public:
-    explicit ObjModel(char* filename, TextureManager* context);
+    explicit ObjModel(const char* filename, TextureManager* context);
     ~ObjModel();
 
     virtual void draw() const;

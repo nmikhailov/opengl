@@ -159,7 +159,7 @@ duplicate:
 
 /* glmFindGroup: Find a group in the model */
 GLMgroup*
-glmFindGroup(GLMmodel* model, char* name)
+glmFindGroup(GLMmodel* model, const char* name)
 {
     GLMgroup* group;
     
@@ -177,7 +177,7 @@ glmFindGroup(GLMmodel* model, char* name)
 
 /* glmAddGroup: Add a group to the model */
 GLMgroup*
-glmAddGroup(GLMmodel* model, char* name)
+glmAddGroup(GLMmodel* model, const char* name)
 {
     GLMgroup* group;
     
@@ -1303,7 +1303,7 @@ glmDelete(GLMmodel* model)
  * filename - name of the file containing the Wavefront .OBJ format data.  
  */
 GLMmodel* 
-glmReadOBJ(char* filename)
+glmReadOBJ(const char* filename)
 {
     GLMmodel* model;
     FILE* file;

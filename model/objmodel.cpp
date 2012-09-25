@@ -2,7 +2,7 @@
 
 #include "objmodel.h"
 
-ObjModel::ObjModel(char* filename, TextureManager* context)
+ObjModel::ObjModel(const char* filename, TextureManager* context)
         : Model(context) {
     m_model = glmReadOBJ(filename);
     // TODO: check if successfully loaded

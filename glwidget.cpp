@@ -77,7 +77,7 @@ void GLWidget::initializeGL() {
     m_landscape->setTexturing(true);
     m_landscape->setScale(QVector3D(1, 1, 0.25));
 
-    m_model = new ObjModel("/home/zaquest/projects/cgi/opengl/models/f-16.obj", m_texman);
+    m_model = new ObjModel("/home/nsl/Study/s07/graphics/qt_labs/Lab_02/models/f-16.obj", m_texman);
     m_model->setPosition(QVector3D(0, 1, 0));
     m_model->setRotation(QVector3D(90, 0, 0));
 }
