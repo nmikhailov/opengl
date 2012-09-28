@@ -7,7 +7,7 @@
 #include <QGLWidget>
 #include <QGLShaderProgram>
 
-#include "objects/camera.h"
+#include "camera/lookatcamera.h"
 #include "objects/landscape.h"
 #include "texturemanager.h"
 
@@ -33,7 +33,6 @@ private slots:
 protected:
     void initializeGL();
     void paintGL();
-    void resizeGL(int width, int height);
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
@@ -44,7 +43,7 @@ protected:
     void nextTerraGen();
 
 private:
-    Camera *m_camera;
+    LookAtCamera *m_camera;
 
     std::deque<ColoringModel*> m_cmodels;
     std::deque<TerraGen*> m_generators;

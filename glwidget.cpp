@@ -57,7 +57,8 @@ void GLWidget::initializeGL() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
 
-    m_camera = new Camera(QVector3D(0, 1.5, -1.5));
+    m_camera = new LookAtCamera(m_msm);
+    m_camera->setPosition(QVector3D(0, 1.5, -1.5));
 
     m_landscape = new Landscape(m_texman, m_msm, m_generators.back());
     m_landscape->setColoringModel(m_cmodels.back());
@@ -85,21 +86,14 @@ void GLWidget::paintGL() {
     qglClearColor(m_clear_color);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    m_camera->apply();
-    m_status = getStatus();
+    m_msm->clear();
+    m_msm->setPerspective((double)width() / height());
 
+    m_camera->apply();
 
     m_landscape->draw();
 
-    renderText(0, 10, m_status);
-}
-
-void GLWidget::resizeGL(int width, int height) {
-    int w = width, h = height;
-    double ar = (double) w / (double) h;
-
-    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
-    m_camera->setAspectRatio(ar);
+    renderText(0, 10, getStatus());
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {

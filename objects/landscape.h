@@ -4,11 +4,11 @@
 #include <QVector2D>
 #include <QtOpenGL>
 
-#include "globject.h"
+#include "texturedglobject.h"
 #include "coloring/coloringmodel.h"
 #include "terragen/randomterragen.h"
 
-class Landscape : public GLObject {
+class Landscape : public TexturedGLObject {
     Q_OBJECT
 
     struct Geometry {

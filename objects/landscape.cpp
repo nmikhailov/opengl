@@ -6,7 +6,7 @@
 #include "landscape.h"
 
 Landscape::Landscape(TextureManager * context, MatrixStackManager *msm, TerraGen *generator)
-    : GLObject(context, msm) {
+    : TexturedGLObject(context, msm) {
     m_generator = generator;
     connect(m_generator, SIGNAL(terrainChanged()), this, SLOT(terrainChanged()));
 

@@ -2,11 +2,10 @@
 #include "globject.h"
 
 
-GLObject::GLObject(TextureManager *context, MatrixStackManager * ms_manager) {
+GLObject::GLObject(MatrixStackManager * ms_manager) {
     m_position = QVector3D(0, 0, 0);
     m_scale = QVector3D(1, 1, 1);
     m_rotation = QVector3D(0, 0, 0);
-    m_texman = context;
     m_msmanager = ms_manager;
 }
 
