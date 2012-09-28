@@ -1,16 +1,17 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
+#include <deque>
+
 #include <QtGui>
 #include <QGLWidget>
-#include <deque>
+#include <QGLShaderProgram>
 
 #include "objects/camera.h"
 #include "objects/landscape.h"
 #include "texturemanager.h"
 
-class GLWidget : public QGLWidget
-{
+class GLWidget : public QGLWidget {
     Q_OBJECT
 
 public:
@@ -49,15 +50,15 @@ private:
     std::deque<TerraGen*> m_generators;
 
     TextureManager *m_texman;
-    QColor clearColor;
-    QPoint lastPos;
-    int xRot;
-    int yRot;
-    int zRot;
+    QColor m_clear_color;
+    QPoint m_last_mouse_pos;
 
     QString m_status;
 
     Landscape* m_landscape;
+    MatrixStackManager * m_msm;
+
+    QGLShaderProgram * m_sh_program;
 };
 
 #endif

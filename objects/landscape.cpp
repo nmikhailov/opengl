@@ -5,7 +5,8 @@
 
 #include "landscape.h"
 
-Landscape::Landscape(TextureManager * context, TerraGen *generator) : GLObject(context){
+Landscape::Landscape(TextureManager * context, MatrixStackManager *msm, TerraGen *generator)
+    : GLObject(context, msm) {
     m_generator = generator;
     connect(m_generator, SIGNAL(terrainChanged()), this, SLOT(terrainChanged()));
 
@@ -16,7 +17,6 @@ Landscape::Landscape(TextureManager * context, TerraGen *generator) : GLObject(c
 }
 
 Landscape::~Landscape() {
-//    delete m_cm;
     delete m_cache_vertex;
     delete m_cache_index;
     delete m_cache_colors;
@@ -38,8 +38,6 @@ void Landscape::setColoring(bool val) {
 }
 
 void Landscape::setColoringModel(ColoringModel *cm) {
-  //  delete m_cm;
-
     m_cm = cm;
     m_is_cached_colors = false;
 }

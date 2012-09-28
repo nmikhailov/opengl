@@ -18,7 +18,7 @@ class Landscape : public GLObject {
         Geometry(GLdouble* vs, GLuint* ts) : vertexes(vs), triangles(ts) {}
     };
 public:
-    Landscape(TextureManager *context,  TerraGen * generator);
+    Landscape(TextureManager *context,  MatrixStackManager * msm, TerraGen * generator);
     virtual ~Landscape();
 
     virtual void regenerateTerrain();

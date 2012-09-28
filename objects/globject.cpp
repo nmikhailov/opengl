@@ -2,11 +2,12 @@
 #include "globject.h"
 
 
-GLObject::GLObject(TextureManager *context) {
+GLObject::GLObject(TextureManager *context, MatrixStackManager * ms_manager) {
     m_position = QVector3D(0, 0, 0);
     m_scale = QVector3D(1, 1, 1);
     m_rotation = QVector3D(0, 0, 0);
     m_texman = context;
+    m_msmanager = ms_manager;
 }
 
 GLObject::~GLObject() {
@@ -15,17 +16,20 @@ GLObject::~GLObject() {
 void GLObject::draw() const {
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    glPushMatrix();
-    glTranslated(m_position.x(), m_position.y(), m_position.z());
 
-    glRotated(m_rotation.x(), 1, 0, 0);
-    glRotated(m_rotation.y(), 0, 1, 0);
-    glRotated(m_rotation.z(), 0, 0, 1);
+    m_msmanager->push();
+    m_msmanager->top().translate(m_position.x(), m_position.y(), m_position.z());
 
-    glScaled(m_scale.x(), m_scale.y(), m_scale.z());
+    m_msmanager->top().rotate(m_rotation.x(), 1, 0, 0);
+    m_msmanager->top().rotate(m_rotation.y(), 0, 1, 0);
+    m_msmanager->top().rotate(m_rotation.z(), 0, 0, 1);
 
+    m_msmanager->top().scale(m_scale.x(), m_scale.y(), m_scale.z());
+
+    m_msmanager->apply();
     _draw();
-    glPopMatrix();
+
+    m_msmanager->pop();
 }
 
 

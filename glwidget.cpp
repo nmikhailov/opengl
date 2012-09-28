@@ -14,12 +14,11 @@
 
 GLWidget::GLWidget(QWidget *parent, QGLWidget *shareWidget)
     : QGLWidget(parent, shareWidget) {
-    clearColor = Qt::black;
-    xRot = 0;
-    yRot = 0;
-    zRot = 0;
+    m_clear_color = Qt::black;
 
+    m_sh_program = new QGLShaderProgram(context());
     m_texman = new TextureManager(this);
+    m_msm = new MatrixStackManager(m_sh_program);
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
@@ -48,15 +47,8 @@ QSize GLWidget::sizeHint() const {
     return QSize(200, 200);
 }
 
-void GLWidget::rotateBy(int xAngle, int yAngle, int zAngle) {
-    xRot += xAngle;
-    yRot += yAngle;
-    zRot += zAngle;
-    updateGL();
-}
-
 void GLWidget::setClearColor(const QColor &color) {
-    clearColor = color;
+    m_clear_color = color;
     updateGL();
 }
 
@@ -67,7 +59,7 @@ void GLWidget::initializeGL() {
 
     m_camera = new Camera(QVector3D(0, 1.5, -1.5));
 
-    m_landscape = new Landscape(m_texman, m_generators.back());
+    m_landscape = new Landscape(m_texman, m_msm, m_generators.back());
     m_landscape->setColoringModel(m_cmodels.back());
 
     m_landscape->setTexturing(true);
@@ -90,11 +82,12 @@ QString GLWidget::getStatus() const {
 }
 
 void GLWidget::paintGL() {
-    qglClearColor(clearColor);
+    qglClearColor(m_clear_color);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_camera->apply();
     m_status = getStatus();
+
 
     m_landscape->draw();
 
@@ -110,18 +103,18 @@ void GLWidget::resizeGL(int width, int height) {
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {
-    lastPos = event->pos();
+    m_last_mouse_pos = event->pos();
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event) {
-    int dx = event->x() - lastPos.x();
-    int dy = event->y() - lastPos.y();
+    int dx = event->x() - m_last_mouse_pos.x();
+    int dy = event->y() - m_last_mouse_pos.y();
 
     if (event->buttons() & Qt::LeftButton) {
         m_landscape->rotateBy(-0.5 * dy, 0, 0.5 * dx);
         updateGL();
     }
-    lastPos = event->pos();
+    m_last_mouse_pos = event->pos();
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent * /* event */) {
@@ -149,10 +142,18 @@ void GLWidget::nextTerraGen() {
 
 void GLWidget::keyPressEvent(QKeyEvent * event) {
     switch (event->key()) {
-    case Qt::Key_T: m_landscape->setTexturing(!m_landscape->texturing()); break;
-    case Qt::Key_C: nextColoring(); break;
-    case Qt::Key_G: nextTerraGen(); break;
-    case Qt::Key_Escape: QApplication::exit(); break;
+    case Qt::Key_T:
+        m_landscape->setTexturing(!m_landscape->texturing());
+        break;
+    case Qt::Key_C:
+        nextColoring();
+        break;
+    case Qt::Key_G:
+        nextTerraGen();
+        break;
+    case Qt::Key_Escape:
+        QApplication::exit();
+        break;
     };
 
     updateGL();

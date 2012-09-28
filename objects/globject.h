@@ -6,11 +6,12 @@
 #include <QObject>
 
 #include "texturemanager.h"
+#include "matrixstackmanager.h"
 
 class GLObject : public QObject {
     Q_OBJECT
 public:
-    GLObject(TextureManager * context);
+    GLObject(TextureManager * context, MatrixStackManager * ms_manager);
     virtual ~GLObject();
 
     virtual void draw() const;
@@ -29,6 +30,7 @@ public:
 protected:
     QVector3D m_position, m_rotation, m_scale;
     TextureManager * m_texman;
+    MatrixStackManager * m_msmanager;
 
     virtual void _draw() const = 0;
 };
