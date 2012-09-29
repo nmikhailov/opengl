@@ -2,33 +2,32 @@
 #include "globject.h"
 
 
-GLObject::GLObject(MatrixStackManager * ms_manager) {
+GLObject::GLObject(ContextManager * context) {
     m_position = QVector3D(0, 0, 0);
     m_scale = QVector3D(1, 1, 1);
     m_rotation = QVector3D(0, 0, 0);
-    m_msmanager = ms_manager;
+    m_context = context;
 }
 
 GLObject::~GLObject() {
 }
 
 void GLObject::draw() const {
-    glBindTexture(GL_TEXTURE_2D, 0);
+    MatrixStackManager * msm = m_context->matrixStackManager();
 
+    msm->push();
+    msm->top().translate(m_position.x(), m_position.y(), m_position.z());
 
-    m_msmanager->push();
-    m_msmanager->top().translate(m_position.x(), m_position.y(), m_position.z());
+    msm->top().rotate(m_rotation.x(), 1, 0, 0);
+    msm->top().rotate(m_rotation.y(), 0, 1, 0);
+    msm->top().rotate(m_rotation.z(), 0, 0, 1);
 
-    m_msmanager->top().rotate(m_rotation.x(), 1, 0, 0);
-    m_msmanager->top().rotate(m_rotation.y(), 0, 1, 0);
-    m_msmanager->top().rotate(m_rotation.z(), 0, 0, 1);
+    msm->top().scale(m_scale.x(), m_scale.y(), m_scale.z());
 
-    m_msmanager->top().scale(m_scale.x(), m_scale.y(), m_scale.z());
-
-    m_msmanager->apply();
+    msm->apply();
     _draw();
 
-    m_msmanager->pop();
+    msm->pop();
 }
 
 

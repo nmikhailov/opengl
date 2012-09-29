@@ -40,10 +40,11 @@ void MatrixStackManager::apply() {
         res *= m;
     }
     // opengl 1
-    glLoadIdentity();
-    glMultMatrixd(res.constData());
+    //glLoadIdentity();
+    //glMultMatrixd(res.constData());
     // opengl (3.3+, ES 2)
     // pass to shader
+    m_sh_program->setUniformValue("proj", res);
 }
 
 void MatrixStackManager::clear() {
@@ -52,8 +53,8 @@ void MatrixStackManager::clear() {
 
     m_projection = Matrix();
     // opengl 1
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    //glMatrixMode(GL_PROJECTION);
+    //glLoadIdentity();
+    //glMatrixMode(GL_MODELVIEW);
+    //glLoadIdentity();
 }

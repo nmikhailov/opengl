@@ -1,14 +1,28 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
-{
-    ui->setupUi(this);
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+    if (objectName().isEmpty())
+        setObjectName("MainWindow");
+
+    resize(800, 800);
+
+    QGLFormat glFormat;
+    glFormat.setVersion(3, 3);
+    glFormat.setProfile(QGLFormat::CoreProfile);
+    glFormat.setSampleBuffers(true);
+
+
+    m_context = new QGLContext(glFormat);
+    m_widget = new GLWidget(m_context, this);
+    m_widget->setObjectName("centralWidget");
+    setCentralWidget(m_widget);
+
+    setWindowTitle("GL_HW");
+
+    QMetaObject::connectSlotsByName(this);
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
+MainWindow::~MainWindow() {
+    delete m_context;
+    delete m_widget;
 }

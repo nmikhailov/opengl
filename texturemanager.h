@@ -1,18 +1,19 @@
 #ifndef TEXTUREMANAGER_H
 #define TEXTUREMANAGER_H
 
-#include <QGLWidget>
+#include <QGLContext>
 #include <QtOpenGL>
 
 class TextureManager {
 public:
-    TextureManager(QGLWidget * widget);
+    TextureManager(QGLContext * context);
     virtual ~TextureManager();
 
     GLuint loadTexture(const QImage & img);
     void unloadTexture(GLuint id);
+
 private:
-    QGLWidget * m_widget;
+    QGLContext * m_context;
 };
 
 #endif // TEXTUREMANAGER_H

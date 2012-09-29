@@ -7,6 +7,7 @@
 QT       += core gui opengl
 LIBS    += -lGLU
 QMAKE_CXXFLAGS += -std=c++11
+DEFINES += GL_GLEXT_PROTOTYPES
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -26,8 +27,8 @@ SOURCES += main.cpp\
     texturemanager.cpp \
     matrixstackmanager.cpp \
     camera/lookatcamera.cpp \
-    objects/texturedglobject.cpp \
-    camera/camera.cpp
+    camera/camera.cpp \
+    contextmanager.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
@@ -41,17 +42,18 @@ HEADERS  += mainwindow.h \
     texturemanager.h \
     matrixstackmanager.h \
     camera/lookatcamera.h \
-    objects/texturedglobject.h \
-    camera/camera.h
+    camera/camera.h \
+    contextmanager.h
 
-FORMS    += mainwindow.ui
+FORMS    +=
 
 RESOURCES += \
-    resources.qrc
+    resources.qrc \
+    shaders.qrc
 
 
 
-ParentDirectory = "/tmp/qt/lab_22"
+ParentDirectory = "/tmp/qt/lab_02"
 
 RCC_DIR = "$$ParentDirectory/Build/RCCFiles"
 UI_DIR = "$$ParentDirectory/Build/UICFiles"
@@ -64,4 +66,8 @@ CONFIG(debug, debug|release) {
 CONFIG(release, debug|release) {
     DESTDIR = "$$ParentDirectory/release"
 }
+
+OTHER_FILES += \
+    shaders/f_main.frag \
+    shaders/v_main.vert
 

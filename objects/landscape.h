@@ -4,21 +4,14 @@
 #include <QVector2D>
 #include <QtOpenGL>
 
-#include "texturedglobject.h"
+#include "globject.h"
 #include "coloring/coloringmodel.h"
 #include "terragen/randomterragen.h"
 
-class Landscape : public TexturedGLObject {
+class Landscape : public GLObject {
     Q_OBJECT
-
-    struct Geometry {
-        GLdouble* vertexes;
-        GLuint* triangles;
-
-        Geometry(GLdouble* vs, GLuint* ts) : vertexes(vs), triangles(ts) {}
-    };
 public:
-    Landscape(TextureManager *context,  MatrixStackManager * msm, TerraGen * generator);
+    Landscape(ContextManager *context, TerraGen * generator);
     virtual ~Landscape();
 
     virtual void regenerateTerrain();
@@ -61,10 +54,9 @@ private:
 protected:
     virtual void _draw() const;
 
-    virtual GLdouble* genVertexes() const;
-    virtual GLuint* genTriangles() const;
-    virtual Geometry genGeometry() const;
-    virtual GLdouble* genColorsIndex() const;
+    virtual void genVertexes() const;
+    virtual void genTriangles() const;
+    virtual void genColorsIndex() const;
     virtual void genTextureIndex() const;
 
 public slots:

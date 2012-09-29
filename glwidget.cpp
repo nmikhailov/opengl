@@ -12,13 +12,11 @@
 #include "terragen/diamondsquaregen.h"
 #include "terragen/spheregen.h"
 
-GLWidget::GLWidget(QWidget *parent, QGLWidget *shareWidget)
-    : QGLWidget(parent, shareWidget) {
+GLWidget::GLWidget(QGLContext* context, QWidget *parent, QGLWidget *shareWidget)
+    : QGLWidget(context, parent, shareWidget) {
     m_clear_color = Qt::black;
 
-    m_sh_program = new QGLShaderProgram(context());
-    m_texman = new TextureManager(this);
-    m_msm = new MatrixStackManager(m_sh_program);
+    initContextManager(context);
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
@@ -53,14 +51,15 @@ void GLWidget::setClearColor(const QColor &color) {
 }
 
 void GLWidget::initializeGL() {
+    loadShaders();
     // glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_TEXTURE_2D);
+    //glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_TEXTURE_2D);
 
     m_camera = new LookAtCamera(m_msm);
     m_camera->setPosition(QVector3D(0, 1.5, -1.5));
 
-    m_landscape = new Landscape(m_texman, m_msm, m_generators.back());
+    m_landscape = new Landscape(m_context, m_generators.back());
     m_landscape->setColoringModel(m_cmodels.back());
 
     m_landscape->setTexturing(true);
@@ -93,7 +92,7 @@ void GLWidget::paintGL() {
 
     m_landscape->draw();
 
-    renderText(0, 10, getStatus());
+    //renderText(0, 10, getStatus());
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {
@@ -134,6 +133,15 @@ void GLWidget::nextTerraGen() {
     m_generators.pop_front();
 }
 
+void GLWidget::loadShaders() {
+    QString prefix = ":/s/shaders/";
+    m_sh_program->addShaderFromSourceFile(QGLShader::Vertex, prefix + "v_main.vert");
+    m_sh_program->addShaderFromSourceFile(QGLShader::Fragment, prefix + "f_main.frag");
+
+    m_sh_program->link();
+    m_sh_program->bind();
+}
+
 void GLWidget::keyPressEvent(QKeyEvent * event) {
     switch (event->key()) {
     case Qt::Key_T:
@@ -164,4 +172,16 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
 void GLWidget::rotateOneStep() {
     m_landscape->rotateBy(0, 0.1, 0);
     updateGL();
+}
+
+void GLWidget::initContextManager(QGLContext *context) {
+    m_context = new ContextManager(context);
+
+    m_sh_program = new QGLShaderProgram(context);
+    m_texman = new TextureManager(context);
+    m_msm = new MatrixStackManager(m_sh_program);
+
+    m_context->setMatrixStackManager(m_msm);
+    m_context->setTextureManager(m_texman);
+    m_context->setShaderProgram(m_sh_program);
 }

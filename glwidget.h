@@ -10,12 +10,13 @@
 #include "camera/lookatcamera.h"
 #include "objects/landscape.h"
 #include "texturemanager.h"
+#include "contextmanager.h"
 
 class GLWidget : public QGLWidget {
     Q_OBJECT
 
 public:
-    GLWidget(QWidget *parent = 0, QGLWidget *shareWidget = 0);
+    GLWidget(QGLContext *context, QWidget *parent = 0, QGLWidget *shareWidget = 0);
     ~GLWidget();
 
     QSize minimumSizeHint() const;
@@ -31,6 +32,7 @@ private slots:
     void rotateOneStep();
 
 protected:
+    void initContextManager(QGLContext * context);
     void initializeGL();
     void paintGL();
     void mousePressEvent(QMouseEvent *event);
@@ -42,22 +44,27 @@ protected:
     void nextColoring();
     void nextTerraGen();
 
+    void loadShaders();
+
 private:
-    LookAtCamera *m_camera;
+    std::deque<ColoringModel*> m_cmodels; // For cycling trought coloring models
+    std::deque<TerraGen*> m_generators; // For cycling trought landscape generators
 
-    std::deque<ColoringModel*> m_cmodels;
-    std::deque<TerraGen*> m_generators;
-
-    TextureManager *m_texman;
     QColor m_clear_color;
     QPoint m_last_mouse_pos;
 
-    QString m_status;
+    QString m_status; // Status text (top left screen corner)
 
-    Landscape* m_landscape;
+    Landscape * m_landscape;
+
+    LookAtCamera * m_camera;
+
+    // Context stuff
+    ContextManager * m_context;
+    TextureManager * m_texman;
+    QGLShaderProgram * m_sh_program;
     MatrixStackManager * m_msm;
 
-    QGLShaderProgram * m_sh_program;
 };
 
 #endif

@@ -1,8 +1,8 @@
 #include "texturemanager.h"
 #include <QtOpenGL>
 
-TextureManager::TextureManager(QGLWidget *widget) {
-    m_widget = widget;
+TextureManager::TextureManager(QGLContext *context) {
+    m_context = context;
 }
 
 TextureManager::~TextureManager() {
@@ -28,10 +28,10 @@ GLuint TextureManager::loadTexture(const QImage &img) {
 
 //    return id;
 
-    return m_widget->bindTexture(img);
+    return m_context->bindTexture(img);
 }
 
 void TextureManager::unloadTexture(GLuint id) {
-    m_widget->deleteTexture(id);
+    m_context->deleteTexture(id);
 }
 

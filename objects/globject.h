@@ -5,8 +5,7 @@
 #include <QVector3D>
 #include <QObject>
 
-#include "texturemanager.h"
-#include "matrixstackmanager.h"
+#include "contextmanager.h"
 
 /*
  * Basic drawable opengl object
@@ -15,7 +14,7 @@
 class GLObject : public QObject {
     Q_OBJECT
 public:
-    GLObject(MatrixStackManager * ms_manager);
+    GLObject(ContextManager * context);
     virtual ~GLObject();
 
     virtual void draw() const;
@@ -33,7 +32,7 @@ public:
 
 protected:
     QVector3D m_position, m_rotation, m_scale;
-    MatrixStackManager * m_msmanager;
+    ContextManager * m_context;
 
     virtual void _draw() const = 0;
 };
