@@ -5,7 +5,6 @@
 #-------------------------------------------------
 
 QT       += core gui opengl
-LIBS    += -lGLU
 QMAKE_CXXFLAGS += -std=c++11
 DEFINES += GL_GLEXT_PROTOTYPES
 

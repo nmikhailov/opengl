@@ -5,8 +5,6 @@
 #include <QtGui>
 #include <QtOpenGL>
 
-#include <GL/glu.h>
-
 #include "glwidget.h"
 #include "terragen/randomterragen.h"
 #include "terragen/diamondsquaregen.h"
@@ -53,7 +51,7 @@ void GLWidget::setClearColor(const QColor &color) {
 void GLWidget::initializeGL() {
     loadShaders();
     // glEnable(GL_CULL_FACE);
-    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     //glEnable(GL_TEXTURE_2D);
 
     m_camera = new LookAtCamera(m_msm);
@@ -62,8 +60,15 @@ void GLWidget::initializeGL() {
     m_landscape = new Landscape(m_context, m_generators.back());
     m_landscape->setColoringModel(m_cmodels.back());
 
-    m_landscape->setTexturing(true);
+    //m_landscape->setTexturing(true);
+    m_landscape->setColoring(true);
     m_landscape->setScale(QVector3D(1, 0.25, 1));
+
+    m_landscape2 = new Landscape(m_context, m_generators.back());
+    m_landscape2->setColoringModel(m_cmodels.back());
+    m_landscape2->setColoring(true);
+    m_landscape2->setScale(QVector3D(0.25, 0.25 * 0.25, 0.25));
+    m_landscape2->setPosition(QVector3D(0.5, 0.5, 0.5));
 }
 
 QString GLWidget::getStatus() const {
@@ -91,8 +96,9 @@ void GLWidget::paintGL() {
     m_camera->apply();
 
     m_landscape->draw();
+    m_landscape2->draw();
 
-    //renderText(0, 10, getStatus());
+    renderText(0, 10, getStatus());
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {

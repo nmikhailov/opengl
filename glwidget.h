@@ -55,7 +55,7 @@ private:
 
     QString m_status; // Status text (top left screen corner)
 
-    Landscape * m_landscape;
+    Landscape * m_landscape, * m_landscape2;
 
     LookAtCamera * m_camera;
 

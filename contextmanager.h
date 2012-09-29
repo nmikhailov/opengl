@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QGLContext>
 #include <QGLShaderProgram>
+#include <QGLBuffer>
 
 #include "texturemanager.h"
 #include "matrixstackmanager.h"
@@ -33,6 +34,7 @@ public:
     QGLShaderProgram* shaderProgram();
     void setShaderProgram(QGLShaderProgram * sh_program);
 
+    enum LOCATIONS{LOC_VERTEX = 1, LOC_COLOR = 2};
 protected:
     QGLContext * m_context;
     TextureManager * m_texman = nullptr;

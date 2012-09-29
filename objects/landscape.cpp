@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include <QtOpenGL>
-#include <GL/glu.h>
 
 #include "landscape.h"
 
@@ -10,16 +9,18 @@ Landscape::Landscape(ContextManager * context, TerraGen *generator)
     m_generator = generator;
     connect(m_generator, SIGNAL(terrainChanged()), this, SLOT(terrainChanged()));
 
-    m_is_vertexes_cached = false;
-    m_is_triangles_cached = false;
-    m_is_cached_colors = false;
+    m_vertex_buffer_valid = false;
+    m_color_buffer_valid = false;
     m_is_cached_texture = false;
+
+
+    m_vertex_buffer.create();
+    m_index_buffer = QGLBuffer(QGLBuffer::IndexBuffer);
+    m_index_buffer.create();
+    m_color_buffer.create();
 }
 
 Landscape::~Landscape() {
-    delete m_cache_vertex;
-    delete m_cache_index;
-    delete m_cache_colors;
     for(int i = 0; i < 3; i++) {
         delete m_cache_textures[i];
     }
@@ -39,7 +40,7 @@ void Landscape::setColoring(bool val) {
 
 void Landscape::setColoringModel(ColoringModel *cm) {
     m_cm = cm;
-    m_is_cached_colors = false;
+    m_color_buffer_valid = false;
 }
 
 const TerraGen *Landscape::generator() const {
@@ -51,8 +52,7 @@ void Landscape::setGenerator(TerraGen *generator) {
     connect(generator, SIGNAL(terrainChanged()), this, SLOT(terrainChanged()));
 
     m_generator = generator;
-    m_is_vertexes_cached = false;
-    m_is_triangles_cached = false;
+    m_vertex_buffer_valid = false;
 }
 
 bool Landscape::texturing() const {
@@ -72,133 +72,130 @@ void Landscape::regenerateTerrain() {
 
 void Landscape::_draw() const {
     int width = m_generator->width(), height = m_generator->height();
-    bool color = false, texture = false;
+    bool color = m_coloring, texture = false;
 
-    genVertexes();
-    genTriangles();
-    genColorsIndex();
-    genTextureIndex();
+    updateVertexBuffer();
+    updateColorBuffer();
+    //genTextureIndex();
 
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_DOUBLE, 0, m_cache_vertex);
-
-    if (texture) {
-        for(size_t i = 0; i < m_texfiles.size(); i++) {
-            glActiveTexture(GL_TEXTURE0 + i);
-            glEnable(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D, m_cache_texid[i]);
-            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
-            glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_INTERPOLATE);
-            glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_PREVIOUS);
-            glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_TEXTURE);
-            glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_TEXTURE);
-        }
+//    if (texture) {
+//        for(size_t i = 0; i < m_texfiles.size(); i++) {
+//            glActiveTexture(GL_TEXTURE0 + i);
+//            glEnable(GL_TEXTURE_2D);
+//            glBindTexture(GL_TEXTURE_2D, m_cache_texid[i]);
+//            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+//            glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_INTERPOLATE);
+//            glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_PREVIOUS);
+//            glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_TEXTURE);
+//            glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_TEXTURE);
+//        }
 
 
-        for(size_t i = 0; i < m_texfiles.size(); i++) {
-            glClientActiveTexture(GL_TEXTURE0 + i);
-            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-            glTexCoordPointer(2, GL_DOUBLE, 0, m_cache_textures[i]);
-        }
-    } else {
-        for(size_t i = 0; i < m_texfiles.size(); i++) {
-            glActiveTexture(GL_TEXTURE0 + i);
-            glBindTexture(GL_TEXTURE_2D, 0);
-        }
-    }
+//        for(size_t i = 0; i < m_texfiles.size(); i++) {
+//            glClientActiveTexture(GL_TEXTURE0 + i);
+//            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+//            glTexCoordPointer(2, GL_DOUBLE, 0, m_cache_textures[i]);
+//        }
+//    } else {
+//        for(size_t i = 0; i < m_texfiles.size(); i++) {
+//            glActiveTexture(GL_TEXTURE0 + i);
+//            glBindTexture(GL_TEXTURE_2D, 0);
+//        }
+//    }
 
     if(color){
-        glEnableClientState(GL_COLOR_ARRAY);
-        glColorPointer(3, GL_DOUBLE, 0, m_cache_colors);
+        m_color_buffer.bind();
+        m_context->shaderProgram()->setAttributeBuffer(1, GL_FLOAT, 0, 3);
+        m_context->shaderProgram()->enableAttributeArray(1);
+    } else {
+        m_context->shaderProgram()->disableAttributeArray(1);
     }
 
-    glDrawElements(GL_TRIANGLES, (width - 1) * (height - 1) * 6, GL_UNSIGNED_INT,
-                   m_cache_index);
+    m_vertex_buffer.bind();
+    m_context->shaderProgram()->setAttributeBuffer(0, GL_FLOAT, 0, 3);
+    m_context->shaderProgram()->enableAttributeArray(0);
 
-    if(color) {
-        glDisableClientState(GL_COLOR_ARRAY);
-    }
+    m_index_buffer.bind();
 
-    if(texture) {
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    }
-    glDisableClientState(GL_VERTEX_ARRAY);
+    size_t sz = (width - 1) * (height - 1) * 6; // index array size
+    glDrawElements(GL_TRIANGLES, sz, GL_UNSIGNED_INT, nullptr);
 }
 
-void Landscape::genVertexes() const {
-    if (!m_is_vertexes_cached) {
-        m_is_cached_colors = m_is_cached_texture = false;
+void Landscape::updateVertexBuffer() const {
+    if (!m_vertex_buffer_valid) {
+        m_color_buffer_valid = m_is_cached_texture = false;
 
         int width = m_generator->width(),
                 height = m_generator->height();
         const TerraGen::TTerrain &terr = m_generator->get();
 
-        delete[] m_cache_vertex;
-        m_cache_vertex = new GLdouble[width * height * 3];
+        QVector<GLfloat> vertexes;
+
+        m_vertex_buffer.destroy();
 
         for (int i = 0, p = 0; i < height; i++) {
             for (int j = 0; j < width; j++, p += 3) {
                 double ex = (j - height / 2.) / height;
                 double ey = (i - width / 2.) / width;
 
-                m_cache_vertex[p + 0] = ex;
-                m_cache_vertex[p + 1] = terr[i][j] - 0.5;
-                m_cache_vertex[p + 2] = ey;
+                vertexes << ex << terr[i][j] - 0.5 << ey;
             }
         }
+        m_vertex_buffer.bind();
+        m_vertex_buffer.allocate(vertexes.constData(), sizeof(GLfloat) * vertexes.size());
 
-        m_is_vertexes_cached = true;
+        updateIndexBuffer();
+        m_vertex_buffer_valid = true;
     }
 }
 
-void Landscape::genTriangles() const {
-    if (!m_is_triangles_cached) {
-        m_is_cached_colors = m_is_cached_texture = false;
+void Landscape::updateIndexBuffer() const {
+    if (!m_vertex_buffer_valid) {
+        QVector<GLuint> indexes;
+        m_color_buffer_valid = m_is_cached_texture = false;
 
         int width = m_generator->width(),
                 height = m_generator->height();
 
-        delete[] m_cache_index;
-        m_cache_index = new GLuint[(width - 1) * (height - 1) * 6];
+        for (int i = 0; i < height - 1; i++) {
+            for (int j = 0; j < width - 1; j++) {
+                // Top
+                indexes << width * i + j + 1
+                        << width * i + j
+                        << width * i + j + width;
 
-        for (int i = 0, p = 0; i < height - 1; i++) {
-            for (int j = 0; j < width - 1; j++, p += 6) {
-                m_cache_index[p + 0] = width* i + j + 1;
-                m_cache_index[p + 1] = width * i + j;
-                m_cache_index[p + 2] = width * i + j + width;
-
-                m_cache_index[p + 3] = width * i + j + 1;
-                m_cache_index[p + 4] = width * i + j + width;
-                m_cache_index[p + 5] = width * i + j + width + 1;
+                // Bottom
+                indexes << width * i + j + 1
+                        << width * i + j + width
+                        << width * i + j + width + 1;
             }
         }
 
-        m_is_triangles_cached = true;
+        m_index_buffer.bind();
+        m_index_buffer.allocate(indexes.constData(), sizeof(GLuint) * indexes.size());
     }
 }
 
-void Landscape::genColorsIndex() const {
+void Landscape::updateColorBuffer() const {
     int width = m_generator->width(), height = m_generator->height();
 
-    if(!m_is_cached_colors && m_coloring) {
-        delete[] m_cache_colors;
-        m_cache_colors = new GLdouble[width * height * 3];
+    if(!m_color_buffer_valid && m_coloring) {
+        QVector<GLfloat> colors;
 
         ColoringModel &cm = *m_cm;
         const TerraGen::TTerrain &terr = m_generator->get();
 
-        for (int i = 0, p = 0; i < height; i++) {
-            for (int j = 0; j < width; j++, p += 3) {
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
                 auto color = cm(terr[i][j]); // Z coord
 
-                m_cache_colors[p + 0] = color.redF();
-                m_cache_colors[p + 1] = color.greenF();
-                m_cache_colors[p + 2] = color.blueF();
+                colors << color.redF() << color.greenF() << color.blueF();
             }
         }
+        m_color_buffer.bind();
+        m_color_buffer.allocate(colors.constData(), sizeof(GLfloat) * colors.size());
 
-        m_is_cached_colors = true;
+        m_color_buffer_valid = true;
     }
 }
 
@@ -239,7 +236,7 @@ void Landscape::genTextureIndex() const {
         m_cache_texid[tex_id] = m_context->textureManager()->loadTexture(img);
 
         delete[] m_cache_textures[tex_id];
-        m_cache_textures[tex_id] = new GLdouble[textures_size];
+        m_cache_textures[tex_id] = new GLfloat[textures_size];
 
         for (int i = 0, p = 0; i < terrain_height; i++) {
             for (int j = 0; j < terrain_width; j++, p += 2) {
@@ -253,8 +250,6 @@ void Landscape::genTextureIndex() const {
 }
 
 void Landscape::terrainChanged() {
-    qDebug() << "changed";
-    m_is_vertexes_cached = false;
-    m_is_triangles_cached = false;
+    m_vertex_buffer_valid = false;
 }
 
