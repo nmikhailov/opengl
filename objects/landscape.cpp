@@ -78,31 +78,6 @@ void Landscape::_draw() const {
     updateColorBuffer();
     //genTextureIndex();
 
-//    if (texture) {
-//        for(size_t i = 0; i < m_texfiles.size(); i++) {
-//            glActiveTexture(GL_TEXTURE0 + i);
-//            glEnable(GL_TEXTURE_2D);
-//            glBindTexture(GL_TEXTURE_2D, m_cache_texid[i]);
-//            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
-//            glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_INTERPOLATE);
-//            glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_PREVIOUS);
-//            glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_TEXTURE);
-//            glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_TEXTURE);
-//        }
-
-
-//        for(size_t i = 0; i < m_texfiles.size(); i++) {
-//            glClientActiveTexture(GL_TEXTURE0 + i);
-//            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-//            glTexCoordPointer(2, GL_DOUBLE, 0, m_cache_textures[i]);
-//        }
-//    } else {
-//        for(size_t i = 0; i < m_texfiles.size(); i++) {
-//            glActiveTexture(GL_TEXTURE0 + i);
-//            glBindTexture(GL_TEXTURE_2D, 0);
-//        }
-//    }
-
     if(color){
         m_color_buffer.bind();
         m_context->shaderProgram()->setAttributeBuffer(1, GL_FLOAT, 0, 3);
