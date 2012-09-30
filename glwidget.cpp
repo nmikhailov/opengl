@@ -31,6 +31,17 @@ GLWidget::GLWidget(QGLContext* context, QWidget *parent, QGLWidget *shareWidget)
 }
 
 GLWidget::~GLWidget() {
+    delete m_camera;
+    delete m_landscape;
+    delete m_landscape2;
+    delete m_context;
+    delete m_texman;
+    delete m_shman;
+    delete m_msm;
+    for(auto x: m_cmodels)
+        delete x;
+    for(auto x: m_generators)
+        delete x;
 }
 
 QSize GLWidget::minimumSizeHint() const {

@@ -73,6 +73,13 @@ private:
             > >::type map_types;
 
     boost::fusion::result_of::as_map<map_types>::type m_programs;
+
+    struct release {
+        template<typename A, typename B>
+        void operator()(boost::fusion::pair<A, B>& t) const {
+            delete t.second;
+        }
+    };
 };
 
 #endif // SHADERMANAGER_H

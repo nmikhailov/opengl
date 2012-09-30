@@ -5,7 +5,6 @@
 ShaderProgram::ShaderProgram(QGLContext * context) {
     m_program = new QGLShaderProgram(context);
     m_context = context;
-    qDebug() << context;
 }
 
 ShaderProgram::~ShaderProgram() {

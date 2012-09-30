@@ -1,5 +1,7 @@
 #include "shadermanager.h"
 
+#include <boost/fusion/include/for_each.hpp>
+
 
 ShaderManager::ShaderManager(QGLContext *context) {
     m_context = context;
@@ -7,7 +9,7 @@ ShaderManager::ShaderManager(QGLContext *context) {
 }
 
 ShaderManager::~ShaderManager() {
-    // TODO: delete shaders
+    boost::fusion::for_each(m_programs, release());
 }
 
 ShaderProgram &ShaderManager::getActiveShader() {
