@@ -23,7 +23,6 @@ public:
 protected:
     friend class ShaderManager;
     ColorShader(QGLContext * context);
-    virtual ~ColorShader() {}
 };
 
 #endif // COLORSHADER_H

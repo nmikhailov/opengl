@@ -6,6 +6,8 @@
 #include <QGLBuffer>
 #include <QGLShaderProgram>
 
+#include <memory>
+
 /*
  * Abstract shader program class
  * Manages data supplying to opengl shader
@@ -16,6 +18,9 @@
 class ShaderProgram : public QObject {
     Q_OBJECT
 public:
+    ShaderProgram(const ShaderProgram& program);
+    virtual ~ShaderProgram();
+
     virtual bool bind(); // Binds shader program to opengl context
 
     // Index buffer should'n be passed to shaders
@@ -28,14 +33,10 @@ protected:
     friend class ShaderManager;
 
     ShaderProgram(QGLContext * context);
-    virtual ~ShaderProgram();
     virtual void init(QString vert, QString frag);
 
-    QGLShaderProgram * m_program;
+    std::shared_ptr<QGLShaderProgram> m_program;
     QGLContext * m_context;
-    QString a, b;
-    bool x = false;
-
 };
 
 #endif // SHADERPROGRAM_H

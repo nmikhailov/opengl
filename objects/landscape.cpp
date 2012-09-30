@@ -79,7 +79,7 @@ void Landscape::_draw() const {
     updateColorBuffer();
     //genTextureIndex();
 
-    ColorShader &sh = m_context->shaderManager()->setActiveShader<ColorShader>();
+    auto sh = m_context->shaderManager()->setActiveShader<ColorShader>();
     if(color){
         sh.setColorMode(ColorShader::COLOR_MAP);
         sh.setColorBuffer(m_color_buffer);

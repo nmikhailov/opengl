@@ -2,13 +2,12 @@
 #include <QFile>
 
 
-ShaderProgram::ShaderProgram(QGLContext * context) {
-    m_program = new QGLShaderProgram(context);
+ShaderProgram::ShaderProgram(QGLContext * context) :
+    m_program(new QGLShaderProgram(context)) {
     m_context = context;
 }
 
 ShaderProgram::~ShaderProgram() {
-    delete m_program;
 }
 
 void ShaderProgram::init(QString vert, QString frag) {
@@ -26,4 +25,11 @@ bool ShaderProgram::bind() {
 
 void ShaderProgram::setIndexBuffer(QGLBuffer &buff) {
     buff.bind();
+}
+
+
+ShaderProgram::ShaderProgram(const ShaderProgram &program) :
+    QObject() {
+    this->m_context = program.m_context;
+    this->m_program = program.m_program;
 }
