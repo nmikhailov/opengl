@@ -7,6 +7,8 @@
 #include <QMatrix4x4>
 #include <QGLShaderProgram>
 
+#include "shaders/shadermanager.h"
+
 /*
  * Matrix stack class.
  * Manages transformation(scale, rotation) matrices.
@@ -18,8 +20,8 @@ class MatrixStackManager : public QObject {
 public:
     typedef QMatrix4x4 Matrix;
 
-    MatrixStackManager(QGLShaderProgram* sh_program);
-    virtual ~MatrixStackManager() {};
+    MatrixStackManager(ShaderManager* sh_program);
+    virtual ~MatrixStackManager() {}
 
     virtual void push();
     virtual void pop();
@@ -42,7 +44,7 @@ protected:
     std::vector<Matrix> m_stack; // Top element is m_stack.back()
     Matrix m_projection;
 
-    QGLShaderProgram * m_sh_program;
+    ShaderManager * m_shman;
 };
 
 #endif // MATRIXSTACK_H

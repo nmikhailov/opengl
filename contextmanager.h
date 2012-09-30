@@ -8,6 +8,7 @@
 
 #include "texturemanager.h"
 #include "matrixstackmanager.h"
+#include "shaders/shadermanager.h"
 
 /*
  * Provides access to some opengl stuff:
@@ -30,16 +31,15 @@ public:
     MatrixStackManager* matrixStackManager();
     void setMatrixStackManager(MatrixStackManager * msmanager);
 
-    const QGLShaderProgram* shaderProgram() const;
-    QGLShaderProgram* shaderProgram();
-    void setShaderProgram(QGLShaderProgram * sh_program);
+    const ShaderManager* shaderManager() const;
+    ShaderManager* shaderManager();
+    void setShaderManager(ShaderManager * sh_program);
 
-    enum LOCATIONS{LOC_VERTEX = 1, LOC_COLOR = 2};
 protected:
     QGLContext * m_context;
     TextureManager * m_texman = nullptr;
     MatrixStackManager * m_msmanager = nullptr;
-    QGLShaderProgram * m_sh_program = nullptr;
+    ShaderManager * m_shman = nullptr;
 };
 
 #endif // CONTEXTMANAGER_H

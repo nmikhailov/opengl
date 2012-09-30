@@ -29,14 +29,14 @@ void ContextManager::setMatrixStackManager(MatrixStackManager *msmanager) {
     m_msmanager = msmanager;
 }
 
-const QGLShaderProgram *ContextManager::shaderProgram() const {
-    return m_sh_program;
+const ShaderManager *ContextManager::shaderManager() const {
+    return m_shman;
 }
 
-QGLShaderProgram *ContextManager::shaderProgram() {
-    return m_sh_program;
+ShaderManager *ContextManager::shaderManager() {
+    return m_shman;
 }
 
-void ContextManager::setShaderProgram(QGLShaderProgram *sh_program) {
-    m_sh_program = sh_program;
+void ContextManager::setShaderManager(ShaderManager *sh_program) {
+    m_shman = sh_program;
 }

@@ -11,6 +11,7 @@
 #include "objects/landscape.h"
 #include "texturemanager.h"
 #include "contextmanager.h"
+#include "shaders/shadermanager.h"
 
 class GLWidget : public QGLWidget {
     Q_OBJECT
@@ -44,8 +45,6 @@ protected:
     void nextColoring();
     void nextTerraGen();
 
-    void loadShaders();
-
 private:
     std::deque<ColoringModel*> m_cmodels; // For cycling trought coloring models
     std::deque<TerraGen*> m_generators; // For cycling trought landscape generators
@@ -62,7 +61,7 @@ private:
     // Context stuff
     ContextManager * m_context;
     TextureManager * m_texman;
-    QGLShaderProgram * m_sh_program;
+    ShaderManager * m_shman;
     MatrixStackManager * m_msm;
 
 };

@@ -27,7 +27,10 @@ SOURCES += main.cpp\
     matrixstackmanager.cpp \
     camera/lookatcamera.cpp \
     camera/camera.cpp \
-    contextmanager.cpp
+    contextmanager.cpp \
+    shaders/shaderprogram.cpp \
+    shaders/shadermanager.cpp \
+    shaders/colorshader.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
@@ -42,7 +45,10 @@ HEADERS  += mainwindow.h \
     matrixstackmanager.h \
     camera/lookatcamera.h \
     camera/camera.h \
-    contextmanager.h
+    contextmanager.h \
+    shaders/shaderprogram.h \
+    shaders/shadermanager.h \
+    shaders/colorshader.h
 
 FORMS    +=
 

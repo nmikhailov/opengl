@@ -3,6 +3,7 @@
 #include <QtOpenGL>
 
 #include "landscape.h"
+#include "shaders/colorshader.h"
 
 Landscape::Landscape(ContextManager * context, TerraGen *generator)
     : GLObject(context) {
@@ -78,19 +79,18 @@ void Landscape::_draw() const {
     updateColorBuffer();
     //genTextureIndex();
 
+    ColorShader &sh = m_context->shaderManager()->setActiveShader<ColorShader>();
     if(color){
-        m_color_buffer.bind();
-        m_context->shaderProgram()->setAttributeBuffer(1, GL_FLOAT, 0, 3);
-        m_context->shaderProgram()->enableAttributeArray(1);
+        sh.setColorMode(ColorShader::COLOR_MAP);
+        sh.setColorBuffer(m_color_buffer);
     } else {
-        m_context->shaderProgram()->disableAttributeArray(1);
+        sh.setColorMode(ColorShader::ONE_COLOR);
+        sh.setColor(Qt::white);
     }
 
-    m_vertex_buffer.bind();
-    m_context->shaderProgram()->setAttributeBuffer(0, GL_FLOAT, 0, 3);
-    m_context->shaderProgram()->enableAttributeArray(0);
 
-    m_index_buffer.bind();
+    sh.setIndexBuffer(m_index_buffer);
+    sh.setVertexBuffer(m_vertex_buffer);
 
     size_t sz = (width - 1) * (height - 1) * 6; // index array size
     glDrawElements(GL_TRIANGLES, sz, GL_UNSIGNED_INT, nullptr);
@@ -105,8 +105,6 @@ void Landscape::updateVertexBuffer() const {
         const TerraGen::TTerrain &terr = m_generator->get();
 
         QVector<GLfloat> vertexes;
-
-        m_vertex_buffer.destroy();
 
         for (int i = 0, p = 0; i < height; i++) {
             for (int j = 0; j < width; j++, p += 3) {

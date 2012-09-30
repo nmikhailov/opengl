@@ -7,6 +7,8 @@ layout(location=1) in vec4 color;
 varying vec4 v_color;
 uniform mat4x4 proj;
 
+uniform vec4 cl_color;
+uniform bool oneColor;
 
 void main() {
     gl_Position = proj * vert;

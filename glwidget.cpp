@@ -14,8 +14,6 @@ GLWidget::GLWidget(QGLContext* context, QWidget *parent, QGLWidget *shareWidget)
     : QGLWidget(context, parent, shareWidget) {
     m_clear_color = Qt::black;
 
-    initContextManager(context);
-
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
     timer->start(20);
@@ -49,10 +47,10 @@ void GLWidget::setClearColor(const QColor &color) {
 }
 
 void GLWidget::initializeGL() {
-    loadShaders();
+    initContextManager((QGLContext*)context());
     // glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_TEXTURE_2D);
+    //glEnable(GL_TEXTURE_2D); 
 
     m_camera = new LookAtCamera(m_msm);
     m_camera->setPosition(QVector3D(0, 1.5, -1.5));
@@ -139,15 +137,6 @@ void GLWidget::nextTerraGen() {
     m_generators.pop_front();
 }
 
-void GLWidget::loadShaders() {
-    QString prefix = ":/s/shaders/";
-    m_sh_program->addShaderFromSourceFile(QGLShader::Vertex, prefix + "v_main.vert");
-    m_sh_program->addShaderFromSourceFile(QGLShader::Fragment, prefix + "f_main.frag");
-
-    m_sh_program->link();
-    m_sh_program->bind();
-}
-
 void GLWidget::keyPressEvent(QKeyEvent * event) {
     switch (event->key()) {
     case Qt::Key_T:
@@ -183,11 +172,11 @@ void GLWidget::rotateOneStep() {
 void GLWidget::initContextManager(QGLContext *context) {
     m_context = new ContextManager(context);
 
-    m_sh_program = new QGLShaderProgram(context);
+    m_shman = new ShaderManager(context);
     m_texman = new TextureManager(context);
-    m_msm = new MatrixStackManager(m_sh_program);
+    m_msm = new MatrixStackManager(m_shman);
 
     m_context->setMatrixStackManager(m_msm);
     m_context->setTextureManager(m_texman);
-    m_context->setShaderProgram(m_sh_program);
+    m_context->setShaderManager(m_shman);
 }

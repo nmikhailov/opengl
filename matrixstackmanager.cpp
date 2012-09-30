@@ -1,8 +1,8 @@
 #include "matrixstackmanager.h"
 #include <QtOpenGL>
 
-MatrixStackManager::MatrixStackManager(QGLShaderProgram *sh_program) {
-    m_sh_program = sh_program;
+MatrixStackManager::MatrixStackManager(ShaderManager *sh_program) {
+    m_shman = sh_program;
     clear();
 }
 
@@ -39,12 +39,8 @@ void MatrixStackManager::apply() {
     for(Matrix &m : m_stack) {
         res *= m;
     }
-    // opengl 1
-    //glLoadIdentity();
-    //glMultMatrixd(res.constData());
-    // opengl (3.3+, ES 2)
-    // pass to shader
-    m_sh_program->setUniformValue("proj", res);
+
+    m_shman->getActiveShader().setPTMatrix(res);
 }
 
 void MatrixStackManager::clear() {
@@ -52,9 +48,4 @@ void MatrixStackManager::clear() {
     m_stack.push_back(Matrix());
 
     m_projection = Matrix();
-    // opengl 1
-    //glMatrixMode(GL_PROJECTION);
-    //glLoadIdentity();
-    //glMatrixMode(GL_MODELVIEW);
-    //glLoadIdentity();
 }
