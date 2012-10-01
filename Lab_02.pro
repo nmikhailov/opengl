@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     contextmanager.cpp \
     shaders/shaderprogram.cpp \
     shaders/shadermanager.cpp \
-    shaders/colorshader.cpp
+    shaders/colorshader.cpp \
+    shaders/textureblendshader.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
@@ -48,7 +49,8 @@ HEADERS  += mainwindow.h \
     contextmanager.h \
     shaders/shaderprogram.h \
     shaders/shadermanager.h \
-    shaders/colorshader.h
+    shaders/colorshader.h \
+    shaders/textureblendshader.h
 
 FORMS    +=
 
@@ -74,5 +76,7 @@ CONFIG(release, debug|release) {
 
 OTHER_FILES += \
     shaders/f_main.frag \
-    shaders/v_main.vert
+    shaders/v_main.vert \
+    shaders/mtex_landscape.frag \
+    shaders/mtex_landscape.vert
 

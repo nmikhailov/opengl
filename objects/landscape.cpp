@@ -4,6 +4,7 @@
 
 #include "landscape.h"
 #include "shaders/colorshader.h"
+#include "shaders/textureblendshader.h"
 
 Landscape::Landscape(ContextManager * context, TerraGen *generator)
     : GLObject(context) {
@@ -12,19 +13,20 @@ Landscape::Landscape(ContextManager * context, TerraGen *generator)
 
     m_vertex_buffer_valid = false;
     m_color_buffer_valid = false;
-    m_is_cached_texture = false;
+    m_uv_buffer_valid = false;
 
 
     m_vertex_buffer.create();
     m_index_buffer = QGLBuffer(QGLBuffer::IndexBuffer);
     m_index_buffer.create();
     m_color_buffer.create();
+
+    for(size_t i = 0; i < m_texfiles.size(); i++) {
+        m_uv_buffer[i].create();
+    }
 }
 
 Landscape::~Landscape() {
-    for(int i = 0; i < 3; i++) {
-        delete m_cache_textures[i];
-    }
 }
 
 bool Landscape::coloring() const {
@@ -63,7 +65,7 @@ bool Landscape::texturing() const {
 void Landscape::setTexturing(bool val) {
     if(m_texturing != val) {
         m_texturing = val;
-        m_is_cached_texture = false;
+        m_uv_buffer_valid = false;
     }
 }
 
@@ -73,24 +75,35 @@ void Landscape::regenerateTerrain() {
 
 void Landscape::_draw() const {
     int width = m_generator->width(), height = m_generator->height();
-    bool color = m_coloring, texture = false;
+    bool color = m_coloring, textures_enabled = m_texturing;
 
     updateVertexBuffer();
     updateColorBuffer();
-    //genTextureIndex();
+    updateUVBuffer();
+    if(textures_enabled) {
+        TextureBlendShader sh = m_context->shaderManager()->setActiveShader<TextureBlendShader>();
+        sh.setIndexBuffer(m_index_buffer);
+        sh.setVertexBuffer(m_vertex_buffer);
 
-    auto sh = m_context->shaderManager()->setActiveShader<ColorShader>();
-    if(color){
-        sh.setColorMode(ColorShader::COLOR_MAP);
-        sh.setColorBuffer(m_color_buffer);
+        sh.setUVBuffer(m_uv_buffer[0]);
+
+        for(size_t i = 0; i < m_texfiles.size(); i++) {
+            sh.bindTexture(i, m_cache_texid[i]);
+        }
+        sh.setProp(0.5, 0.5);
     } else {
-        sh.setColorMode(ColorShader::ONE_COLOR);
-        sh.setColor(Qt::white);
+        auto sh = m_context->shaderManager()->setActiveShader<ColorShader>();
+        if(color){
+            sh.setColorMode(ColorShader::COLOR_MAP);
+            sh.setColorBuffer(m_color_buffer);
+        } else {
+            sh.setColorMode(ColorShader::ONE_COLOR);
+            sh.setColor(Qt::white);
+        }
+
+        sh.setIndexBuffer(m_index_buffer);
+        sh.setVertexBuffer(m_vertex_buffer);
     }
-
-
-    sh.setIndexBuffer(m_index_buffer);
-    sh.setVertexBuffer(m_vertex_buffer);
 
     size_t sz = (width - 1) * (height - 1) * 6; // index array size
     glDrawElements(GL_TRIANGLES, sz, GL_UNSIGNED_INT, nullptr);
@@ -98,7 +111,7 @@ void Landscape::_draw() const {
 
 void Landscape::updateVertexBuffer() const {
     if (!m_vertex_buffer_valid) {
-        m_color_buffer_valid = m_is_cached_texture = false;
+        m_color_buffer_valid = m_uv_buffer_valid = false;
 
         int width = m_generator->width(),
                 height = m_generator->height();
@@ -125,7 +138,7 @@ void Landscape::updateVertexBuffer() const {
 void Landscape::updateIndexBuffer() const {
     if (!m_vertex_buffer_valid) {
         QVector<GLuint> indexes;
-        m_color_buffer_valid = m_is_cached_texture = false;
+        m_color_buffer_valid = m_uv_buffer_valid = false;
 
         int width = m_generator->width(),
                 height = m_generator->height();
@@ -172,54 +185,30 @@ void Landscape::updateColorBuffer() const {
     }
 }
 
-void Landscape::genTextureIndex() const {
-    if (m_is_cached_texture) {
-        return;
-    }
+void Landscape::updateUVBuffer() const {
+    if (!m_uv_buffer_valid) {
+        GLfloat terrain_width = m_generator->width(),
+                terrain_height = m_generator->height();
 
-    enum { Grass, Rock, Ice };
-    TerraGen::TTerrain terrain = m_generator->get();
-    int terrain_width = m_generator->width(),
-        terrain_height = m_generator->height(),
-        textures_size = terrain_width * terrain_height * 2;
+        for(size_t tex_id = 0; tex_id < m_texfiles.size(); tex_id++) {
+            QImage img(":/images/" + m_texfiles[tex_id]);
+            m_cache_texid[tex_id] = m_context->textureManager()->loadTexture(img);
 
-    for(size_t tex_id = 0; tex_id < m_texfiles.size(); tex_id++) {
-        QImage img(":/images/" + m_texfiles[tex_id]);
-        int img_width = img.width(), img_height = img.height();
-        double width_scale = ((double) terrain_width / img_width),
-               height_scale = ((double) terrain_height / img_height);
+            QVector<GLfloat> uv_coords;
 
-        for(int i = 0; i < img_width; i++) {
-            for(int j = 0; j < img_height; j++) {
-                int mi = i * width_scale, mj = j * height_scale;
-                double current_height = terrain[mi][mj], alpha = 0;
-
-                switch (tex_id) {
-                case Grass: alpha = current_height;					  break;
-                case Rock:  alpha = (1 - current_height) * 0.8;       break;
-                case Ice:   alpha = (current_height > 0.8) ? 0.3 : 1; break;
-                };
-
-                QColor color = img.pixel(i, j);
-                color.setAlphaF(alpha);
-                img.setPixel(i, j, color.rgba());
+            for (int i = 0; i < terrain_height; i++) {
+                for (int j = 0; j < terrain_width; j++) {
+                    double u = i / terrain_height;
+                    double v = (terrain_width - j - 1) / terrain_width;
+                    uv_coords << u << v;
+                }
             }
+            m_uv_buffer[tex_id].bind();
+            m_uv_buffer[tex_id].allocate(uv_coords.constData(), sizeof(GLfloat) * uv_coords.size());
         }
 
-        m_cache_texid[tex_id] = m_context->textureManager()->loadTexture(img);
-
-        delete[] m_cache_textures[tex_id];
-        m_cache_textures[tex_id] = new GLfloat[textures_size];
-
-        for (int i = 0, p = 0; i < terrain_height; i++) {
-            for (int j = 0; j < terrain_width; j++, p += 2) {
-                m_cache_textures[tex_id][p + 0] = (double) i / terrain_height;
-                m_cache_textures[tex_id][p + 1] = (double) (terrain_width - j) / terrain_width;
-            }
-        }
+        m_uv_buffer_valid = true;
     }
-
-    m_is_cached_texture = true;
 }
 
 void Landscape::terrainChanged() {

@@ -3,5 +3,6 @@
         <file>images/grass.png</file>
         <file>images/rock.png</file>
         <file>images/ice.png</file>
+        <file>images/side1.png</file>
     </qresource>
 </RCC>

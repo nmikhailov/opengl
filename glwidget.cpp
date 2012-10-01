@@ -61,7 +61,7 @@ void GLWidget::initializeGL() {
     initContextManager((QGLContext*)context());
     // glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_TEXTURE_2D); 
+    //glEnable(GL_TEXTURE_2D);
 
     m_camera = new LookAtCamera(m_msm);
     m_camera->setPosition(QVector3D(0, 1.5, -1.5));
@@ -69,8 +69,8 @@ void GLWidget::initializeGL() {
     m_landscape = new Landscape(m_context, m_generators.back());
     m_landscape->setColoringModel(m_cmodels.back());
 
-    //m_landscape->setTexturing(true);
-    m_landscape->setColoring(true);
+    m_landscape->setTexturing(true);
+    //m_landscape->setColoring(true);
     m_landscape->setScale(QVector3D(1, 0.25, 1));
 
     m_landscape2 = new Landscape(m_context, m_generators.back());

@@ -39,12 +39,12 @@ private:
 
     mutable bool m_vertex_buffer_valid = false,
                  m_color_buffer_valid = false,
-                 m_is_cached_texture = false;
+                 m_uv_buffer_valid = false;
 
-    mutable GLfloat * m_cache_textures[3] = {nullptr, nullptr, nullptr};
     mutable GLuint m_cache_texid[3] = {0, 0, 0};
 
     mutable QGLBuffer m_vertex_buffer, m_index_buffer, m_color_buffer;
+    mutable QGLBuffer m_uv_buffer[3];
 
     std::vector<QString> m_texfiles = {"grass.png", "rock.png", "ice.png"};
 
@@ -55,7 +55,7 @@ protected:
     virtual void updateVertexBuffer() const;
     virtual void updateIndexBuffer() const;
     virtual void updateColorBuffer() const;
-    virtual void genTextureIndex() const;
+    virtual void updateUVBuffer() const;
 
 public slots:
     void terrainChanged();
