@@ -36,15 +36,12 @@ private:
     bool m_coloring = false;
     bool m_texturing = false;
 
-
     mutable bool m_vertex_buffer_valid = false,
                  m_color_buffer_valid = false,
                  m_uv_buffer_valid = false;
 
     mutable GLuint m_cache_texid[3] = {0, 0, 0};
-
-    mutable QGLBuffer m_vertex_buffer, m_index_buffer, m_color_buffer;
-    mutable QGLBuffer m_uv_buffer[3];
+    mutable QGLBuffer m_vertex_buffer, m_index_buffer, m_color_buffer, m_uv_buffer;
 
     std::vector<QString> m_texfiles = {"grass.png", "rock.png", "ice.png"};
 

@@ -16,7 +16,7 @@ void main(void) {
     vec4 c1 = texture2D(tex1, uv) * (1 - height);
     vec4 c2 = texture2D(tex2, uv) * height;
     vec4 c3 = texture2D(tex3, uv) * height;
-    vec4 cr = (c1 + c2 + c3 * 0.8);
+    vec4 cr = (c1*0.8 + c2 + c3 * 0.6);
     float m = max(cr.r, max(cr.g, cr.b));
 
     gl_FragColor = cr * m;

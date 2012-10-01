@@ -21,9 +21,7 @@ Landscape::Landscape(ContextManager * context, TerraGen *generator)
     m_index_buffer.create();
     m_color_buffer.create();
 
-    for(size_t i = 0; i < m_texfiles.size(); i++) {
-        m_uv_buffer[i].create();
-    }
+    m_uv_buffer.create();
 }
 
 Landscape::~Landscape() {
@@ -80,12 +78,12 @@ void Landscape::_draw() const {
     updateVertexBuffer();
     updateColorBuffer();
     updateUVBuffer();
+
     if(textures_enabled) {
         TextureBlendShader sh = m_context->shaderManager()->setActiveShader<TextureBlendShader>();
         sh.setIndexBuffer(m_index_buffer);
         sh.setVertexBuffer(m_vertex_buffer);
-
-        sh.setUVBuffer(m_uv_buffer[0]);
+        sh.setUVBuffer(m_uv_buffer);
 
         for(size_t i = 0; i < m_texfiles.size(); i++) {
             sh.bindTexture(i, m_cache_texid[i]);
@@ -187,25 +185,24 @@ void Landscape::updateColorBuffer() const {
 
 void Landscape::updateUVBuffer() const {
     if (!m_uv_buffer_valid) {
-        GLfloat terrain_width = m_generator->width(),
+        int terrain_width = m_generator->width(),
                 terrain_height = m_generator->height();
 
         for(size_t tex_id = 0; tex_id < m_texfiles.size(); tex_id++) {
             QImage img(":/images/" + m_texfiles[tex_id]);
             m_cache_texid[tex_id] = m_context->textureManager()->loadTexture(img);
-
-            QVector<GLfloat> uv_coords;
-
-            for (int i = 0; i < terrain_height; i++) {
-                for (int j = 0; j < terrain_width; j++) {
-                    double u = i / terrain_height;
-                    double v = (terrain_width - j - 1) / terrain_width;
-                    uv_coords << u << v;
-                }
-            }
-            m_uv_buffer[tex_id].bind();
-            m_uv_buffer[tex_id].allocate(uv_coords.constData(), sizeof(GLfloat) * uv_coords.size());
         }
+
+        QVector<GLfloat> uv_coords;
+        for (int i = 0; i < terrain_height; i++) {
+            for (int j = 0; j < terrain_width; j++) {
+                double u = (double) i / (terrain_height / 2);
+                double v = (double) (terrain_width - j - 1) / (terrain_width / 2);
+                uv_coords << u << v;
+            }
+        }
+        m_uv_buffer.bind();
+        m_uv_buffer.allocate(uv_coords.constData(), sizeof(GLfloat) * uv_coords.size());
 
         m_uv_buffer_valid = true;
     }
