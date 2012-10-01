@@ -4,6 +4,8 @@
 MatrixStackManager::MatrixStackManager(ShaderManager *sh_program) {
     m_shman = sh_program;
     clear();
+
+    connect(sh_program, SIGNAL(activeShaderChanged()), this, SLOT(apply()));
 }
 
 void MatrixStackManager::push() {

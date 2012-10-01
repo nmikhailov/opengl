@@ -21,5 +21,7 @@ void ShaderManager::activate(ShaderProgram *shader) {
     if(m_active_shader != shader) {
         m_active_shader = shader;
         m_active_shader->bind();
+
+        emit activeShaderChanged();
     }
 }

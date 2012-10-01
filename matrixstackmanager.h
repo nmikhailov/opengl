@@ -36,7 +36,7 @@ public:
     // Sets perspective projection matrix
     void setPerspective(double aspectRatio = 1, double angle = 45, double near = 1e-5, double far = 1e5);
 
-
+public slots:
     void apply(); // Send matrices product to opengl/shader
     void clear();
 

@@ -60,6 +60,9 @@ public:
     ShaderProgram& getActiveShader();
     const ShaderProgram& getActiveShader() const;
 
+signals:
+    void activeShaderChanged();
+
 private:
     void activate(ShaderProgram * shader);
 
