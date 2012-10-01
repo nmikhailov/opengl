@@ -4,6 +4,7 @@
 #include <QGLContext>
 #include <QVector3D>
 #include <QObject>
+#include <QMatrix4x4>
 
 #include "contextmanager.h"
 
@@ -23,15 +24,18 @@ public:
     virtual QVector3D position() const;
     virtual void setPosition(const QVector3D &vec);
 
-    virtual QVector3D rotation() const;
+    virtual QMatrix4x4 rotation() const;
     virtual void setRotation(const QVector3D &vec);
+    virtual void setRotation(const QMatrix4x4 &mx);
+
     virtual void rotateBy(double x, double y, double z);
 
     virtual QVector3D scale() const;
     virtual void setScale(const QVector3D &vec);
 
 protected:
-    QVector3D m_position, m_rotation, m_scale;
+    QVector3D m_position, m_scale;
+    QMatrix4x4 m_rotation;
     ContextManager * m_context;
 
     virtual void _draw() const = 0;

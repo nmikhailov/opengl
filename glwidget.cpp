@@ -106,8 +106,6 @@ void GLWidget::paintGL() {
 
     m_landscape->draw();
     m_landscape2->draw();
-
-    renderText(0, 10, getStatus());
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {
@@ -177,6 +175,7 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
 
 void GLWidget::rotateOneStep() {
     m_landscape->rotateBy(0, 0.1, 0);
+    m_landscape2->rotateBy(0, 0.1, 0);
     updateGL();
 }
 
