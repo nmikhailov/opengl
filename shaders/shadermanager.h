@@ -21,6 +21,7 @@
 #include "shaderprogram.h"
 #include "colorshader.h"
 #include "textureblendshader.h"
+#include "fixedpipeline.h"
 
 /*
  * Manages shader programs switching
@@ -35,7 +36,7 @@
 class ShaderManager : public QObject {
     Q_OBJECT
 public:
-    typedef boost::mpl::vector<ColorShader, TextureBlendShader> shader_list; // Add new Shaders here
+    typedef boost::mpl::vector<ColorShader, TextureBlendShader, FixedPipeline> shader_list; // Add new Shaders here
 
     ShaderManager(QGLContext* context);
     virtual ~ShaderManager();

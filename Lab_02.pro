@@ -31,7 +31,8 @@ SOURCES += main.cpp\
     shaders/shaderprogram.cpp \
     shaders/shadermanager.cpp \
     shaders/colorshader.cpp \
-    shaders/textureblendshader.cpp
+    shaders/textureblendshader.cpp \
+    shaders/fixedpipeline.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
@@ -50,7 +51,8 @@ HEADERS  += mainwindow.h \
     shaders/shaderprogram.h \
     shaders/shadermanager.h \
     shaders/colorshader.h \
-    shaders/textureblendshader.h
+    shaders/textureblendshader.h \
+    shaders/fixedpipeline.h
 
 FORMS    +=
 
