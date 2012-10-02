@@ -59,6 +59,7 @@ void GLWidget::setClearColor(const QColor &color) {
 
 void GLWidget::initializeGL() {
     initContextManager((QGLContext*)context());
+    qglClearColor(m_clear_color);
     // glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_TEXTURE_2D);
@@ -96,7 +97,6 @@ QString GLWidget::getStatus() const {
 }
 
 void GLWidget::paintGL() {
-    qglClearColor(m_clear_color);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_msm->clear();
