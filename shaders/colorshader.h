@@ -10,7 +10,7 @@
 class ColorShader : public ShaderProgram {
     Q_OBJECT
 public:
-    enum EColorMode {ONE_COLOR, COLOR_MAP};
+    enum EColorMode {CM_ONE_COLOR = 0, CM_COLOR_MAP = 1, CM_TEXTURE = 2};
 
     // Used when one color mode is enabled
     void setColor(const QColor & color);
@@ -18,6 +18,9 @@ public:
     
     void setVertexBuffer(QGLBuffer &buff, GLenum type = GL_FLOAT, int tupleSize = 3);
     void setColorBuffer(QGLBuffer &buff, GLenum type = GL_FLOAT, int tupleSize = 3);
+
+    void setUVBuffer(QGLBuffer &buff, GLenum type = GL_FLOAT, int tupleSize = 2);
+    void bindTexture(GLuint id);
 
     void setPTMatrix(const QMatrix4x4 &proj);
 protected:

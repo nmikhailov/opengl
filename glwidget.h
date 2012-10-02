@@ -12,6 +12,7 @@
 #include "texturemanager.h"
 #include "contextmanager.h"
 #include "shaders/shadermanager.h"
+#include "objects/assimpmodel.h"
 
 class GLWidget : public QGLWidget {
     Q_OBJECT
@@ -55,6 +56,7 @@ private:
     QString m_status; // Status text (top left screen corner)
 
     Landscape * m_landscape, * m_landscape2;
+    AssimpModel * m_plane1;
 
     LookAtCamera * m_camera;
 

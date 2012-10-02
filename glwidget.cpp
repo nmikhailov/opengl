@@ -38,6 +38,7 @@ GLWidget::~GLWidget() {
     delete m_texman;
     delete m_shman;
     delete m_msm;
+    delete m_plane1;
     for(auto x: m_cmodels)
         delete x;
     for(auto x: m_generators)
@@ -79,6 +80,9 @@ void GLWidget::initializeGL() {
     m_landscape2->setColoring(true);
     m_landscape2->setScale(QVector3D(0.25, 0.25 * 0.25, 0.25));
     m_landscape2->setPosition(QVector3D(0.5, 0.5, 0.5));
+
+    m_plane1 = new AssimpModel(m_context);
+    m_plane1->loadModel("airplane2b.obj");
 }
 
 QString GLWidget::getStatus() const {
@@ -96,6 +100,31 @@ QString GLWidget::getStatus() const {
     return status;
 }
 
+float XP[3] = {1,0,0}, XN[3] = {-1,0,0},
+YP[3] = {0,1,0}, YN[3] = {0,-1,0},
+ZP[3] = {0,0,1}, ZN[3] = {0,0,-1};
+
+float ORG[3] = {0,0,0};
+void Draw_Axes (void)
+{
+glPushMatrix ();
+
+glLineWidth (2.0);
+
+glBegin (GL_LINES);
+glColor3f (1,0,0); // X axis is red.
+glVertex3fv (ORG);
+glVertex3fv (XP );
+glColor3f (0,1,0); // Y axis is green.
+glVertex3fv (ORG);
+glVertex3fv (YP );
+glColor3f (0,0,1); // z axis is blue.
+glVertex3fv (ORG);
+glVertex3fv (ZP );
+glEnd();
+
+glPopMatrix ();
+}
 void GLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -104,8 +133,11 @@ void GLWidget::paintGL() {
 
     m_camera->apply();
 
-    m_landscape->draw();
+    //m_landscape->draw();
     m_landscape2->draw();
+
+    m_plane1->draw();
+    Draw_Axes();
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {
@@ -118,6 +150,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event) {
 
     if (event->buttons() & Qt::LeftButton) {
         m_landscape->rotateBy(-0.5 * dy, 0, 0.5 * dx);
+        m_plane1->rotateBy(-0.5 * dy, 0, 0.5 * dx);
         updateGL();
     }
     m_last_mouse_pos = event->pos();
@@ -176,6 +209,7 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
 void GLWidget::rotateOneStep() {
     m_landscape->rotateBy(0, 0.1, 0);
     m_landscape2->rotateBy(0, 0.1, 0);
+    m_plane1->rotateBy(0, 0.1, 0);
     updateGL();
 }
 

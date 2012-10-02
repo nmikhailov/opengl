@@ -34,7 +34,7 @@ public:
     Matrix projectionMatrix() const;
     void setProjectionMatrix(const Matrix &m);
     // Sets perspective projection matrix
-    void setPerspective(double aspectRatio = 1, double angle = 45, double near = 1e-5, double far = 1e5);
+    void setPerspective(double aspectRatio = 1, double angle = 45, double near = 1e-1, double far = 1e5);
 
 public slots:
     void apply(); // Send matrices product to opengl/shader

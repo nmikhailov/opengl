@@ -13,7 +13,6 @@ class Landscape : public GLObject {
     Q_OBJECT
 public:
     Landscape(ContextManager *context, TerraGen * generator);
-    virtual ~Landscape();
 
     virtual void regenerateTerrain();
 

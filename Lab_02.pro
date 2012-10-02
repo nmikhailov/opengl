@@ -7,6 +7,7 @@
 QT       += core gui opengl
 QMAKE_CXXFLAGS += -std=c++11
 DEFINES += GL_GLEXT_PROTOTYPES
+LIBS += -lassimp
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -31,7 +32,8 @@ SOURCES += main.cpp\
     shaders/shaderprogram.cpp \
     shaders/shadermanager.cpp \
     shaders/colorshader.cpp \
-    shaders/textureblendshader.cpp
+    shaders/textureblendshader.cpp \
+    objects/assimpmodel.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
@@ -50,7 +52,8 @@ HEADERS  += mainwindow.h \
     shaders/shaderprogram.h \
     shaders/shadermanager.h \
     shaders/colorshader.h \
-    shaders/textureblendshader.h
+    shaders/textureblendshader.h \
+    objects/assimpmodel.h
 
 FORMS    +=
 

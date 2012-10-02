@@ -4,6 +4,8 @@
 #include <QGLContext>
 #include <QtOpenGL>
 
+#include <map>
+
 class TextureManager {
 public:
     TextureManager(QGLContext * context);
@@ -12,7 +14,9 @@ public:
     GLuint loadTexture(const QImage & img);
     void unloadTexture(GLuint id);
 
+    GLuint getTextureByName(const QString &file_name);
 private:
+    std::map<QString, GLuint> m_file2id;
     QGLContext * m_context;
 };
 

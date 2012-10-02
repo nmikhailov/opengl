@@ -24,9 +24,6 @@ Landscape::Landscape(ContextManager * context, TerraGen *generator)
     m_uv_buffer.create();
 }
 
-Landscape::~Landscape() {
-}
-
 bool Landscape::coloring() const {
     return m_coloring;
 }
@@ -72,7 +69,6 @@ void Landscape::regenerateTerrain() {
 }
 
 void Landscape::_draw() const {
-    int width = m_generator->width(), height = m_generator->height();
     bool color = m_coloring, textures_enabled = m_texturing;
 
     updateVertexBuffer();
@@ -92,10 +88,10 @@ void Landscape::_draw() const {
     } else {
         auto sh = m_context->shaderManager()->setActiveShader<ColorShader>();
         if(color){
-            sh.setColorMode(ColorShader::COLOR_MAP);
+            sh.setColorMode(ColorShader::CM_COLOR_MAP);
             sh.setColorBuffer(m_color_buffer);
         } else {
-            sh.setColorMode(ColorShader::ONE_COLOR);
+            sh.setColorMode(ColorShader::CM_ONE_COLOR);
             sh.setColor(Qt::white);
         }
 
@@ -103,7 +99,7 @@ void Landscape::_draw() const {
         sh.setVertexBuffer(m_vertex_buffer);
     }
 
-    size_t sz = (width - 1) * (height - 1) * 6; // index array size
+    size_t sz = m_index_buffer.size() / sizeof(GLuint);
     glDrawElements(GL_TRIANGLES, sz, GL_UNSIGNED_INT, nullptr);
 }
 
