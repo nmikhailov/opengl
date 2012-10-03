@@ -33,7 +33,8 @@ SOURCES += main.cpp\
     shaders/shadermanager.cpp \
     shaders/colorshader.cpp \
     shaders/textureblendshader.cpp \
-    objects/assimpmodel.cpp
+    objects/assimpmodel.cpp \
+    objects/axis.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
@@ -53,7 +54,8 @@ HEADERS  += mainwindow.h \
     shaders/shadermanager.h \
     shaders/colorshader.h \
     shaders/textureblendshader.h \
-    objects/assimpmodel.h
+    objects/assimpmodel.h \
+    objects/axis.h
 
 FORMS    +=
 

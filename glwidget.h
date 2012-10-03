@@ -13,6 +13,7 @@
 #include "contextmanager.h"
 #include "shaders/shadermanager.h"
 #include "objects/assimpmodel.h"
+#include "objects/axis.h"
 
 class GLWidget : public QGLWidget {
     Q_OBJECT
@@ -57,6 +58,7 @@ private:
 
     Landscape * m_landscape, * m_landscape2;
     AssimpModel * m_plane1;
+    Axis * m_axis;
 
     LookAtCamera * m_camera;
 

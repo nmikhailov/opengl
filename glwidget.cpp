@@ -83,6 +83,8 @@ void GLWidget::initializeGL() {
 
     m_plane1 = new AssimpModel(m_context);
     m_plane1->loadModel("airplane2b.obj");
+
+    m_axis = new Axis(m_context);
 }
 
 QString GLWidget::getStatus() const {
@@ -100,44 +102,19 @@ QString GLWidget::getStatus() const {
     return status;
 }
 
-float XP[3] = {1,0,0}, XN[3] = {-1,0,0},
-YP[3] = {0,1,0}, YN[3] = {0,-1,0},
-ZP[3] = {0,0,1}, ZN[3] = {0,0,-1};
-
-float ORG[3] = {0,0,0};
-void Draw_Axes (void)
-{
-glPushMatrix ();
-
-glLineWidth (2.0);
-
-glBegin (GL_LINES);
-glColor3f (1,0,0); // X axis is red.
-glVertex3fv (ORG);
-glVertex3fv (XP );
-glColor3f (0,1,0); // Y axis is green.
-glVertex3fv (ORG);
-glVertex3fv (YP );
-glColor3f (0,0,1); // z axis is blue.
-glVertex3fv (ORG);
-glVertex3fv (ZP );
-glEnd();
-
-glPopMatrix ();
-}
 void GLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_msm->clear();
     m_msm->setPerspective((double)width() / height());
-
     m_camera->apply();
+
+    m_axis->draw();
 
     //m_landscape->draw();
     m_landscape2->draw();
 
     m_plane1->draw();
-    Draw_Axes();
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {

@@ -126,7 +126,7 @@ void AssimpModel::_draw() const {
 
             m_context->matrixStackManager()->pop();
             m_context->matrixStackManager()->apply();
-            z += 10;
+            z += 100;
         }
     }
 
