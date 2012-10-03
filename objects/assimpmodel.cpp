@@ -39,7 +39,7 @@ void AssimpModel::loadModel(const QString &file_name) {
     //m.setToIdentity();
     //m.rotate(-90, 1, 0, 0);
     m.scale(QVector3D(1, 1, 1) * 1e-3);
-    qDebug() << m;
+    //qDebug() << m;
     for(size_t mesh_id = 0; mesh_id < root->mNumMeshes; mesh_id++) {
         aiMesh * mesh = scene->mMeshes[root->mMeshes[mesh_id]];
         int cont = aiGetMaterialTextureCount(scene->mMaterials[mesh->mMaterialIndex], aiTextureType_DIFFUSE);

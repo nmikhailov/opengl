@@ -83,6 +83,7 @@ void GLWidget::initializeGL() {
 
     m_plane1 = new AssimpModel(m_context);
     m_plane1->loadModel("airplane2b.obj");
+    m_plane1->setPosition(QVector3D(1, 0.5, 0));
 
     m_axis = new Axis(m_context);
 }
@@ -111,10 +112,15 @@ void GLWidget::paintGL() {
 
     m_axis->draw();
 
-    //m_landscape->draw();
-    m_landscape2->draw();
-
+    m_landscape->draw();
+    //m_landscape2->draw();
+    static double x = 0;
+    m_msm->push();
+    m_msm->top().rotate(x, 0, 1, 0);
+    x -= 0.5;
+    m_msm->apply();
     m_plane1->draw();
+    m_msm->pop();
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {
@@ -127,7 +133,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event) {
 
     if (event->buttons() & Qt::LeftButton) {
         m_landscape->rotateBy(-0.5 * dy, 0, 0.5 * dx);
-        m_plane1->rotateBy(-0.5 * dy, 0, 0.5 * dx);
+        //m_plane1->rotateBy(-0.5 * dy, 0, 0.5 * dx);
         updateGL();
     }
     m_last_mouse_pos = event->pos();
@@ -186,7 +192,7 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
 void GLWidget::rotateOneStep() {
     m_landscape->rotateBy(0, 0.1, 0);
     m_landscape2->rotateBy(0, 0.1, 0);
-    m_plane1->rotateBy(0, 0.1, 0);
+    //m_plane1->rotateBy(0, 0.1, 0);
     updateGL();
 }
 
