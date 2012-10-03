@@ -54,24 +54,12 @@ void AssimpModel::loadModel(const QString &file_name) {
         }
         // Vertexes
         QVector<GLfloat> vertexes, uv;
-        double min_x, max_x, min_z, max_z;
         for(size_t v_id = 0; v_id < mesh->mNumVertices; v_id++) {
             aiVector3D v = mesh->mVertices[v_id];
-            QVector4D vec(v.x, v.y, v.z, 0);
+            QVector4D vec(v.x, v.y, v.z, 1);
             vec = m * vec;
             vertexes << vec.x() << vec.y() << vec.z();
-            if(i == 5) {
-               // qDebug() << vec;
-                if(v_id == 0) {
-                    min_x = max_x = vec.x();
-                    min_z = max_z = vec.z();
-                }
-                min_z = std::min(min_z, vec.z());
-                max_z = std::max(max_z, vec.z());
 
-                min_x = std::min(min_x, vec.x());
-                max_x = std::max(max_x, vec.x());
-            }
             if(mesh->HasTextureCoords(0)) {
                 aiVector3D t = mesh->mTextureCoords[0][v_id];
                 uv << t.x << t.y;
@@ -95,6 +83,10 @@ void AssimpModel::loadModel(const QString &file_name) {
     }
 }
 
+void AssimpModel::recDraw() const {
+
+}
+
 void AssimpModel::_draw() const {
     ColorShader sh = m_context->shaderManager()->setActiveShader<ColorShader>();
     sh.setColorMode(ColorShader::CM_TEXTURE);
@@ -113,7 +105,7 @@ void AssimpModel::_draw() const {
         //
         if(i != 15){
             glDrawArrays(GL_TRIANGLES, 0, a.size() / sizeof(GLfloat));
-        }else{
+        } else {
             QVector3D diff(-0.01, 0, 0.05);
             m_context->matrixStackManager()->push();
             m_context->matrixStackManager()->top().translate(-diff);

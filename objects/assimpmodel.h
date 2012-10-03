@@ -4,8 +4,6 @@
 #include <QVector>
 #include <QString>
 #include <QGLBuffer>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
 
 #include "globject.h"
 
@@ -16,6 +14,7 @@ public:
     void loadModel(const QString& file_name);
     
 protected:
+    void recDraw() const;
     void _draw() const;
 
     QVector<QGLBuffer> m_vertex_buffer;
