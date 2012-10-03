@@ -11,8 +11,8 @@ class TextureBlendShader : public ShaderProgram {
     Q_OBJECT
 public:
 
-    void setVertexBuffer(const QGLBuffer &buff, GLenum type = GL_FLOAT, int tupleSize = 3);
-    void setUVBuffer(const QGLBuffer &buff, GLenum type = GL_FLOAT, int tupleSize = 2);
+    void setVertexBuffer(QGLBuffer buff, GLenum type = GL_FLOAT, int tupleSize = 3);
+    void setUVBuffer(QGLBuffer buff, GLenum type = GL_FLOAT, int tupleSize = 2);
 
     void setPTMatrix(const QMatrix4x4 &proj);
     void bindTexture(int tex_id, int val);

@@ -24,7 +24,7 @@ public:
     virtual bool bind(); // Binds shader program to opengl context
 
     // Index buffer
-    virtual void setIndexBuffer(const QGLBuffer &buff);
+    virtual void setIndexBuffer(QGLBuffer buff);
 
     // Handle projection + transformation matrices
     virtual void setPTMatrix(const QMatrix4x4 & proj) = 0;

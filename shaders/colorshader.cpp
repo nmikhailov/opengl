@@ -12,23 +12,20 @@ void ColorShader::setColorMode(ColorShader::EColorMode mode) {
     m_program->setUniformValue("color_mode", (int)mode);
 }
 
-void ColorShader::setVertexBuffer(const QGLBuffer &buff, GLenum type, int tupleSize) {
-    QGLBuffer b(buff);
-    b.bind();
+void ColorShader::setVertexBuffer(QGLBuffer buff, GLenum type, int tupleSize) {
+    buff.bind();
     m_program->setAttributeBuffer(0, type, 0, tupleSize);
     m_program->enableAttributeArray(0);
 }
 
-void ColorShader::setColorBuffer(const QGLBuffer &buff, GLenum type, int tupleSize) {
-    QGLBuffer b(buff);
-    b.bind();
+void ColorShader::setColorBuffer(QGLBuffer buff, GLenum type, int tupleSize) {
+    buff.bind();
     m_program->setAttributeBuffer(1, type, 0, tupleSize);
     m_program->enableAttributeArray(1);
 }
 
-void ColorShader::setUVBuffer(const QGLBuffer &buff, GLenum type, int tupleSize) {
-    QGLBuffer b(buff);
-    b.bind();
+void ColorShader::setUVBuffer(QGLBuffer buff, GLenum type, int tupleSize) {
+    buff.bind();
     m_program->setAttributeBuffer(2, type, 0, tupleSize);
     m_program->enableAttributeArray(2);
 }

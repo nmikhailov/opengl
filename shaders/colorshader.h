@@ -16,10 +16,10 @@ public:
     void setColor(const QColor & color);
     void setColorMode(EColorMode mode);
     
-    void setVertexBuffer(const QGLBuffer &buff, GLenum type = GL_FLOAT, int tupleSize = 3);
-    void setColorBuffer(const QGLBuffer &buff, GLenum type = GL_FLOAT, int tupleSize = 3);
+    void setVertexBuffer(QGLBuffer buff, GLenum type = GL_FLOAT, int tupleSize = 3);
+    void setColorBuffer(QGLBuffer buff, GLenum type = GL_FLOAT, int tupleSize = 3);
 
-    void setUVBuffer(const QGLBuffer &buff, GLenum type = GL_FLOAT, int tupleSize = 2);
+    void setUVBuffer(QGLBuffer buff, GLenum type = GL_FLOAT, int tupleSize = 2);
     void bindTexture(GLuint id);
 
     void setPTMatrix(const QMatrix4x4 &proj);
