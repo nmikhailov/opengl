@@ -4,14 +4,16 @@ TextureBlendShader::TextureBlendShader(QGLContext *context) : ShaderProgram(cont
     init("mtex_landscape.vert", "mtex_landscape.frag");
 }
 
-void TextureBlendShader::setVertexBuffer(QGLBuffer &buff, GLenum type, int tupleSize) {
-    buff.bind();
+void TextureBlendShader::setVertexBuffer(const QGLBuffer &buff, GLenum type, int tupleSize) {
+    QGLBuffer b(buff);
+    b.bind();
     m_program->setAttributeBuffer(0, type, 0, tupleSize);
     m_program->enableAttributeArray(0);
 }
 
-void TextureBlendShader::setUVBuffer(QGLBuffer &buff, GLenum type, int tupleSize) {
-    buff.bind();
+void TextureBlendShader::setUVBuffer(const QGLBuffer &buff, GLenum type, int tupleSize) {
+    QGLBuffer b(buff);
+    b.bind();
     m_program->setAttributeBuffer(1, type, 0, tupleSize);
     m_program->enableAttributeArray(1);
 }

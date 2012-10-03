@@ -23,10 +23,10 @@ bool ShaderProgram::bind() {
     return m_program->bind();
 }
 
-void ShaderProgram::setIndexBuffer(QGLBuffer &buff) {
-    buff.bind();
+void ShaderProgram::setIndexBuffer(const QGLBuffer &buff) {
+    QGLBuffer b(buff);
+    b.bind();
 }
-
 
 ShaderProgram::ShaderProgram(const ShaderProgram &program) :
     QObject() {

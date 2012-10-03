@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <QGLContext>
-#include <QGLBuffer>
 #include <QGLShaderProgram>
+#include <QGLBuffer>
 
 #include <memory>
 
@@ -23,8 +23,8 @@ public:
 
     virtual bool bind(); // Binds shader program to opengl context
 
-    // Index buffer should'n be passed to shaders
-    virtual void setIndexBuffer(QGLBuffer &buff);
+    // Index buffer
+    virtual void setIndexBuffer(const QGLBuffer &buff);
 
     // Handle projection + transformation matrices
     virtual void setPTMatrix(const QMatrix4x4 & proj) = 0;

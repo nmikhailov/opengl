@@ -23,6 +23,7 @@ Axis::Axis(ContextManager *context):  GLObject(context) {
     m_buff.create();
     m_buff.bind();
     m_buff.allocate(vert.constData(), vert.size() * sizeof(GLfloat));
+
     m_cl_buff.create();
     m_cl_buff.bind();
     m_cl_buff.allocate(clr.constData(), clr.size() * sizeof(GLfloat));
@@ -31,9 +32,8 @@ Axis::Axis(ContextManager *context):  GLObject(context) {
 void Axis::_draw() const {
     ColorShader sh = m_context->shaderManager()->setActiveShader<ColorShader>();
     sh.setColorMode(ColorShader::CM_COLOR_MAP);
-    QGLBuffer a(m_buff), b(m_cl_buff);
-    sh.setVertexBuffer(a);
-    sh.setColorBuffer(b);
+    sh.setVertexBuffer(m_buff);
+    sh.setColorBuffer(m_cl_buff);
 
     glLineWidth (2.0);
     glDrawArrays(GL_LINES, 0, m_buff.size() / sizeof(GLfloat));
