@@ -25,13 +25,16 @@ public:
     virtual void setPosition(const QVector3D &vec);
 
     virtual QMatrix4x4 rotation() const;
+    virtual void setRotation(const QMatrix4x4 &mt);
     virtual void setRotation(const QVector3D &vec);
-    virtual void setRotation(const QMatrix4x4 &mx);
 
     virtual void rotateBy(double x, double y, double z);
 
     virtual QVector3D scale() const;
     virtual void setScale(const QVector3D &vec);
+
+signals:
+    void transformationChanged(GLObject *sender);
 
 protected:
     QVector3D m_position, m_scale;

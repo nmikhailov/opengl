@@ -5,7 +5,6 @@
 #include <boost/iterator/zip_iterator.hpp>
 
 #include <assimp/Importer.hpp>
-#include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
 QMatrix4x4 conv(const aiMatrix4x4 * m) {
@@ -17,8 +16,8 @@ QMatrix4x4 conv(const aiMatrix4x4 * m) {
 
 AssimpModel::AssimpModel(ContextManager *context) : GLObject(context) {
 }
-
 QString prefix = "/home/nsl/Study/s07/graphics/qt_labs/Lab_02/models/";
+//QString prefix = "/home/nsl/mc.blend";
 void AssimpModel::loadModel(const QString &file_name) {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile((prefix + file_name).toLatin1().data(),
@@ -30,97 +29,152 @@ void AssimpModel::loadModel(const QString &file_name) {
         qDebug() << "Error: " << importer.GetErrorString();
         return;
     }
-    qDebug() << scene->mRootNode->mChildren[0];
-    for(int i = 0; i < scene->mRootNode->mNumChildren; i++) {
-    aiNode * root = scene->mRootNode->mChildren[i];
-    QMatrix4x4 m = conv(&root->mTransformation);
 
-    //setRotation(m);
-    //m.setToIdentity();
-    //m.rotate(-90, 1, 0, 0);
-    m.scale(QVector3D(1, 1, 1) * 1e-3);
-    //qDebug() << m;
-    for(size_t mesh_id = 0; mesh_id < root->mNumMeshes; mesh_id++) {
-        aiMesh * mesh = scene->mMeshes[root->mMeshes[mesh_id]];
-        int cont = aiGetMaterialTextureCount(scene->mMaterials[mesh->mMaterialIndex], aiTextureType_DIFFUSE);
-        if(cont > 0) {
-            aiString * str = new aiString();
-            aiGetMaterialTexture(scene->mMaterials[mesh->mMaterialIndex], aiTextureType_DIFFUSE, 0, str, 0, 0, 0, 0, 0, 0);
-            qDebug() << "TEX:" << str->C_Str();
-            int id = m_context->textureManager()->getTextureByName(prefix + "airplane2/" + str->C_Str());
-            m_texid.append(id);
-        } else {
-            m_texid.append(0);
-        }
-        // Vertexes
-        QVector<GLfloat> vertexes, uv;
-        for(size_t v_id = 0; v_id < mesh->mNumVertices; v_id++) {
-            aiVector3D v = mesh->mVertices[v_id];
-            QVector4D vec(v.x, v.y, v.z, 1);
-            vec = m * vec;
-            vertexes << vec.x() << vec.y() << vec.z();
+    // load
+    m_root = new Node(m_context);
+    m_root->load(scene->mRootNode, scene, prefix);
 
-            if(mesh->HasTextureCoords(0)) {
-                aiVector3D t = mesh->mTextureCoords[0][v_id];
-                uv << t.x << t.y;
-            } else {
-                uv << 0 << 0;
+    QVector3D min = QVector3D(1, 1, 1) * 1e9, max = -min, t;
+    auto fn_draw = [&](Node* node) {
+        for (Mesh * mesh : node->m_meshes) {
+            for (size_t i = 0; i < mesh->m_vertex.size(); i += 3) {
+                min.setX(std::min(mesh->m_vertex[i + 0], (float) min.x()));
+                min.setY(std::min(mesh->m_vertex[i + 1], (float) min.y()));
+                min.setZ(std::min(mesh->m_vertex[i + 2], (float) min.z()));
+
+                max.setX(std::max(mesh->m_vertex[i + 0], (float) max.x()));
+                max.setY(std::max(mesh->m_vertex[i + 1], (float) max.y()));
+                max.setZ(std::max(mesh->m_vertex[i + 2], (float) max.z()));
             }
         }
-       // qDebug() << "-> " << min_x << max_x << min_z << max_z;
-        QGLBuffer b;
-        b.create();
-        b.bind();
-        b.allocate(vertexes.constData(), vertexes.size() * sizeof(GLfloat));
-        m_vertex_buffer.push_back(b);
-        // uv
-        QGLBuffer b2;
-        b2.create();
-        b2.bind();
-        b2.allocate(uv.constData(), uv.size() * sizeof(GLfloat));
-        m_uv_buffer.push_back(b2);
-    }
-    }
-}
+    };
+    dfs(m_root, fn_draw);
 
-void AssimpModel::recDraw() const {
+    // Fix this, should move object to 0,0,0
+    //m_root->m_trans.translate(-(max + min) / 2);
+    //qDebug() << max << min;
+    //qDebug() << -(max + min) / 2;
+    //m_root->m_trans.translate(-(max + min) / 2);
 
+    t = max - min;
+    double r = std::max({t.x(), t.y(), t.z()});
+    m_root->m_trans.scale(1. / r);
 }
 
 void AssimpModel::_draw() const {
     ColorShader sh = m_context->shaderManager()->setActiveShader<ColorShader>();
-    sh.setColorMode(ColorShader::CM_TEXTURE);
-    sh.setColor(Qt::blue);
+    sh.setColorMode(ColorShader::CM_ONE_COLOR);
+    sh.setColor(Qt::white);
 
-    static double z = 0;
-    sh.bindTexture(m_context->textureManager()->getTextureByName(
-                       prefix + "/airplane2/Diffuse.tga"));
-    for(size_t i = 0; i < m_vertex_buffer.size(); i++) {
-        QGLBuffer a = m_vertex_buffer[i], b = m_uv_buffer[i];
-        sh.setVertexBuffer(a);
-        //sh.bindTexture(m_texid[i]);
-        sh.setUVBuffer(b);
-        //sh.setColorMode(ColorShader::CM_ONE_COLOR);
+    sh.bindTexture(m_context->textureManager()->getTextureByName(prefix + "airplane2/Diffuse.tga"));
 
-        //
-        if(i != 15){
-            glDrawArrays(GL_TRIANGLES, 0, a.size() / sizeof(GLfloat));
+    auto fn_draw = [&](Node* node) {
+        for(Mesh * mesh : node->m_meshes) {
+            if (mesh->m_tex_enabled) {
+                sh.setColorMode(ColorShader::CM_TEXTURE);
+                sh.setUVBuffer(mesh->m_buff_uv);
+            } else {
+                sh.setColorMode(ColorShader::CM_ONE_COLOR);
+            }
+            sh.setVertexBuffer(mesh->m_buff_vert);
+            //
+            glDrawArrays(GL_TRIANGLES, 0, mesh->m_buff_vert.size() / sizeof(GLfloat));
+        }
+    };
+
+    dfs(m_root, fn_draw);
+}
+
+void AssimpModel::dfs(AssimpModel::Node *node, AssimpModel::func fn) const {
+    m_context->matrixStackManager()->push();
+    m_context->matrixStackManager()->top() *= node->m_trans;
+    m_context->matrixStackManager()->apply();
+
+    fn(node);
+
+    for (auto * n : node->m_nodes) {
+        dfs(n, fn);
+    }
+    m_context->matrixStackManager()->pop();
+    m_context->matrixStackManager()->apply();
+}
+
+void AssimpModel::Node::load(const aiNode *node, const aiScene *scene, const QString &prefix) {
+    // Current transformation matrix for node and all subnodes
+    m_trans = conv(&node->mTransformation);
+
+    // Process all meshes in node
+    for(size_t mesh_id = 0; mesh_id < node->mNumMeshes; mesh_id++) {
+        Mesh * m = new AssimpModel::Mesh(m_context);
+        m->load(scene->mMeshes[node->mMeshes[mesh_id]], scene, prefix);
+        m_meshes << m;
+    }
+    // Process all subnodes
+    for(size_t node_id = 0; node_id < node->mNumChildren; node_id++) {
+        Node * n = new AssimpModel::Node(m_context);
+        n->load(node->mChildren[node_id], scene, prefix);
+        m_nodes << n;
+    }
+}
+
+AssimpModel::Node::Node(ContextManager *cm) {
+    m_context = cm;
+}
+
+AssimpModel::Node::~Node() {
+    for(auto *node: m_nodes)
+        delete node;
+    for(auto *mesh: m_meshes)
+        delete mesh;
+}
+
+
+void AssimpModel::Mesh::load(const aiMesh *mesh, const aiScene *scene, const QString &prefix) {
+    // Try to load texture(s) for mesh
+    int diff_tex_id = aiGetMaterialTextureCount(scene->mMaterials[mesh->mMaterialIndex], aiTextureType_DIFFUSE);
+    m_texid = 0;
+    if(diff_tex_id > 0) {
+        aiString * str = new aiString();
+        aiGetMaterialTexture(scene->mMaterials[mesh->mMaterialIndex], aiTextureType_DIFFUSE, 0, str, 0, 0, 0, 0, 0, 0);
+        qDebug() << "TEX:" << str->C_Str();
+
+        m_texid = m_context->textureManager()->getTextureByName(prefix + str->C_Str());
+    }
+
+    // Vertexes, tex coords
+    m_vertex.clear();
+    m_texcoords.clear();
+    for(size_t v_id = 0; v_id < mesh->mNumVertices; v_id++) {
+        aiVector3D v = mesh->mVertices[v_id];
+        m_vertex << v.x << v.y << v.z;
+
+        // TODO: Process all textures(currently only first texture is proceeded)
+        if(mesh->HasTextureCoords(0)) {
+            aiVector3D t = mesh->mTextureCoords[0][v_id];
+            m_texcoords << t.x << t.y;
         } else {
-            QVector3D diff(-0.01, 0, 0.05);
-            m_context->matrixStackManager()->push();
-            m_context->matrixStackManager()->top().translate(-diff);
-            m_context->matrixStackManager()->top().rotate(z, 0, 1, 0);
-            m_context->matrixStackManager()->top().translate(diff);
-
-
-            m_context->matrixStackManager()->apply();
-            glDrawArrays(GL_TRIANGLES, 0, a.size() / sizeof(GLfloat));
-
-            m_context->matrixStackManager()->pop();
-            m_context->matrixStackManager()->apply();
-            z += 100;
+            m_texcoords << 0 << 0;
         }
     }
 
+    if(mesh->HasTextureCoords(0)) {
+        m_tex_enabled = true;
+    } else {
+        m_tex_enabled = false;
+    }
+
+    // Make buffers
+    m_buff_vert.create();
+    m_buff_color.create();
+    m_buff_uv.create();
+
+    m_buff_vert.bind();
+    m_buff_vert.allocate(m_vertex.constData(), m_vertex.size() * sizeof(GLfloat));
+
+    m_buff_uv.bind();
+    m_buff_uv.allocate(m_texcoords.constData(), m_texcoords.size() * sizeof(GLfloat));
 }
 
+AssimpModel::Mesh::Mesh(ContextManager *cm) {
+    m_context = cm;
+}
