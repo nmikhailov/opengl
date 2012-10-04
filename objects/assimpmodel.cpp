@@ -75,10 +75,11 @@ void AssimpModel::_draw() const {
                 sh.setUVBuffer(mesh->m_buff_uv);
             } else {
                 sh.setColorMode(ColorShader::CM_ONE_COLOR);
+                sh.setColor(mesh->m_color);
             }
             sh.setVertexBuffer(mesh->m_buff_vert);
             //
-            glDrawArrays(GL_TRIANGLES, 0, mesh->m_buff_vert.size() / sizeof(GLfloat));
+            glDrawArrays(GL_QUADS, 0, mesh->m_buff_vert.size() / sizeof(GLfloat));
         }
     };
 
@@ -131,13 +132,14 @@ AssimpModel::Node::~Node() {
 
 void AssimpModel::Mesh::load(const aiMesh *mesh, const aiScene *scene, const QString &prefix) {
     // Try to load texture(s) for mesh
-    int diff_tex_id = aiGetMaterialTextureCount(scene->mMaterials[mesh->mMaterialIndex], aiTextureType_DIFFUSE);
+    aiMaterial * mat = scene->mMaterials[mesh->mMaterialIndex];
+    unsigned int tex_cnt = mat->GetTextureCount(aiTextureType_DIFFUSE);
     m_texid = 0;
-    if(diff_tex_id > 0) {
+    if(tex_cnt > 0) {
         aiString * str = new aiString();
-        aiGetMaterialTexture(scene->mMaterials[mesh->mMaterialIndex], aiTextureType_DIFFUSE, 0, str, 0, 0, 0, 0, 0, 0);
-        qDebug() << "TEX:" << str->C_Str();
+        mat->GetTexture(aiTextureType_DIFFUSE, 0, str);
 
+        qDebug() << "TEX:" << str->C_Str();
         m_texid = m_context->textureManager()->getTextureByName(prefix + str->C_Str());
     }
 
@@ -157,11 +159,15 @@ void AssimpModel::Mesh::load(const aiMesh *mesh, const aiScene *scene, const QSt
         }
     }
 
-    if(mesh->HasTextureCoords(0)) {
-        m_tex_enabled = true;
-    } else {
-        m_tex_enabled = false;
-    }
+    m_tex_enabled = mesh->HasTextureCoords(0);
+
+    aiString name;
+    aiColor4D color;
+
+    mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+    mat->Get(AI_MATKEY_NAME, name);
+    m_color = QColor(color.r * 255., color.g * 255., color.b * 255.);
+    qDebug() << name.C_Str() << m_color;
 
     // Make buffers
     m_buff_vert.create();

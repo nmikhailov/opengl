@@ -82,8 +82,9 @@ void GLWidget::initializeGL() {
     m_landscape2->setPosition(QVector3D(0.5, 0.5, 0.5));
 
     m_plane1 = new AssimpModel(m_context);
-    m_plane1->loadModel("airplane2b.obj");
-    m_plane1->setPosition(QVector3D(1, 0.5, 0));
+    //m_plane1->loadModel("airplane2b.obj");
+    m_plane1->loadModel("world.obj");
+    //m_plane1->setPosition(QVector3D(1, 0.5, 0));
 
     m_axis = new Axis(m_context);
 }
@@ -112,7 +113,7 @@ void GLWidget::paintGL() {
 
     m_axis->draw();
 
-    m_landscape->draw();
+    //m_landscape->draw();
     //m_landscape2->draw();
     static double x = 0;
     m_msm->push();

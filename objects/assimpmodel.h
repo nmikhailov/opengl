@@ -37,6 +37,8 @@ protected:
 
         QGLBuffer m_buff_vert, m_buff_color, m_buff_uv;
         ContextManager * m_context;
+
+        QString m_mesh_name;
     };
 
     struct Node {
