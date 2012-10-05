@@ -7,7 +7,7 @@
 #include <QGLWidget>
 #include <QGLShaderProgram>
 
-#include "camera/lookatcamera.h"
+#include "camera/freelookcamera.h"
 #include "objects/landscape.h"
 #include "texturemanager.h"
 #include "contextmanager.h"
@@ -38,11 +38,13 @@ protected:
     void initContextManager(QGLContext * context);
     void initializeGL();
     void paintGL();
+    void resizeGL(int w, int h);
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
-    void wheelEvent(QWheelEvent *);
+    void keyReleaseEvent(QKeyEvent *);
+    void wheelEvent(QWheelEvent *event);
 
     void nextColoring();
     void nextTerraGen();
@@ -52,7 +54,7 @@ private:
     std::deque<TerraGen*> m_generators; // For cycling trought landscape generators
 
     QColor m_clear_color;
-    QPoint m_last_mouse_pos;
+    QVector2D m_last_mouse_pos;
 
     QString m_status; // Status text (top left screen corner)
 
@@ -60,7 +62,7 @@ private:
     AssimpModel * m_plane1;
     Axis * m_axis;
 
-    LookAtCamera * m_camera;
+    FreeLookCamera * m_camera;
 
     // Context stuff
     ContextManager * m_context;

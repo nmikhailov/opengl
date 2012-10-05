@@ -12,11 +12,12 @@
 
 GLWidget::GLWidget(QGLContext* context, QWidget *parent, QGLWidget *shareWidget)
     : QGLWidget(context, parent, shareWidget) {
+    setMouseTracking(true);
     m_clear_color = Qt::black;
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
-    timer->start(20);
+    timer->start(1000 / 60);
 
     setFocusPolicy(Qt::StrongFocus);
     setFocus();
@@ -65,8 +66,9 @@ void GLWidget::initializeGL() {
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_TEXTURE_2D);
 
-    m_camera = new LookAtCamera(m_msm);
-    m_camera->setPosition(QVector3D(0, 1.5, -1.5));
+    m_camera = new FreeLookCamera(m_msm);
+    m_camera->setPosition(QVector3D(0, 0.5, -0.5));
+    m_camera->setViewVector(-m_camera->position());
 
     m_landscape = new Landscape(m_context, m_generators.back());
     m_landscape->setColoringModel(m_cmodels.back());
@@ -83,8 +85,10 @@ void GLWidget::initializeGL() {
 
     m_plane1 = new AssimpModel(m_context);
     //m_plane1->loadModel("airplane2b.obj");
-    m_plane1->loadModel("world2.obj");
+    m_plane1->loadModel("world.obj");
+    m_plane1->setScale(QVector3D(1, 1, 1) * 10.);
     //m_plane1->setPosition(QVector3D(1, 0.5, 0));
+
 
     m_axis = new Axis(m_context);
 }
@@ -105,39 +109,43 @@ QString GLWidget::getStatus() const {
 }
 
 void GLWidget::paintGL() {
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+    glEnable(GL_POLYGON_SMOOTH);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_msm->clear();
     m_msm->setPerspective((double)width() / height());
+    m_camera->tick();
     m_camera->apply();
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    GLfloat pos[] = {0.0f, 0.0f, 2.0f, 0.0f};
+    glLightfv(GL_LIGHT0, GL_POSITION, pos);
+
+
 
     m_axis->draw();
 
     //m_landscape->draw();
     //m_landscape2->draw();
-    static double x = 0;
-    m_msm->push();
-    m_msm->top().rotate(x, 0, 1, 0);
-    x -= 0.5;
-    m_msm->apply();
     m_plane1->draw();
-    m_msm->pop();
+}
+
+void GLWidget::resizeGL(int w, int h) {
+    glViewport(0, 0, w, h);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {
-    m_last_mouse_pos = event->pos();
+    m_last_mouse_pos = QVector2D(event->pos());
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event) {
-    int dx = event->x() - m_last_mouse_pos.x();
-    int dy = event->y() - m_last_mouse_pos.y();
-
-    if (event->buttons() & Qt::LeftButton) {
-        m_landscape->rotateBy(-0.5 * dy, 0, 0.5 * dx);
-        //m_plane1->rotateBy(-0.5 * dy, 0, 0.5 * dx);
-        updateGL();
-    }
-    m_last_mouse_pos = event->pos();
+    QVector2D center(width() / 2, height() / 2);
+    QPoint glob = mapToGlobal(QPoint(center.x(), center.y()));
+    m_camera->mouseMoveEvent(event, center);
+    QCursor::setPos(glob);
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent * /* event */) {
@@ -164,6 +172,8 @@ void GLWidget::nextTerraGen() {
 }
 
 void GLWidget::keyPressEvent(QKeyEvent * event) {
+    m_camera->keyPressEvent(event);
+
     switch (event->key()) {
     case Qt::Key_T:
         m_landscape->setTexturing(!m_landscape->texturing());
@@ -182,17 +192,21 @@ void GLWidget::keyPressEvent(QKeyEvent * event) {
     updateGL();
 }
 
+void GLWidget::keyReleaseEvent(QKeyEvent *event) {
+    m_camera->keyReleaseEvent(event);
+}
+
 void GLWidget::wheelEvent(QWheelEvent *event) {
     QVector3D lookFrom = m_camera->position();
     double d = lookFrom.y() + (event->delta() * 1e-3);
     lookFrom.setY(d);
     lookFrom.setZ(-d);
-    m_camera->setPosition(lookFrom);
+    //m_camera->setPosition(lookFrom);
 }
 
 void GLWidget::rotateOneStep() {
-    m_landscape->rotateBy(0, 0.1, 0);
-    m_landscape2->rotateBy(0, 0.1, 0);
+    //m_landscape->rotateBy(0, 0.1, 0);
+    //m_landscape2->rotateBy(0, 0.1, 0);
     //m_plane1->rotateBy(0, 0.1, 0);
     updateGL();
 }

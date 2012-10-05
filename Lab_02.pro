@@ -34,7 +34,8 @@ SOURCES += main.cpp\
     shaders/colorshader.cpp \
     shaders/textureblendshader.cpp \
     objects/assimpmodel.cpp \
-    objects/axis.cpp
+    objects/axis.cpp \
+    camera/freelookcamera.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
@@ -55,7 +56,8 @@ HEADERS  += mainwindow.h \
     shaders/colorshader.h \
     shaders/textureblendshader.h \
     objects/assimpmodel.h \
-    objects/axis.h
+    objects/axis.h \
+    camera/freelookcamera.h
 
 FORMS    +=
 

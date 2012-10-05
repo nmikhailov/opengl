@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     m_widget->setObjectName("centralWidget");
     setCentralWidget(m_widget);
 
-    setWindowTitle("GL_HW");
+    setWindowTitle("GL_HW2");
 
     QMetaObject::connectSlotsByName(this);
 }
