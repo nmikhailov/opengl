@@ -83,7 +83,7 @@ void GLWidget::initializeGL() {
 
     m_plane1 = new AssimpModel(m_context);
     //m_plane1->loadModel("airplane2b.obj");
-    m_plane1->loadModel("world.obj");
+    m_plane1->loadModel("world2.obj");
     //m_plane1->setPosition(QVector3D(1, 0.5, 0));
 
     m_axis = new Axis(m_context);

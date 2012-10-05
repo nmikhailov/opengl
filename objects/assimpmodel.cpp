@@ -50,15 +50,11 @@ void AssimpModel::loadModel(const QString &file_name) {
     };
     dfs(m_root, fn_draw);
 
-    // Fix this, should move object to 0,0,0
-    //m_root->m_trans.translate(-(max + min) / 2);
-    //qDebug() << max << min;
-    //qDebug() << -(max + min) / 2;
-    //m_root->m_trans.translate(-(max + min) / 2);
-
+    // Scales object to fit it in 1x1x1 box and moves it to 0,0,0
     t = max - min;
     double r = std::max({t.x(), t.y(), t.z()});
     m_root->m_trans.scale(1. / r);
+    m_root->m_trans.translate(-(max + min) / 2);
 }
 
 void AssimpModel::_draw() const {
@@ -167,7 +163,7 @@ void AssimpModel::Mesh::load(const aiMesh *mesh, const aiScene *scene, const QSt
     mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
     mat->Get(AI_MATKEY_NAME, name);
     m_color = QColor(color.r * 255., color.g * 255., color.b * 255.);
-    qDebug() << name.C_Str() << m_color;
+    //qDebug() << name.C_Str() << m_color;
 
     // Make buffers
     m_buff_vert.create();
