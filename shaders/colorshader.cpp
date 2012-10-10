@@ -24,6 +24,12 @@ void ColorShader::setColorBuffer(QGLBuffer buff, GLenum type, int tupleSize) {
     m_program->enableAttributeArray(1);
 }
 
+void ColorShader::setNormalBuffer(QGLBuffer buff, GLenum type, int tupleSize) {
+    buff.bind();
+    m_program->setAttributeBuffer(3, type, 0, tupleSize);
+    m_program->enableAttributeArray(3);
+}
+
 void ColorShader::setUVBuffer(QGLBuffer buff, GLenum type, int tupleSize) {
     buff.bind();
     m_program->setAttributeBuffer(2, type, 0, tupleSize);

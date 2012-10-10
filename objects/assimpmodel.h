@@ -30,12 +30,13 @@ protected:
 
         QVector<GLfloat> m_vertex;
         QVector<GLfloat> m_texcoords;
+        QVector<GLfloat> m_normals;
 
         bool m_tex_enabled = false;
         QColor m_color = Qt::white;
         GLuint m_texid;
 
-        QGLBuffer m_buff_vert, m_buff_color, m_buff_uv;
+        QGLBuffer m_buff_vert, m_buff_color, m_buff_uv, m_buff_norm;
         ContextManager * m_context;
 
         QString m_mesh_name;

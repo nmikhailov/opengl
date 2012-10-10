@@ -17,7 +17,7 @@ GLWidget::GLWidget(QGLContext* context, QWidget *parent, QGLWidget *shareWidget)
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
-    timer->start(1000 / 60);
+    timer->start(1000 / 60); // 60 fps
 
     setFocusPolicy(Qt::StrongFocus);
     setFocus();
@@ -62,12 +62,14 @@ void GLWidget::setClearColor(const QColor &color) {
 void GLWidget::initializeGL() {
     initContextManager((QGLContext*)context());
     qglClearColor(m_clear_color);
-    // glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_TEXTURE_2D);
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_BLEND);
 
     m_camera = new FreeLookCamera(m_msm);
-    m_camera->setPosition(QVector3D(0, 0.5, -0.5));
+    m_camera->setPosition(QVector3D(0, 15, -5));
     m_camera->setViewVector(-m_camera->position());
 
     m_landscape = new Landscape(m_context, m_generators.back());
@@ -86,7 +88,7 @@ void GLWidget::initializeGL() {
     m_plane1 = new AssimpModel(m_context);
     //m_plane1->loadModel("airplane2b.obj");
     m_plane1->loadModel("world.obj");
-    m_plane1->setScale(QVector3D(1, 1, 1) * 10.);
+    m_plane1->setScale(QVector3D(1, 1, 1) * 100.);
     //m_plane1->setPosition(QVector3D(1, 0.5, 0));
 
 

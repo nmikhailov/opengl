@@ -23,6 +23,7 @@ void AssimpModel::loadModel(const QString &file_name) {
     const aiScene* scene = importer.ReadFile((prefix + file_name).toLatin1().data(),
                                              aiProcess_CalcTangentSpace |
                                              aiProcess_Triangulate |
+                                             aiProcess_GenSmoothNormals |
                                              //aiProcess_JoinIdenticalVertices |
                                              aiProcess_SortByPType);
     if (!scene) {
@@ -65,7 +66,7 @@ void AssimpModel::_draw() const {
     sh.bindTexture(m_context->textureManager()->getTextureByName(prefix + "airplane2/Diffuse.tga"));
 
     auto fn_draw = [&](Node* node) {
-        for(Mesh * mesh : node->m_meshes) {
+        for (Mesh * mesh : node->m_meshes) {
             if (mesh->m_tex_enabled) {
                 sh.setColorMode(ColorShader::CM_TEXTURE);
                 sh.setUVBuffer(mesh->m_buff_uv);
@@ -139,15 +140,17 @@ void AssimpModel::Mesh::load(const aiMesh *mesh, const aiScene *scene, const QSt
         m_texid = m_context->textureManager()->getTextureByName(prefix + str->C_Str());
     }
 
-    // Vertexes, tex coords
+    // Vertexes, tex coords and normals
+    m_normals.clear();
     m_vertex.clear();
     m_texcoords.clear();
-    for(size_t v_id = 0; v_id < mesh->mNumVertices; v_id++) {
-        aiVector3D v = mesh->mVertices[v_id];
+    for (size_t v_id = 0; v_id < mesh->mNumVertices; v_id++) {
+        aiVector3D v = mesh->mVertices[v_id], vn = mesh->mNormals[v_id];
         m_vertex << v.x << v.y << v.z;
+        m_normals << vn.x << vn.y << vn.z;
 
         // TODO: Process all textures(currently only first texture is proceeded)
-        if(mesh->HasTextureCoords(0)) {
+        if (mesh->HasTextureCoords(0)) {
             aiVector3D t = mesh->mTextureCoords[0][v_id];
             m_texcoords << t.x << t.y;
         } else {
@@ -169,12 +172,16 @@ void AssimpModel::Mesh::load(const aiMesh *mesh, const aiScene *scene, const QSt
     m_buff_vert.create();
     m_buff_color.create();
     m_buff_uv.create();
+    m_buff_norm.create();
 
     m_buff_vert.bind();
     m_buff_vert.allocate(m_vertex.constData(), m_vertex.size() * sizeof(GLfloat));
 
     m_buff_uv.bind();
     m_buff_uv.allocate(m_texcoords.constData(), m_texcoords.size() * sizeof(GLfloat));
+
+    m_buff_norm.bind();
+    m_buff_norm.allocate(m_normals.constData(), m_normals.size() * sizeof(GLfloat));
 }
 
 AssimpModel::Mesh::Mesh(ContextManager *cm) {

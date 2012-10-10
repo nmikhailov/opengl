@@ -18,6 +18,7 @@ public:
     
     void setVertexBuffer(QGLBuffer buff, GLenum type = GL_FLOAT, int tupleSize = 3);
     void setColorBuffer(QGLBuffer buff, GLenum type = GL_FLOAT, int tupleSize = 3);
+    void setNormalBuffer(QGLBuffer buff, GLenum type = GL_FLOAT, int tupleSize = 3);
 
     void setUVBuffer(QGLBuffer buff, GLenum type = GL_FLOAT, int tupleSize = 2);
     void bindTexture(GLuint id);

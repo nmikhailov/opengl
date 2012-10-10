@@ -54,12 +54,13 @@ void FreeLookCamera::mouseMoveEvent(QMouseEvent *event, QVector2D new_pos) {
     if (!first_event) {
         QVector2D diff = (QVector2D(event->pos()) - m_last_mouse_pos) / 5.;
         QMatrix4x4 rot;
-        QVector3D norm = QVector3D::normal(m_normal, m_view);
+        QVector3D norm = QVector3D::normal(m_normal, m_view), t;
 
         rot.rotate(diff.y(), norm);
         rot.rotate(diff.x(), -m_normal);
 
-        //m_camera->setNormal(m * m_camera->normal());
+        t = rot * m_view;
+
         m_view = rot * m_view;
     }
     m_last_mouse_pos = new_pos;
