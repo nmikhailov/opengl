@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     resize(800, 800);
 
     QGLFormat glFormat;
-    glFormat.setVersion(3, 3);
+    glFormat.setVersion(3, 0);
     glFormat.setProfile(QGLFormat::CoreProfile);
     glFormat.setSampleBuffers(true);
 

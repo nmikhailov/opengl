@@ -59,27 +59,9 @@ HEADERS  += mainwindow.h \
     objects/axis.h \
     camera/freelookcamera.h
 
-FORMS    +=
-
 RESOURCES += \
     resources.qrc \
     shaders.qrc
-
-
-
-ParentDirectory = "/tmp/qt/lab_02"
-
-RCC_DIR = "$$ParentDirectory/Build/RCCFiles"
-UI_DIR = "$$ParentDirectory/Build/UICFiles"
-MOC_DIR = "$$ParentDirectory/Build/MOCFiles"
-OBJECTS_DIR = "$$ParentDirectory/Build/ObjFiles"
-
-CONFIG(debug, debug|release) {
-    DESTDIR = "$$ParentDirectory/debug"
-}
-CONFIG(release, debug|release) {
-    DESTDIR = "$$ParentDirectory/release"
-}
 
 OTHER_FILES += \
     shaders/f_main.frag \

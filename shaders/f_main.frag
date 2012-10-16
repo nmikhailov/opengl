@@ -1,8 +1,7 @@
-#version 120
-#extension GL_ARB_explicit_attrib_location : require
+#version 130
 
-varying vec4 v_color;
-varying vec2 uv;
+in vec4 v_color;
+in vec2 uv;
 
 uniform vec4 cl_color;
 uniform int color_mode;
@@ -16,6 +15,5 @@ void main(void) {
         gl_FragColor = v_color;
     } else {
         gl_FragColor = texture2D(tex, uv);
-        //gl_FragColor = vec4(1, 1, 1, 1);
     }
 }

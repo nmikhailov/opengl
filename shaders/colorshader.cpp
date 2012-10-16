@@ -14,26 +14,26 @@ void ColorShader::setColorMode(ColorShader::EColorMode mode) {
 
 void ColorShader::setVertexBuffer(QGLBuffer buff, GLenum type, int tupleSize) {
     buff.bind();
-    m_program->setAttributeBuffer(0, type, 0, tupleSize);
-    m_program->enableAttributeArray(0);
+    m_program->setAttributeBuffer("vert", type, 0, tupleSize);
+    m_program->enableAttributeArray("vert");
 }
 
 void ColorShader::setColorBuffer(QGLBuffer buff, GLenum type, int tupleSize) {
     buff.bind();
-    m_program->setAttributeBuffer(1, type, 0, tupleSize);
-    m_program->enableAttributeArray(1);
+    m_program->setAttributeBuffer("color", type, 0, tupleSize);
+    m_program->enableAttributeArray("color");
 }
 
 void ColorShader::setNormalBuffer(QGLBuffer buff, GLenum type, int tupleSize) {
     buff.bind();
-    m_program->setAttributeBuffer(3, type, 0, tupleSize);
-    m_program->enableAttributeArray(3);
+    m_program->setAttributeBuffer("uv_buf", type, 0, tupleSize);
+    m_program->enableAttributeArray("uv_buf");
 }
 
 void ColorShader::setUVBuffer(QGLBuffer buff, GLenum type, int tupleSize) {
     buff.bind();
-    m_program->setAttributeBuffer(2, type, 0, tupleSize);
-    m_program->enableAttributeArray(2);
+    m_program->setAttributeBuffer("norm_buf", type, 0, tupleSize);
+    m_program->enableAttributeArray("norm_buf");
 }
 
 void ColorShader::bindTexture(GLuint id) {
