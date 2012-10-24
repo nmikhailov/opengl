@@ -84,7 +84,6 @@ void Landscape::_draw() const {
         for(size_t i = 0; i < m_texfiles.size(); i++) {
             sh.bindTexture(i, m_cache_texid[i]);
         }
-        sh.setProp(0.5, 0.5);
     } else {
         auto sh = m_context->shaderManager()->setActiveShader<ColorShader>();
         if(color){

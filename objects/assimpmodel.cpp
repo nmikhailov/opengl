@@ -25,7 +25,9 @@ void AssimpModel::loadModel(const QString &file_name) {
                                              aiProcess_Triangulate |
                                              aiProcess_GenSmoothNormals |
                                              //aiProcess_JoinIdenticalVertices |
-                                             aiProcess_SortByPType);
+                                             aiProcess_SortByPType |
+                                             aiProcess_OptimizeMeshes |
+                                             aiProcess_OptimizeGraph);
     if (!scene) {
         qDebug() << "Error: " << importer.GetErrorString();
         return;
@@ -75,6 +77,7 @@ void AssimpModel::_draw() const {
                 sh.setColor(mesh->m_color);
             }
             sh.setVertexBuffer(mesh->m_buff_vert);
+            sh.setNormalBuffer(mesh->m_buff_norm);
             //
             glDrawArrays(GL_QUADS, 0, mesh->m_buff_vert.size() / sizeof(GLfloat));
         }

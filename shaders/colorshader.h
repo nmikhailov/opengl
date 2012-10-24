@@ -23,7 +23,9 @@ public:
     void setUVBuffer(QGLBuffer buff, GLenum type = GL_FLOAT, int tupleSize = 2);
     void bindTexture(GLuint id);
 
-    void setPTMatrix(const QMatrix4x4 &proj);
+    void setModelMatrix(const QMatrix4x4 &proj);
+    void setViewMatrix(const QMatrix4x4 & proj);
+    void setProjectionMatrix(const QMatrix4x4 & proj);
 protected:
     friend class ShaderManager;
     ColorShader(QGLContext * context);

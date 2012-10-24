@@ -16,8 +16,14 @@ void TextureBlendShader::setUVBuffer(QGLBuffer buff, GLenum type, int tupleSize)
     m_program->enableAttributeArray(1);
 }
 
-void TextureBlendShader::setPTMatrix(const QMatrix4x4 &proj) {
+void TextureBlendShader::setModelMatrix(const QMatrix4x4 &proj) {
     m_program->setUniformValue("proj", proj);
+}
+
+void TextureBlendShader::setViewMatrix(const QMatrix4x4 &proj) {
+}
+
+void TextureBlendShader::setProjectionMatrix(const QMatrix4x4 &proj) {
 }
 
 void TextureBlendShader::bindTexture(int tex_id, int val) {
@@ -25,8 +31,4 @@ void TextureBlendShader::bindTexture(int tex_id, int val) {
     m_program->setUniformValue(names[tex_id], tex_id);
     glActiveTexture(GL_TEXTURE0 + tex_id);
     glBindTexture(GL_TEXTURE_2D, val);
-}
-
-void TextureBlendShader::setProp(float a, float b) {
-    m_program->setUniformValue("prop", QVector2D(a, b));
 }

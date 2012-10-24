@@ -27,7 +27,9 @@ public:
     virtual void setIndexBuffer(QGLBuffer buff);
 
     // Handle projection + transformation matrices
-    virtual void setPTMatrix(const QMatrix4x4 & proj) = 0;
+    virtual void setModelMatrix(const QMatrix4x4 & proj) = 0;
+    virtual void setViewMatrix(const QMatrix4x4 & proj) = 0;
+    virtual void setProjectionMatrix(const QMatrix4x4 & proj) = 0;
 
 protected:
     friend class ShaderManager;

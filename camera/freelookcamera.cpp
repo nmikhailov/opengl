@@ -46,7 +46,7 @@ void FreeLookCamera::apply() const {
     QMatrix4x4 m;
     //m = m_pos + m_view;
     m.lookAt(m_pos, m_pos + m_view, m_normal);
-    m_msmanager->setProjectionMatrix(m_msmanager->projectionMatrix() * m);
+    m_msmanager->setViewMatrix(m);
 }
 
 void FreeLookCamera::mouseMoveEvent(QMouseEvent *event, QVector2D new_pos) {

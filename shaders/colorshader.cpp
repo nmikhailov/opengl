@@ -26,14 +26,14 @@ void ColorShader::setColorBuffer(QGLBuffer buff, GLenum type, int tupleSize) {
 
 void ColorShader::setNormalBuffer(QGLBuffer buff, GLenum type, int tupleSize) {
     buff.bind();
-    m_program->setAttributeBuffer("uv_buf", type, 0, tupleSize);
-    m_program->enableAttributeArray("uv_buf");
+    m_program->setAttributeBuffer("norm_buf", type, 0, tupleSize);
+    m_program->enableAttributeArray("norm_buf");
 }
 
 void ColorShader::setUVBuffer(QGLBuffer buff, GLenum type, int tupleSize) {
     buff.bind();
-    m_program->setAttributeBuffer("norm_buf", type, 0, tupleSize);
-    m_program->enableAttributeArray("norm_buf");
+    m_program->setAttributeBuffer("uv_buf", type, 0, tupleSize);
+    m_program->enableAttributeArray("uv_buf");
 }
 
 void ColorShader::bindTexture(GLuint id) {
@@ -42,6 +42,14 @@ void ColorShader::bindTexture(GLuint id) {
     glBindTexture(GL_TEXTURE_2D, id);
 }
 
-void ColorShader::setPTMatrix(const QMatrix4x4 &proj) {
-    m_program->setUniformValue("proj", proj);
+void ColorShader::setModelMatrix(const QMatrix4x4 &proj) {
+    m_program->setUniformValue("M", proj);
+}
+
+void ColorShader::setViewMatrix(const QMatrix4x4 &proj) {
+    m_program->setUniformValue("V", proj);
+}
+
+void ColorShader::setProjectionMatrix(const QMatrix4x4 &proj) {
+    m_program->setUniformValue("P", proj);
 }

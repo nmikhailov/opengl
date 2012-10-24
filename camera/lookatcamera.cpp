@@ -42,5 +42,5 @@ void LookAtCamera::apply() const {
     QMatrix4x4 m;
     m.lookAt(m_pos, m_look_at, m_normal);
 
-    m_msmanager->setProjectionMatrix(m_msmanager->projectionMatrix() * m);
+    m_msmanager->setViewMatrix(m);
 }

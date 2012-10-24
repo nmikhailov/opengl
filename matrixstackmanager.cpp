@@ -32,17 +32,23 @@ void MatrixStackManager::setProjectionMatrix(const MatrixStackManager::Matrix &m
     m_projection = m;
 }
 
-void MatrixStackManager::setPerspective(double aspectRatio, double angle, double near, double far) {
-    m_projection.perspective(angle, aspectRatio, near, far);
+MatrixStackManager::Matrix MatrixStackManager::viewMatrix() const {
+    return m_view;
+}
+
+void MatrixStackManager::setViewMatrix(const MatrixStackManager::Matrix &m) {
+    m_view = m;
 }
 
 void MatrixStackManager::apply() {
-    Matrix res = m_projection;
+    Matrix res;
     for(Matrix &m : m_stack) {
         res *= m;
     }
 
-    m_shman->getActiveShader().setPTMatrix(res);
+    m_shman->getActiveShader().setModelMatrix(res);
+    m_shman->getActiveShader().setProjectionMatrix(m_projection);
+    m_shman->getActiveShader().setViewMatrix(m_view);
 }
 
 void MatrixStackManager::clear() {

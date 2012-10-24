@@ -88,7 +88,7 @@ void GLWidget::initializeGL() {
     m_plane1 = new AssimpModel(m_context);
     //m_plane1->loadModel("airplane2b.obj");
     m_plane1->loadModel("world.obj");
-    m_plane1->setScale(QVector3D(1, 1, 1) * 100.);
+    m_plane1->setScale(QVector3D(1, 1, 1) * 10.);
     //m_plane1->setPosition(QVector3D(1, 0.5, 0));
 
 
@@ -117,7 +117,9 @@ void GLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_msm->clear();
-    m_msm->setPerspective((double)width() / height());
+    MatrixStackManager::Matrix proj;
+    proj.perspective(45, (double)width() / height(), 0.1, 1e6);
+    m_msm->setProjectionMatrix(proj);
     m_camera->tick();
     m_camera->apply();
 

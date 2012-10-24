@@ -33,8 +33,9 @@ public:
     // Projection Matrix get/set
     Matrix projectionMatrix() const;
     void setProjectionMatrix(const Matrix &m);
-    // Sets perspective projection matrix
-    void setPerspective(double aspectRatio = 1, double angle = 45, double near = 1e-1, double far = 1e5);
+    // View Matrix get/set
+    Matrix viewMatrix() const;
+    void setViewMatrix(const Matrix &m);
 
 public slots:
     void apply(); // Send matrices product to opengl/shader
@@ -42,7 +43,7 @@ public slots:
 
 protected:
     std::vector<Matrix> m_stack; // Top element is m_stack.back()
-    Matrix m_projection;
+    Matrix m_projection, m_view;
 
     ShaderManager * m_shman;
 };
