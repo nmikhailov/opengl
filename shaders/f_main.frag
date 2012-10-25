@@ -1,7 +1,7 @@
 #version 130
 
 in vec4 v_color;
-in vec3 normal;
+flat in vec3 normal;
 in vec2 uv;
 
 uniform vec4 cl_color;
@@ -18,7 +18,7 @@ struct Light {
 
 void main(void) {
     Light l;
-    l.diffuse = normalize(vec3(1, 0.1, 0));
+    l.diffuse = normalize(vec3(1, 0, -1));
     l.position = normalize(vec3(0, 10, 10));
 
     if(color_mode == 0) {
@@ -29,6 +29,6 @@ void main(void) {
         color = texture2D(tex, uv);
     }
     // Light
-    float cos = clamp(dot(normal, l.diffuse), 0.5, 1);
+    float cos = clamp(dot(normal, l.diffuse), 0.2, 1);
     color *= cos;
 }

@@ -6,7 +6,7 @@ in vec2 uv_buf;
 in vec3 norm_buf;
 
 out vec4 v_color;
-out vec3 normal;
+flat out vec3 normal;
 out vec2 uv;
 
 uniform mat4x4 M, V, P;
