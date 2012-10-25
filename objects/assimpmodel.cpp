@@ -22,12 +22,13 @@ void AssimpModel::loadModel(const QString &file_name) {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile((prefix + file_name).toLatin1().data(),
                                              aiProcess_CalcTangentSpace |
-                                             aiProcess_Triangulate |
+                                             //aiProcess_Triangulate |
                                              aiProcess_GenSmoothNormals |
-                                             //aiProcess_JoinIdenticalVertices |
+                                             aiProcess_JoinIdenticalVertices |
                                              aiProcess_SortByPType |
                                              aiProcess_OptimizeMeshes |
-                                             aiProcess_OptimizeGraph);
+                                             aiProcess_OptimizeGraph |
+                                             0);
     if (!scene) {
         qDebug() << "Error: " << importer.GetErrorString();
         return;
@@ -78,8 +79,18 @@ void AssimpModel::_draw() const {
             }
             sh.setVertexBuffer(mesh->m_buff_vert);
             sh.setNormalBuffer(mesh->m_buff_norm);
+            sh.setIndexBuffer(mesh->m_buff_indeces);
             //
-            glDrawArrays(GL_QUADS, 0, mesh->m_buff_vert.size() / sizeof(GLfloat));
+            GLenum dType = GL_TRIANGLES;
+            if (mesh->m_poly_size == 3) {
+                dType = GL_TRIANGLES;
+            } else if (mesh->m_poly_size == 4) {
+                dType = GL_QUADS;
+            } else {
+                qDebug() << "Unsupported polygon size: " << mesh->m_poly_size;
+            }
+            size_t sz = mesh->m_buff_indeces.size() / sizeof(GLuint);
+            glDrawElements(dType, sz, GL_UNSIGNED_INT, nullptr);
         }
     };
 
@@ -171,22 +182,39 @@ void AssimpModel::Mesh::load(const aiMesh *mesh, const aiScene *scene, const QSt
     m_color = QColor(color.r * 255., color.g * 255., color.b * 255.);
     //qDebug() << name.C_Str() << m_color;
 
-    // Make buffers
-    m_buff_vert.create();
-    m_buff_color.create();
-    m_buff_uv.create();
-    m_buff_norm.create();
+    // Load index buffers
+    m_indeces.clear();
+    for (size_t f_id = 0; f_id < mesh->mNumFaces; f_id++) {
+        aiFace* face = &mesh->mFaces[f_id];
+        m_poly_size = face->mNumIndices;
 
+        for (size_t i = 0; i < face->mNumIndices; i++) {
+            m_indeces << face->mIndices[i];
+        }
+    }
+    // Make buffers
+
+    m_buff_color.create();
+    // Color buffer is not supported yet
+
+    m_buff_vert.create();
     m_buff_vert.bind();
     m_buff_vert.allocate(m_vertex.constData(), m_vertex.size() * sizeof(GLfloat));
 
+    m_buff_uv.create();
     m_buff_uv.bind();
     m_buff_uv.allocate(m_texcoords.constData(), m_texcoords.size() * sizeof(GLfloat));
 
+    m_buff_norm.create();
     m_buff_norm.bind();
     m_buff_norm.allocate(m_normals.constData(), m_normals.size() * sizeof(GLfloat));
+
+    // Make index buffers
+    m_buff_indeces.create();
+    m_buff_indeces.bind();
+    m_buff_indeces.allocate(m_indeces.constData(), m_indeces.size() * sizeof(GLuint));
 }
 
-AssimpModel::Mesh::Mesh(ContextManager *cm) {
+AssimpModel::Mesh::Mesh(ContextManager *cm) : m_buff_indeces(QGLBuffer::IndexBuffer) {
     m_context = cm;
 }

@@ -87,7 +87,7 @@ void GLWidget::initializeGL() {
 
     m_plane1 = new AssimpModel(m_context);
     //m_plane1->loadModel("airplane2b.obj");
-    m_plane1->loadModel("world.obj");
+    m_plane1->loadModel("world2.obj");
     m_plane1->setScale(QVector3D(1, 1, 1) * 10.);
     //m_plane1->setPosition(QVector3D(1, 0.5, 0));
 
@@ -122,13 +122,6 @@ void GLWidget::paintGL() {
     m_msm->setProjectionMatrix(proj);
     m_camera->tick();
     m_camera->apply();
-
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    GLfloat pos[] = {0.0f, 0.0f, 2.0f, 0.0f};
-    glLightfv(GL_LIGHT0, GL_POSITION, pos);
-
-
 
     m_axis->draw();
 
