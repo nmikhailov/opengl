@@ -59,7 +59,7 @@ private:
     QString m_status; // Status text (top left screen corner)
 
     Landscape * m_landscape, * m_landscape2;
-    AssimpModel * m_plane1;
+    AssimpModel * m_plane1, * m_plane2;
     Axis * m_axis;
 
     FreeLookCamera * m_camera;

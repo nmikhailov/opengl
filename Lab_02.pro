@@ -18,12 +18,7 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     glwidget.cpp \
-    terragen/terragen.cpp \
-    terragen/randomterragen.cpp \
     objects/globject.cpp \
-    objects/landscape.cpp \
-    terragen/diamondsquaregen.cpp \
-    terragen/spheregen.cpp \
     texturemanager.cpp \
     matrixstackmanager.cpp \
     camera/lookatcamera.cpp \
@@ -35,17 +30,15 @@ SOURCES += main.cpp\
     shaders/textureblendshader.cpp \
     objects/assimpmodel.cpp \
     objects/axis.cpp \
-    camera/freelookcamera.cpp
+    camera/freelookcamera.cpp \
+    scene.cpp \
+    lightsource.cpp \
+    objects/group.cpp \
+    texture.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
-    terragen/terragen.h \
-    terragen/randomterragen.h \
     objects/globject.h \
-    objects/landscape.h \
-    objects/coloring/coloringmodel.h \
-    terragen/diamondsquaregen.h \
-    terragen/spheregen.h \
     texturemanager.h \
     matrixstackmanager.h \
     camera/lookatcamera.h \
@@ -57,7 +50,11 @@ HEADERS  += mainwindow.h \
     shaders/textureblendshader.h \
     objects/assimpmodel.h \
     objects/axis.h \
-    camera/freelookcamera.h
+    camera/freelookcamera.h \
+    scene.h \
+    lightsource.h \
+    objects/group.h \
+    texture.h
 
 RESOURCES += \
     resources.qrc \

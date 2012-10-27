@@ -22,8 +22,8 @@ void AssimpModel::loadModel(const QString &file_name) {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile((prefix + file_name).toLatin1().data(),
                                              aiProcess_CalcTangentSpace |
-                                             //aiProcess_Triangulate |
-                                             aiProcess_GenSmoothNormals |
+                                             aiProcess_Triangulate |
+                                             aiProcess_GenSmoothNormals  |
                                              aiProcess_JoinIdenticalVertices |
                                              aiProcess_SortByPType |
                                              aiProcess_OptimizeMeshes |
@@ -142,6 +142,7 @@ AssimpModel::Node::~Node() {
 
 
 void AssimpModel::Mesh::load(const aiMesh *mesh, const aiScene *scene, const QString &prefix) {
+    m_mesh_name = mesh->mName.C_Str();
     // Try to load texture(s) for mesh
     aiMaterial * mat = scene->mMaterials[mesh->mMaterialIndex];
     unsigned int tex_cnt = mat->GetTextureCount(aiTextureType_DIFFUSE);
@@ -192,6 +193,7 @@ void AssimpModel::Mesh::load(const aiMesh *mesh, const aiScene *scene, const QSt
             m_indeces << face->mIndices[i];
         }
     }
+
     // Make buffers
 
     m_buff_color.create();

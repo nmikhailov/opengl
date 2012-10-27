@@ -44,6 +44,7 @@ void ColorShader::bindTexture(GLuint id) {
 
 void ColorShader::setModelMatrix(const QMatrix4x4 &proj) {
     m_program->setUniformValue("M", proj);
+    m_program->setUniformValue("M_N", proj.normalMatrix());
 }
 
 void ColorShader::setViewMatrix(const QMatrix4x4 &proj) {

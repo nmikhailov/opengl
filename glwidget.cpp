@@ -17,7 +17,7 @@ GLWidget::GLWidget(QGLContext* context, QWidget *parent, QGLWidget *shareWidget)
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
-    timer->start(1000 / 60); // 60 fps
+    timer->start(1000 / 30); // 60 fps
 
     setFocusPolicy(Qt::StrongFocus);
     setFocus();
@@ -69,7 +69,7 @@ void GLWidget::initializeGL() {
     //glBlendFunc(GL_BLEND);
 
     m_camera = new FreeLookCamera(m_msm);
-    m_camera->setPosition(QVector3D(0, 15, -5));
+    m_camera->setPosition(QVector3D(0, 5, -5));
     m_camera->setViewVector(-m_camera->position());
 
     m_landscape = new Landscape(m_context, m_generators.back());
@@ -86,10 +86,14 @@ void GLWidget::initializeGL() {
     m_landscape2->setPosition(QVector3D(0.5, 0.5, 0.5));
 
     m_plane1 = new AssimpModel(m_context);
-    //m_plane1->loadModel("airplane2b.obj");
+
     m_plane1->loadModel("world.obj");
     m_plane1->setScale(QVector3D(1, 1, 1) * 10.);
-    //m_plane1->setPosition(QVector3D(1, 0.5, 0));
+
+    m_plane2 = new AssimpModel(m_context);
+    m_plane2->loadModel("airplane2.obj");
+    m_plane2->setPosition(QVector3D(1, 0.5, 0));
+    m_plane2->setRotation(QVector3D(0, -90, 0));
 
 
     m_axis = new Axis(m_context);
@@ -111,14 +115,11 @@ QString GLWidget::getStatus() const {
 }
 
 void GLWidget::paintGL() {
-    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-    glEnable(GL_POLYGON_SMOOTH);
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_msm->clear();
     MatrixStackManager::Matrix proj;
-    proj.perspective(45, (double)width() / height(), 0.1, 1e6);
+    proj.perspective(45, (double)width() / height(), 0.001, 1e6);
     m_msm->setProjectionMatrix(proj);
     m_camera->tick();
     m_camera->apply();
@@ -128,6 +129,7 @@ void GLWidget::paintGL() {
     //m_landscape->draw();
     //m_landscape2->draw();
     m_plane1->draw();
+    m_plane2->draw();
 }
 
 void GLWidget::resizeGL(int w, int h) {
@@ -204,7 +206,7 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
 void GLWidget::rotateOneStep() {
     //m_landscape->rotateBy(0, 0.1, 0);
     //m_landscape2->rotateBy(0, 0.1, 0);
-    //m_plane1->rotateBy(0, 0.1, 0);
+    m_plane2->rotateBy(0, 0.7, 0);
     updateGL();
 }
 

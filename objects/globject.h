@@ -7,6 +7,8 @@
 #include <QMatrix4x4>
 
 #include "contextmanager.h"
+#include "lightsource.h"
+#include "scene.h"
 
 /*
  * Basic drawable opengl object
@@ -15,8 +17,7 @@
 class GLObject : public QObject {
     Q_OBJECT
 public:
-    GLObject(ContextManager * context);
-    virtual ~GLObject();
+    friend class Scene;
 
     virtual void draw() const;
 
@@ -24,11 +25,8 @@ public:
     virtual QVector3D position() const;
     virtual void setPosition(const QVector3D &vec);
 
-    virtual QMatrix4x4 rotation() const;
-    virtual void setRotation(const QMatrix4x4 &mt);
-    virtual void setRotation(const QVector3D &vec);
-
-    virtual void rotateBy(double x, double y, double z);
+    virtual QQuaternion rotation() const;
+    virtual void setRotation(const QQuaternion &vec);
 
     virtual QVector3D scale() const;
     virtual void setScale(const QVector3D &vec);
@@ -37,9 +35,13 @@ signals:
     void transformationChanged(GLObject *sender);
 
 protected:
+    GLObject(Scene * scene);
+    virtual ~GLObject();
+
     QVector3D m_position, m_scale;
-    QMatrix4x4 m_rotation;
-    ContextManager * m_context;
+    QQuaternion m_rotation;
+
+    Scene * m_scene;
 
     virtual void _draw() const = 0;
 };
