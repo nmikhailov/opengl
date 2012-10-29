@@ -5,6 +5,7 @@
 #include <QGLBuffer>
 #include <QString>
 
+#include "scene.h"
 #include "shaderprogram.h"
 
 class ColorShader : public ShaderProgram {
@@ -26,9 +27,11 @@ public:
     void setModelMatrix(const QMatrix4x4 &proj);
     void setViewMatrix(const QMatrix4x4 & proj);
     void setProjectionMatrix(const QMatrix4x4 & proj);
+
+    void activated();
 protected:
     friend class ShaderManager;
-    ColorShader(QGLContext * context);
+    ColorShader(Scene *scene);
 };
 
 #endif // COLORSHADER_H

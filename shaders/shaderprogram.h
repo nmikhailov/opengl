@@ -31,14 +31,15 @@ public:
     virtual void setViewMatrix(const QMatrix4x4 & proj) = 0;
     virtual void setProjectionMatrix(const QMatrix4x4 & proj) = 0;
 
+    virtual void activated();
 protected:
     friend class ShaderManager;
 
-    ShaderProgram(QGLContext * context);
+    ShaderProgram(Scene *context);
     virtual void init(QString vert, QString frag);
 
     std::shared_ptr<QGLShaderProgram> m_program;
-    QGLContext * m_context;
+    Scene *m_scene;
 };
 
 #endif // SHADERPROGRAM_H

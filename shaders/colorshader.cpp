@@ -1,6 +1,6 @@
 #include "colorshader.h"
 
-ColorShader::ColorShader(QGLContext *context) : ShaderProgram(context) {
+ColorShader::ColorShader(Scene *scene) : ShaderProgram(scene) {
     init("v_main.vert", "f_main.frag");
 }
 
@@ -53,4 +53,8 @@ void ColorShader::setViewMatrix(const QMatrix4x4 &proj) {
 
 void ColorShader::setProjectionMatrix(const QMatrix4x4 &proj) {
     m_program->setUniformValue("P", proj);
+}
+
+void ColorShader::activated() {
+    m_scene->getLights();
 }

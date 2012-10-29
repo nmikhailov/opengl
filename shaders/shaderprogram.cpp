@@ -2,9 +2,9 @@
 #include <QFile>
 
 
-ShaderProgram::ShaderProgram(QGLContext * context) :
+ShaderProgram::ShaderProgram(Scene * context) :
     m_program(new QGLShaderProgram(context)) {
-    m_context = context;
+    m_scene = scene;
 }
 
 ShaderProgram::~ShaderProgram() {
@@ -27,8 +27,11 @@ void ShaderProgram::setIndexBuffer(QGLBuffer buff) {
     buff.bind();
 }
 
+void ShaderProgram::activated() {
+}
+
 ShaderProgram::ShaderProgram(const ShaderProgram &program) :
     QObject() {
-    this->m_context = program.m_context;
+    this->m_scene = program.m_scene;
     this->m_program = program.m_program;
 }
