@@ -54,16 +54,6 @@ public:
 
     Group* newGroup();
 
-    // Add Camera/Object/Light to scene
-    void add(Camera *cam);
-    void add(GLObject *obj);
-    void add(LightSource *light);
-
-    // Remove Camera/Object/Light from scene
-    void remove(Camera *cam);
-    void remove(GLObject *obj);
-    void remove(LightSource *light);
-
     // Remove and dealloc Camera/Object/Light from scene
     void dealloc(Camera *cam);
     void dealloc(GLObject *obj);

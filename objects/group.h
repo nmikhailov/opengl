@@ -13,29 +13,34 @@ public:
 
     // Add Camera/Object/Light to scene
     // Checks scene ownership
-    void add(Camera *cam);
-    void add(GLObject *obj);
-    void add(LightSource *light);
+    virtual void add(Camera *cam);
+    virtual void add(GLObject *obj);
+    virtual void add(LightSource *light);
 
     // Remove Camera/Object/Light from scene
-    void remove(Camera *cam);
-    void remove(GLObject *obj);
-    void remove(LightSource *light);
+    virtual bool remove(Camera *cam);
+    virtual bool remove(GLObject *obj);
+    virtual bool remove(LightSource *light);
+
+    // Deep remove Camera/Object/Light from scene
+    virtual bool deepRemove(Camera *cam);
+    virtual bool deepRemove(GLObject *obj);
+    virtual bool deepRemove(LightSource *light);
 
     // Manage Objects
-    int getObjectCount() const;
-    const GLObject* getObject(int id) const;
-    GLObject* getObject(int id);
+    virtual int getObjectCount() const;
+    virtual const GLObject* getObject(int id) const;
+    virtual GLObject* getObject(int id);
 
     // Manage Lights
-    int getLightCount() const;
-    const LightSource* getLight(int id) const;
-    LightSource* getLight(int id);
+    virtual int getLightCount() const;
+    virtual const LightSource* getLight(int id) const;
+    virtual LightSource* getLight(int id);
 
     // Manage Cameras
-    int getCameraCount() const;
-    const Camera* getCamera(int id) const;
-    Camera* getCamera(int id);
+    virtual int getCameraCount() const;
+    virtual const Camera* getCamera(int id) const;
+    virtual Camera* getCamera(int id);
 
 protected:
     void _draw() const;
@@ -44,8 +49,10 @@ protected:
     virtual ~Group();
 
 
-private:
-    std::vector<GLObject*> m_objects;
+protected:
+    enum OBJ_TYPE{T_OBJECT, T_GROUP};
+
+    std::vector<std::pair<GLObject*, OBJ_TYPE> > m_objects;
     std::vector<LightSource*> m_lights;
     std::vector<Camera*> m_cameras;
 };

@@ -28,8 +28,6 @@
  * auto shader = shader_manager->setActiveShader<MyShaderProgram>();
  * shader.setVertexBuffer(...);
  * ...
- * To register new shader programm, add new shader program class to
- * ShaderManager::shader_list
  */
 
 class ShaderManager : public QObject {
