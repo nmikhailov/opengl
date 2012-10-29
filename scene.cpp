@@ -1,4 +1,5 @@
 #include "scene.h"
+#include <queue>
 
 Scene::Scene(QGLContext *context) : m_context(context){
     m_root = newGroup();
@@ -7,6 +8,9 @@ Scene::Scene(QGLContext *context) : m_context(context){
 Scene::~Scene() {
     delete m_root;
 
+    for (auto *obj: m_groups) {
+        delete obj;
+    }
     for (auto *obj: m_objects) {
         delete obj;
     }
@@ -61,15 +65,76 @@ void Scene::dealloc(LightSource *light) {
     }
 }
 
+QMatrix4x4 Scene::modelMatrix(const void *obj) const {
+    auto it = m_positions.find(obj) ;
+    if (it == m_positions.end()) {
+        qDebug() << "Error. Requested model matrix is not caclulated";
+        return QMatrix4x4();
+    }
+    return *it;
+}
 
+bool Scene::inLastSceneTree(const void *obj) const {
+    return m_positions.find(obj) != m_positions.end();
+}
 
 void Scene::render() {
     // Texture *x = new Texture()
     // renderToTexture(x);
     // SM.setActiveShader(x)
     //
+    updatePositions();
+    for (GLObject *obj: m_objects) {
+        if (!inLastSceneTree(obj))
+            continue;
+
+        obj->draw();
+    }
 }
+
+
 
 void Scene::renderToTexture(Texture *texture) {
     // ?
+}
+
+void Scene::updatePositions() {
+    m_positions.clear(); // ?
+
+    std::queue<std::pair<Group*, QMatrix4x4> > q;
+    q.push(std::make_pair(m_root, QMatrix4x4()));
+    while(!q.empty()) {
+        Group *cur = q.front().first();
+        QMatrix4x4 model = q.front().second() * cur->trMatrix();
+        q.pop();
+
+        // Groups
+        for (int i = 0; i < cur->groupCount(); i++) {
+            q.push(std::make_pair(cur->group(i), model));
+        }
+
+        // Objects
+        for (int i = 0; i < cur->objectCount(); i++) {
+            m_positions[cur->object(i)] = model;
+        }
+
+        // Lights
+        for (int i = 0; i < cur->lightCount(); i++) {
+            m_positions[cur->light(i)] = model;
+        }
+
+        // Cameras
+        for (int i = 0; i < cur->cameraCount(); i++) {
+            m_positions[cur->camera(i)] = model;
+        }
+    }
+
+}
+
+const Group *Scene::root() const {
+    return m_root;
+}
+
+Group *Scene::root() {
+    return m_root;
 }

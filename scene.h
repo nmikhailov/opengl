@@ -4,11 +4,16 @@
 #include <QObject>
 #include <QGLContext>
 
+#include <set>
+#include <map>
+#include <vector>
+
 #include "objects/group.h"
 #include "objects/globject.h"
 #include "camera/camera.h"
 #include "lightsource.h"
 #include "texture.h"
+#include "matrixstackmanager.h"
 
 /*
  * OpenGL scene
@@ -60,30 +65,41 @@ public:
     void dealloc(LightSource *light);
 
     // Manage Objects
-    int getObjectCount() const;
-    const GLObject* getObject(int id) const;
-    GLObject* getObject(int id);
+    int objectCount() const;
+    const GLObject* object(int id) const;
+    GLObject* object(int id);
 
     // Manage Lights
-    int getLightCount() const;
-    const LightSource* getLight(int id) const;
-    LightSource* getLight(int id);
+    int lightCount() const;
+    const LightSource* light(int id) const;
+    LightSource* light(int id);
 
     // Manage Cameras
-    int getCameraCount() const;
-    const Camera* getCamera(int id) const;
-    Camera* getCamera(int id);
+    int cameraCount() const;
+    const Camera* camera(int id) const;
+    Camera* camera(int id);
 
     // Manage Active camera(Render target)
-    Camera* getRenderCamera();
-    const Camera* getRenderCamera() const;
-    void setRenderCamera(Camera * cam);
+    Camera* renderCamera();
+    const Camera* renderCamera() const;
+    void renderCamera(Camera * cam);
+
+    // Manage root group
+    const Group* root() const;
+    Group* root();
 
     // Render scene to screen
     void render();
+
+    // Transformation matrix for object. Works on last scene postions update
+    QMatrix4x4 modelMatrix (const void *obj) const;
+    bool inLastSceneTree (const void *obj) const;
+
 protected:
     void renderToTexture(Texture * texture);
 
+    // Update matrices map
+    void updatePositions();
 private:
     // Level 0 group
     Group * m_root;
@@ -92,12 +108,16 @@ private:
     std::vector<GLObject*> m_objects;
     std::vector<LightSource*> m_lights;
     std::vector<Camera*> m_cameras;
+    std::vector<Group*> m_groups;
 
     // Render target camera
     Camera *m_render_camera;
 
+    QGLContext *m_context;
 
-    QGLContext * m_context;
+    // Object/light/group -> its postion
+    std::map<void*, QMatrix4x4> m_positions;
 };
 
 #endif // SCENE_H
+

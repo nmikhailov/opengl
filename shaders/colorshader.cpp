@@ -37,7 +37,7 @@ void ColorShader::setUVBuffer(QGLBuffer buff, GLenum type, int tupleSize) {
 }
 
 void ColorShader::bindTexture(GLuint id) {
-    //m_program->setUniformValue("tex", id);
+    m_program->setUniformValue("tex", id);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, id);
 }
@@ -56,5 +56,19 @@ void ColorShader::setProjectionMatrix(const QMatrix4x4 &proj) {
 }
 
 void ColorShader::activated() {
-    m_scene->getLights();
+    int id = 0;
+    for (int i = 0; i < m_scene->lightCount(); i++) {
+        LightSource *light = m_scene->light(i);
+
+        if (m_scene->inLastSceneTree(light)) {
+            QString name = QString("light[%1].").arg(id++);
+
+            QVector3D pos = (m_scene->modelMatrix(light) * QVector4D(light->position(), 0)).toVector3D();
+
+            m_program->setUniformValue(name + "diffuse", light->diffuseColor());
+            m_program->setUniformValue(name + "position", pos);
+            m_program->setUniformValue(name + "att", light->attenuation());
+        }
+    }
+    m_program->setUniformValueArray("lightCnt", id);
 }

@@ -3,21 +3,16 @@
 #include <algorithm>
 #include <utility>
 
-Group::Group(Scene *scene) : GLObject(scene) {
+Group::Group(Scene *scene) : Transformable() {
+    m_scene = scene;
 }
 
 Group::~Group() {
 }
 
-void Group::_draw() const {
-    for (GLObject *x: m_objects) {
-        x->draw();
-    }
-}
-
 void Group::add(Camera *cam) {
     if (std::find(m_scene->m_cameras.begin(), m_scene->m_cameras.end(), cam) != m_scene->m_cameras.end()) {
-        m_scene->remove(cam);
+        m_scene->root()->deepRemove(cam);
         m_cameras.push_back(cam);
     } else {
         qDebug() << "Error. Trying to add camera from other scene";
@@ -25,22 +20,27 @@ void Group::add(Camera *cam) {
 }
 
 void Group::add(GLObject *obj) {
-    if (std::find(m_scene->m_objects.begin(), m_scene->m_objects.end(), cam) != m_scene->m_objects.end()) {
-        m_scene->deepRemove(obj);
-        try {
-            m_objects.push_back(std::make_pair(dynamic_cast<Group*>(obj), T_GROUP));
-        } catch (...) {
-            m_objects.push_back(std::make_pair(obj, T_OBJECT));
-        }
+    if (std::find(m_scene->m_objects.begin(), m_scene->m_objects.end(), obj) != m_scene->m_objects.end()) {
+        m_scene->root()->deepRemove(obj);
+        m_objects.push_back(obj);
     } else {
         qDebug() << "Error. Trying to add object from other scene";
     }
 }
 
+void Group::add(Group *obj) {
+    if (std::find(m_scene->m_groups.begin(), m_scene->m_groups.end(), obj) != m_scene->m_groups.end()) {
+        m_scene->root()->deepRemove(obj);
+        m_groups.push_back(obj);
+    } else {
+        qDebug() << "Error. Trying to add group from other scene";
+    }
+}
+
 void Group::add(LightSource *light) {
-    if (std::find(m_scene->m_lights.begin(), m_scene->m_lights.end(), cam) != m_scene->m_lights.end()) {
-        m_scene->remove(obj);
-        m_objects.push_back(obj);
+    if (std::find(m_scene->m_lights.begin(), m_scene->m_lights.end(), light) != m_scene->m_lights.end()) {
+        m_scene->root()->deepRemove(light);
+        m_lights.push_back(light);
     } else {
         qDebug() << "Error. Trying to add light from other scene";
     }
@@ -56,10 +56,7 @@ bool Group::remove(Camera *cam) {
 }
 
 bool Group::remove(GLObject *obj) {
-    auto it = std::find_if(m_objects.begin(), m_objects.end(), [&](auto &x) {
-        return x.first() == obj;
-    });
-
+    auto it = std::find(m_objects.begin(), m_objects.end(), obj);
     if (it != m_objects.end()) {
         m_objects.erase(it);
         return true;
@@ -76,14 +73,22 @@ bool Group::remove(LightSource *light) {
     return false;
 }
 
+bool Group::remove(Group *g) {
+    auto it = std::find(m_groups.begin(), m_groups.end(), g);
+    if (it != m_groups.end()) {
+        m_groups.erase(it);
+        return true;
+    }
+    return false;
+}
+
+
 bool Group::deepRemove(Camera *cam)  {
-    if(remove(cam))
+    if (remove(cam))
         return true;
 
-    for (auto it = m_objects.begin(); it != m_objects.end(); it++) {
-        if (it->second() != T_GROUP)
-            continue;
-        if(((Group*)it->second()).deepRemove(cam))
+    for (auto it = m_groups.begin(); it != m_groups.end(); it++) {
+        if (it->deepRemove(cam))
             return true;
     }
     return false;
@@ -103,50 +108,71 @@ bool Group::deepRemove(GLObject *obj) {
 }
 
 bool Group::deepRemove(LightSource *light) {
-    if(remove(light))
+    if (remove(light))
         return true;
 
-    for (auto it = m_objects.begin(); it != m_objects.end(); it++) {
-        if (it->second() != T_GROUP)
-            continue;
-        if(((Group*)it->second()).deepRemove(light))
+    for (auto it = m_lights.begin(); it != m_lights.end(); it++) {
+        if (it->deepRemove(light))
             return true;
     }
     return false;
 }
 
-int Group::getObjectCount() const {
+bool Group::deepRemove(Group *group) {
+    if (remove(group))
+        return true;
+
+    for (auto it = m_groups.begin(); it != m_groups.end(); it++) {
+        if (it->deepRemove(group))
+            return true;
+    }
+    return false;
+}
+
+int Group::objectCount() const {
     return m_objects.size();
 }
 
-const GLObject *Group::getObject(int id) const {
+const GLObject *Group::object(int id) const {
     return m_objects[id];
 }
 
-GLObject *Group::getObject(int id) {
+GLObject *Group::object(int id) {
     return m_objects[id];
 }
 
-int Group::getLightCount() const {
+int Group::lightCount() const {
     return m_lights.size();
 }
 
-const LightSource *Group::getLight(int id) const {
+const LightSource *Group::light(int id) const {
     return m_lights[id];
 }
 
-LightSource *Group::getLight(int id) {
+LightSource *Group::light(int id) {
     return m_lights[id];
 }
 
-int Group::getCameraCount() const {
+int Group::cameraCount() const {
     return m_cameras.size();
 }
 
-const Camera *Group::getCamera(int id) const {
+const Camera *Group::camera(int id) const {
     return m_cameras[id];
 }
 
-Camera *Group::getCamera(int id) {
+Camera *Group::camera(int id) {
     return m_cameras[id];
+}
+
+int Group::groupCount() const {
+    return m_groups.size();
+}
+
+const Group *Group::group(int id) const {
+    return m_groups[id];
+}
+
+Group *Group::group(int id) {
+    return m_groups[id];
 }

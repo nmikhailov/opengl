@@ -17,7 +17,7 @@ public:
     void loadModel(const QString& file_name);
     
 protected:
-    void _draw() const;
+    void draw() const;
 
     QVector<QGLBuffer> m_vertex_buffer;
     QVector<QGLBuffer> m_uv_buffer;

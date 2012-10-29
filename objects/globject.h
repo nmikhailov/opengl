@@ -9,28 +9,18 @@
 #include "contextmanager.h"
 #include "lightsource.h"
 #include "scene.h"
+#include "transformable.h"
 
 /*
  * Basic drawable opengl object
  */
 
-class GLObject : public QObject {
+class GLObject : public Transformable {
     Q_OBJECT
 public:
     friend class Scene;
 
-    virtual void draw() const;
-
-    // Getters / setters
-    virtual QVector3D position() const;
-    virtual void setPosition(const QVector3D &vec);
-
-    virtual QQuaternion rotation() const;
-    virtual void setRotation(const QQuaternion &vec);
-
-    virtual QVector3D scale() const;
-    virtual void setScale(const QVector3D &vec);
-
+    virtual void draw() const = 0;
 signals:
     void transformationChanged(GLObject *sender);
 
@@ -38,12 +28,7 @@ protected:
     GLObject(Scene * scene);
     virtual ~GLObject();
 
-    QVector3D m_position, m_scale;
-    QQuaternion m_rotation;
-
     Scene * m_scene;
-
-    virtual void _draw() const = 0;
 };
 
 #endif // GLOBJECT_H

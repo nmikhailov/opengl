@@ -61,7 +61,7 @@ void AssimpModel::loadModel(const QString &file_name) {
     m_root->m_trans.translate(-(max + min) / 2);
 }
 
-void AssimpModel::_draw() const {
+void AssimpModel::draw() const {
     ColorShader sh = m_context->shaderManager()->setActiveShader<ColorShader>();
     sh.setColorMode(ColorShader::CM_ONE_COLOR);
     sh.setColor(Qt::white);

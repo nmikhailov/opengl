@@ -14,23 +14,16 @@ uniform mat3x3 M_N;
 uniform vec4 cl_color;
 uniform bool oneColor;
 
-
 struct Light {
-    vec3 diffuse;
+    vec4 diffuse;
     vec3 position;
 
-    float constantAttenuation, linearAttenuation, quadraticAttenuation;
+    vec3 att;
 };
-int sz = 2;
-Light lights[2] = Light[2](Light(normalize(vec3(1, 1, 1)),
-                    vec3(-4, 0.1, -1),
-                    0, 0.5, 0.5),
+int max_lights = 50;
 
-                    Light(normalize(vec3(1, 1, 1)),
-                    vec3(-1, 0.5, 0),
-                    0, 0.5, 0)
-                   );
-
+uniform int lightCnt;
+uniform Light lights[max_lights];
 
 void main() {
     gl_Position = P * V * M * vert;
@@ -39,16 +32,13 @@ void main() {
 
     // Light v2
     vec3 normal = M_N * norm_buf;
-    for (int i = 0; i < sz; i++) {
+    for (int i = 0; i < lightCnt; i++) {
         Light l = lights[i];
         vec3 vertexToLightSource = vec3(l.position - vec4(M * vert).xyz);
         vec3 lightDirection = normalize(vertexToLightSource);
 
-        float distance = length(vertexToLightSource);
-
-        float attenuation = 1.0 / (l.constantAttenuation
-                              + l.linearAttenuation * distance
-                              + l.quadraticAttenuation * distance * distance);
+        float dist = length(vertexToLightSource);
+        float attenuation = 1.0 / (l.att.x + l.att.y * dist + l.att.z * dist * dist);
 
         vec3 diffuseReflection = l.diffuse * clamp(dot(normal, lightDirection), 0.1, 1) * attenuation;
         if(i == 0) {

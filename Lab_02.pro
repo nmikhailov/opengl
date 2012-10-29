@@ -20,7 +20,6 @@ SOURCES += main.cpp\
     glwidget.cpp \
     objects/globject.cpp \
     texturemanager.cpp \
-    matrixstackmanager.cpp \
     camera/lookatcamera.cpp \
     camera/camera.cpp \
     contextmanager.cpp \
@@ -34,13 +33,13 @@ SOURCES += main.cpp\
     scene.cpp \
     lightsource.cpp \
     objects/group.cpp \
-    texture.cpp
+    texture.cpp \
+    transformable.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
     objects/globject.h \
     texturemanager.h \
-    matrixstackmanager.h \
     camera/lookatcamera.h \
     camera/camera.h \
     contextmanager.h \
@@ -54,7 +53,8 @@ HEADERS  += mainwindow.h \
     scene.h \
     lightsource.h \
     objects/group.h \
-    texture.h
+    texture.h \
+    transformable.h
 
 RESOURCES += \
     resources.qrc \

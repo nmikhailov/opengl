@@ -29,7 +29,7 @@ Axis::Axis(ContextManager *context):  GLObject(context) {
     m_cl_buff.allocate(clr.constData(), clr.size() * sizeof(GLfloat));
 }
 
-void Axis::_draw() const {
+void Axis::draw() const {
     ColorShader sh = m_context->shaderManager()->setActiveShader<ColorShader>();
     sh.setColorMode(ColorShader::CM_COLOR_MAP);
     sh.setVertexBuffer(m_buff);
