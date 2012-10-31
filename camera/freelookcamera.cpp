@@ -2,8 +2,9 @@
 #include <QMouseEvent>
 #include "freelookcamera.h"
 
-FreeLookCamera::FreeLookCamera(MatrixStackManager *msm) : Camera(msm) {
+FreeLookCamera::FreeLookCamera(Scene *scene) : Camera(scene) {
     m_normal = QVector3D(0, 1, 0);
+    //
     m_keys.resize(6);
     m_keys[0].keys << Qt::Key_W << Qt::Key_Up;
     m_keys[0].diff = QVector3D(1, 0, 0);
@@ -26,6 +27,9 @@ FreeLookCamera::FreeLookCamera(MatrixStackManager *msm) : Camera(msm) {
     //m_timer.start(50);
 }
 
+FreeLookCamera::~FreeLookCamera() {
+}
+
 QVector3D FreeLookCamera::viewVector() const {
     return m_view;
 }
@@ -42,11 +46,16 @@ void FreeLookCamera::setNormal(const QVector3D &normal) {
     m_normal = normal.normalized();
 }
 
-void FreeLookCamera::apply() const {
+QMatrix4x4 FreeLookCamera::projectionMatrix() const {
+    QMatrix4x4 mat;
+    mat.perspective(45, m_screen_size.x() / m_screen_size.y(), 1e-3, 1e6);
+    return mat;
+}
+
+QMatrix4x4 FreeLookCamera::viewMatrix() const {
     QMatrix4x4 m;
-    //m = m_pos + m_view;
     m.lookAt(m_pos, m_pos + m_view, m_normal);
-    m_msmanager->setViewMatrix(m);
+    return m;
 }
 
 void FreeLookCamera::mouseMoveEvent(QMouseEvent *event, QVector2D new_pos) {

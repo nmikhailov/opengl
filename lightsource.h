@@ -5,6 +5,7 @@
 #include <QVector3D>
 #include "scene.h"
 
+class Scene;
 class LightSource : public QObject {
     Q_OBJECT
 public:
@@ -25,7 +26,7 @@ public:
 protected:
     friend class Scene;
 
-    LightSource(Scene * scene);
+    LightSource(Scene* scene);
     virtual ~LightSource();
 
     QVector3D m_position, m_attenuation;
@@ -34,6 +35,7 @@ protected:
     LIGHT_TYPE m_type;
 
     Scene *m_scene;
+    QVector3D m_pos;
 };
 
 #endif // LIGHTSOURCE_H

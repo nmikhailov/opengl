@@ -5,7 +5,12 @@
 #include "lightsource.h"
 #include "camera/camera.h"
 #include "scene.h"
+#include "rect.h"
 #include "transformable.h"
+
+class Camera;
+class GLObject;
+class LightSource;
 
 class Group : public Transformable {
     Q_OBJECT
@@ -50,6 +55,11 @@ public:
     virtual int groupCount() const;
     virtual const Group* group(int id) const;
     virtual Group* group(int id);
+
+    Rect rect() const;
+
+    //
+    QMatrix4x4 trMatrix() const;
 protected:
     Group(Scene * scene);
     virtual ~Group();
@@ -62,6 +72,8 @@ protected:
     std::vector<Group*> m_groups;
     std::vector<LightSource*> m_lights;
     std::vector<Camera*> m_cameras;
+
+    QMatrix4x4 m_base_transform;
     Scene *m_scene;
 };
 

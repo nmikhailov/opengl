@@ -21,5 +21,5 @@ void main(void) {
 
     // Light
     //float cos = clamp(dot(normal, l.diffuse), 0.2, 1);
-    color *= light;
+    //color *= light;
 }

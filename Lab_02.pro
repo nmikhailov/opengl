@@ -20,41 +20,35 @@ SOURCES += main.cpp\
     glwidget.cpp \
     objects/globject.cpp \
     texturemanager.cpp \
-    camera/lookatcamera.cpp \
     camera/camera.cpp \
-    contextmanager.cpp \
-    shaders/shaderprogram.cpp \
-    shaders/shadermanager.cpp \
-    shaders/colorshader.cpp \
-    shaders/textureblendshader.cpp \
+    glpainter.cpp \
     objects/assimpmodel.cpp \
-    objects/axis.cpp \
     camera/freelookcamera.cpp \
     scene.cpp \
     lightsource.cpp \
     objects/group.cpp \
     texture.cpp \
-    transformable.cpp
+    transformable.cpp \
+    material.cpp \
+    objects/axes.cpp \
+    rect.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
     objects/globject.h \
     texturemanager.h \
-    camera/lookatcamera.h \
     camera/camera.h \
-    contextmanager.h \
-    shaders/shaderprogram.h \
-    shaders/shadermanager.h \
-    shaders/colorshader.h \
-    shaders/textureblendshader.h \
+    glpainter.h \
     objects/assimpmodel.h \
-    objects/axis.h \
     camera/freelookcamera.h \
     scene.h \
     lightsource.h \
     objects/group.h \
     texture.h \
-    transformable.h
+    transformable.h \
+    material.h \
+    objects/axes.h \
+    rect.h
 
 RESOURCES += \
     resources.qrc \

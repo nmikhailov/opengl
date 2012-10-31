@@ -9,10 +9,8 @@
 
 #include "camera/freelookcamera.h"
 #include "texturemanager.h"
-#include "contextmanager.h"
-#include "shaders/shadermanager.h"
 #include "objects/assimpmodel.h"
-#include "objects/axis.h"
+#include "objects/axes.h"
 #include "scene.h"
 
 class GLWidget : public QGLWidget {
@@ -51,7 +49,7 @@ private:
     // Context stuff
     Scene *m_scene;
     QGLContext *m_context;
-
+    FreeLookCamera* m_cam;
 };
 
 #endif

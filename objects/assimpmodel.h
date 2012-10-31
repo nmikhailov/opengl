@@ -6,61 +6,57 @@
 #include <QGLBuffer>
 #include <functional>
 
-#include "globject.h"
-
 #include <assimp/scene.h>
 
-class AssimpModel : public GLObject {
+#include "globject.h"
+#include "objects/group.h"
+#include "scene.h"
+#include "material.h"
+
+
+class AssimpModel : public Group {
     Q_OBJECT
 public:
-    AssimpModel(ContextManager *context);
-    void loadModel(const QString& file_name);
-    
+    friend class Scene;
+private:
+    void load(const QString &file_name);
 protected:
-    void draw() const;
+    AssimpModel(Scene *scene, const QString &file);
+};
 
-    QVector<QGLBuffer> m_vertex_buffer;
-    QVector<QGLBuffer> m_uv_buffer;
-    QVector<GLuint> m_texid;
+class AssimpSubMesh : public GLObject {
+    Q_OBJECT
+public:
+    friend class Scene;
+    friend class AssimpModel;
 
-    struct Mesh {
-        void load(const aiMesh *mesh, const aiScene *scene, const QString& prefix);
-        Mesh(ContextManager * cm);
-        ~Mesh() {}
+    Material material() const;
+    BufferInfo vertexBuffer() const;
+    GLenum primitiveType() const;
 
-        QVector<GLfloat> m_vertex;
-        QVector<GLfloat> m_texcoords;
-        QVector<GLfloat> m_normals;
-        QVector<GLuint> m_indeces;
-        int m_poly_size;
+    // Get objects index, normal, tex buffers (can be not present)
+    BufferInfo indexBuffer() const;
+    BufferInfo normalBuffer() const;
+    BufferInfo texcoordBuffer() const;
 
-        bool m_tex_enabled = false;
-        QColor m_color = Qt::white;
-        GLuint m_texid;
+    Rect rect() const;
+//
+protected:
+    AssimpSubMesh(Scene* scene, aiMesh* mesh, aiScene* obj_scene);
 
-        QGLBuffer m_buff_vert, m_buff_color, m_buff_uv, m_buff_norm, m_buff_indeces;
-        ContextManager * m_context;
+private:
+    void load(aiMesh* mesh, aiScene* obj_scene);
 
-        QString m_mesh_name;
-    };
+    Material m_material;
+    QGLBuffer m_buff_index, m_buff_vertex, m_buff_normal, m_buff_tex;
 
-    struct Node {
-        Node(ContextManager * cm);
-        ~Node();
+    QVector<GLfloat> m_vertex;
+    QVector<GLfloat> m_texcoords;
+    QVector<GLfloat> m_normals;
+    QVector<GLuint> m_indeces;
+    QString m_mesh_name;
 
-        void load(const aiNode *node, const aiScene *scene, const QString& prefix);
-
-        QVector<Mesh*> m_meshes;
-        QVector<Node*> m_nodes;
-
-        QMatrix4x4 m_trans;
-        ContextManager * m_context;
-    };
-
-    Node * m_root = nullptr;
-
-    typedef std::function<void(Node*)> func;
-    void dfs(Node * node, func fn) const;
+    Rect m_rect;
 };
 
 #endif // ASSIMPMODEL_H

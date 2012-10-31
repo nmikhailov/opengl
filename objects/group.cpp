@@ -88,7 +88,7 @@ bool Group::deepRemove(Camera *cam)  {
         return true;
 
     for (auto it = m_groups.begin(); it != m_groups.end(); it++) {
-        if (it->deepRemove(cam))
+        if ((*it)->deepRemove(cam))
             return true;
     }
     return false;
@@ -98,10 +98,8 @@ bool Group::deepRemove(GLObject *obj) {
     if(remove(obj))
         return true;
 
-    for (auto it = m_objects.begin(); it != m_objects.end(); it++) {
-        if (it->second() != T_GROUP)
-            continue;
-        if(((Group*)it->second()).deepRemove(obj))
+    for (auto it = m_groups.begin(); it != m_groups.end(); it++) {
+        if ((*it)->deepRemove(obj))
             return true;
     }
     return false;
@@ -111,8 +109,8 @@ bool Group::deepRemove(LightSource *light) {
     if (remove(light))
         return true;
 
-    for (auto it = m_lights.begin(); it != m_lights.end(); it++) {
-        if (it->deepRemove(light))
+    for (auto it = m_groups.begin(); it != m_groups.end(); it++) {
+        if ((*it)->deepRemove(light))
             return true;
     }
     return false;
@@ -123,7 +121,7 @@ bool Group::deepRemove(Group *group) {
         return true;
 
     for (auto it = m_groups.begin(); it != m_groups.end(); it++) {
-        if (it->deepRemove(group))
+        if ((*it)->deepRemove(group))
             return true;
     }
     return false;
@@ -175,4 +173,27 @@ const Group *Group::group(int id) const {
 
 Group *Group::group(int id) {
     return m_groups[id];
+}
+
+Rect Group::rect() const {
+    Rect r;
+    for (GLObject* obj: m_objects) {
+        r.xMax = std::max(obj->rect().xMax, r.xMax);
+        r.xMin = std::min(obj->rect().xMin, r.xMin);
+
+        r.yMax = std::max(obj->rect().yMax, r.yMax);
+        r.yMin = std::min(obj->rect().yMin, r.yMin);
+
+        r.zMax = std::max(obj->rect().zMax, r.zMax);
+        r.zMin = std::min(obj->rect().zMin, r.zMin);
+    }
+    return r;
+}
+
+QMatrix4x4 Group::trMatrix() const {
+    QMatrix4x4 mat;
+    mat.translate(m_position);
+    mat.rotate(m_rotation);
+    mat.scale(m_scale);
+    return mat * m_base_transform;
 }

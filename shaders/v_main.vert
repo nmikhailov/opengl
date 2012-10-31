@@ -20,7 +20,7 @@ struct Light {
 
     vec3 att;
 };
-int max_lights = 50;
+const int max_lights = 50;
 
 uniform int lightCnt;
 uniform Light lights[max_lights];
@@ -29,7 +29,7 @@ void main() {
     gl_Position = P * V * M * vert;
     v_color = color;
     uv = uv_buf;
-
+/*
     // Light v2
     vec3 normal = M_N * norm_buf;
     for (int i = 0; i < lightCnt; i++) {
@@ -46,5 +46,5 @@ void main() {
         } else {
             light += vec4(diffuseReflection, 1.0);
         }
-    }
+    }*/
 }

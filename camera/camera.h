@@ -4,27 +4,33 @@
 #include <QVector3D>
 #include <QObject>
 
-#include <matrixstackmanager.h>
+#include "scene.h"
 
 /*
  * Camera class
- * apply() method should be called
- * BEFORE drawing any objects.
  */
-
+class Scene;
 class Camera : public QObject {
     Q_OBJECT
 public:
-    Camera(MatrixStackManager * msm);
-    virtual ~Camera() {}
-    
     virtual void setPosition(const QVector3D & pos);
     virtual QVector3D position() const;
 
-    virtual void apply() const = 0;
+    virtual QMatrix4x4 projectionMatrix() const = 0;
+    virtual QMatrix4x4 viewMatrix() const = 0;
+
+    // Manage screen size
+    virtual void setScreenSize(const QVector2D &rect);
+    virtual QVector2D screenSize() const;
+
 protected:
-    MatrixStackManager * m_msmanager;
+    friend class Scene;
+    Camera(Scene* scene);
+    virtual ~Camera() {}
+
+    Scene* m_scene;
     QVector3D m_pos;
+    QVector2D m_screen_size;
 };
 
 #endif // CAMERA_H

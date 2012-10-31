@@ -1,5 +1,15 @@
 #include "transformable.h"
 
+
+Transformable::Transformable() {
+    m_position = QVector3D(0, 0, 0);
+    m_scale = QVector3D(1, 1, 1);
+    m_rotation = QQuaternion();
+}
+
+Transformable::~Transformable() {
+}
+
 QVector3D Transformable::position() const {
     return m_position;
 }
@@ -30,11 +40,4 @@ QMatrix4x4 Transformable::trMatrix() const {
     mat.rotate(m_rotation);
     mat.scale(m_scale);
     return mat;
-}
-
-
-Transformable::Transformable() {
-}
-
-Transformable::~Transformable() {
 }

@@ -3,13 +3,12 @@
 
 #include <QObject>
 
-class Texture : public QObject {
-    Q_OBJECT
+class Texture {
 public:
-    Texture();
-    virtual ~Texture();
+//    Texture() {};
+//    virtual ~Texture() {};
 
-    GLuint getId() const;
+    //GLuint getId() const;
 };
 
 #endif // TEXTURE_H

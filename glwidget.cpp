@@ -34,31 +34,51 @@ QSize GLWidget::sizeHint() const {
 
 void GLWidget::setClearColor(const QColor &color) {
     m_clear_color = color;
-    updateGL();
 }
 
 void GLWidget::initializeGL() {
-    initContextManager((QGLContext*)context());
     qglClearColor(m_clear_color);
     //glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_TEXTURE_2D);
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_BLEND);
 
     m_scene = new Scene(m_context);
-    m_scene->add(m_scene->newCamera<FreeLookCamera>());
-    //m_scene->add(m_scene->newCamera<FreeLookCamera>());
+    m_cam = m_scene->newCamera<FreeLookCamera>();
+    m_scene->setRenderCamera(m_cam);
+    m_scene->root()->add(m_scene->newGroup<Axes>());
+    m_cam->setPosition(QVector3D(1, 1, 1));
+    m_cam->setViewVector(QVector3D(-1, -1, -1));
+
+    AssimpModel *model = m_scene->newGroup<AssimpModel>("world.obj");
+    m_scene->root()->add(model);
+
+    qDebug() << model->rect().xMin << " "
+             << model->rect().xMax << " "
+             << model->rect().yMin << " "
+             << model->rect().yMax << " "
+             << model->rect().zMin << " "
+             << model->rect().zMax << " ";
+
+//    model->setPosition(-QVector3D((model->rect().xMax + model->rect().xMin) / 2.,
+//                 (model->rect().yMax - model->rect().yMin) / 2.,
+//                 (model->rect().zMax - model->rect().zMin) / 2.));
+//    model->setScale(QVector3D(1. / (model->rect().xMax - model->rect().xMin),
+//                 1. / (model->rect().yMax - model->rect().yMin),
+//                 1. / (model->rect().zMax - model->rect().zMin)));
+
+
 }
 
 void GLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    m_cam->tick();
     m_scene->render();
 }
 
 void GLWidget::resizeGL(int w, int h) {
     glViewport(0, 0, w, h);
+    m_scene->setScreenSize(QVector2D(w, h));
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {
@@ -68,7 +88,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event) {
 void GLWidget::mouseMoveEvent(QMouseEvent *event) {
     QVector2D center(width() / 2, height() / 2);
     QPoint glob = mapToGlobal(QPoint(center.x(), center.y()));
-    //m_camera->mouseMoveEvent(event, center);
+    m_cam->mouseMoveEvent(event, center);
     QCursor::setPos(glob);
 }
 
@@ -77,20 +97,16 @@ void GLWidget::mouseReleaseEvent(QMouseEvent * /* event */) {
 }
 
 void GLWidget::keyPressEvent(QKeyEvent * event) {
-    //m_camera->keyPressEvent(event);
-    //updateGL();
+    m_cam->keyPressEvent(event);
 }
 
 void GLWidget::keyReleaseEvent(QKeyEvent *event) {
-    m_camera->keyReleaseEvent(event);
+    m_cam->keyReleaseEvent(event);
 }
 
 void GLWidget::wheelEvent(QWheelEvent *event) {
 }
 
 void GLWidget::rotateOneStep() {
-    //m_landscape->rotateBy(0, 0.1, 0);
-    //m_landscape2->rotateBy(0, 0.1, 0);
-    //m_plane2->rotateBy(0, 0.7, 0);
-    //updateGL();
+    updateGL();
 }

@@ -32,6 +32,9 @@ LightSource::LightSource(Scene *scene) {
     m_position = QVector3D(0, 0, 0);
 }
 
+LightSource::~LightSource() {
+}
+
 void LightSource::setType(LightSource::LIGHT_TYPE type) {
     m_type = type;
 }

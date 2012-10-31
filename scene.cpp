@@ -1,12 +1,15 @@
 #include "scene.h"
 #include <queue>
+#include <utility>
 
 Scene::Scene(QGLContext *context) : m_context(context){
-    m_root = newGroup();
+    m_root = newGroup<Group>();
+    m_painter = new GLPainter(this);
 }
 
 Scene::~Scene() {
     delete m_root;
+    delete m_painter;
 
     for (auto *obj: m_groups) {
         delete obj;
@@ -20,10 +23,6 @@ Scene::~Scene() {
     for (auto *obj: m_cameras) {
         delete obj;
     }
-}
-
-Group *Scene::newGroup() {
-    return newObject<Group>();
 }
 
 void Scene::dealloc(Camera *cam) {
@@ -65,16 +64,53 @@ void Scene::dealloc(LightSource *light) {
     }
 }
 
-QMatrix4x4 Scene::modelMatrix(const void *obj) const {
+int Scene::objectCount() const {
+    return m_objects.size();
+}
+
+const GLObject *Scene::object(int id) const {
+    return m_objects[id];
+}
+
+GLObject *Scene::object(int id) {
+    return m_objects[id];
+}
+
+int Scene::lightCount() const {
+    return m_lights.size();
+}
+
+const LightSource *Scene::light(int id) const {
+    return m_lights[id];
+}
+
+LightSource *Scene::light(int id) {
+    return m_lights[id];
+}
+
+int Scene::cameraCount() const {
+    return m_cameras.size();
+}
+
+const Camera *Scene::camera(int id) const {
+    return m_cameras[id];
+}
+
+Camera *Scene::camera(int id) {
+    return m_cameras[id];
+}
+
+QMatrix4x4 Scene::modelMatrix(void *obj) const {
     auto it = m_positions.find(obj) ;
     if (it == m_positions.end()) {
         qDebug() << "Error. Requested model matrix is not caclulated";
         return QMatrix4x4();
     }
-    return *it;
+    return it->second;
+    //return m_positions[obj];
 }
 
-bool Scene::inLastSceneTree(const void *obj) const {
+bool Scene::inLastSceneTree(void *obj) const {
     return m_positions.find(obj) != m_positions.end();
 }
 
@@ -84,11 +120,17 @@ void Scene::render() {
     // SM.setActiveShader(x)
     //
     updatePositions();
+    m_painter->bind();
+    m_painter->setProjectionMatrix(m_render_camera->projectionMatrix());
+    m_painter->setViewMatrix(m_render_camera->viewMatrix());
     for (GLObject *obj: m_objects) {
         if (!inLastSceneTree(obj))
             continue;
 
-        obj->draw();
+        QMatrix4x4 model = modelMatrix(obj) * obj->trMatrix();
+        m_painter->setModelMatrix(model);
+
+        m_painter->render(obj);
     }
 }
 
@@ -104,8 +146,8 @@ void Scene::updatePositions() {
     std::queue<std::pair<Group*, QMatrix4x4> > q;
     q.push(std::make_pair(m_root, QMatrix4x4()));
     while(!q.empty()) {
-        Group *cur = q.front().first();
-        QMatrix4x4 model = q.front().second() * cur->trMatrix();
+        Group *cur = q.front().first;
+        QMatrix4x4 model = q.front().second * cur->trMatrix();
         q.pop();
 
         // Groups
@@ -137,4 +179,24 @@ const Group *Scene::root() const {
 
 Group *Scene::root() {
     return m_root;
+}
+
+void Scene::setScreenSize(const QVector2D &rect) {
+    m_screen_size = rect;
+}
+
+QVector2D Scene::screenSize() const {
+    return m_screen_size;
+}
+
+Camera *Scene::renderCamera() {
+    return m_render_camera;
+}
+
+const Camera *Scene::renderCamera() const {
+    return m_render_camera;
+}
+
+void Scene::setRenderCamera(Camera *cam) {
+    m_render_camera = cam;
 }

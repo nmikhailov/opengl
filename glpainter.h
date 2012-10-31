@@ -1,14 +1,19 @@
-#ifndef COLORSHADER_H
-#define COLORSHADER_H
+#ifndef GLPAINTER_H
+#define GLPAINTER_H
 
 #include <QColor>
 #include <QGLBuffer>
 #include <QString>
+#include <memory>
+#include <QGLShaderProgram>
 
 #include "scene.h"
-#include "shaderprogram.h"
+#include "objects/globject.h"
+#include "material.h"
+#include "objects/globject.h"
 
-class ColorShader : public ShaderProgram {
+class GLObject;
+class GLPainter: public QObject {
     Q_OBJECT
 public:
     enum EColorMode {CM_ONE_COLOR = 0, CM_COLOR_MAP = 1, CM_TEXTURE = 2};
@@ -20,6 +25,7 @@ public:
     void setVertexBuffer(QGLBuffer buff, GLenum type = GL_FLOAT, int tupleSize = 3);
     void setColorBuffer(QGLBuffer buff, GLenum type = GL_FLOAT, int tupleSize = 3);
     void setNormalBuffer(QGLBuffer buff, GLenum type = GL_FLOAT, int tupleSize = 3);
+    void setIndexBuffer(QGLBuffer buff);
 
     void setUVBuffer(QGLBuffer buff, GLenum type = GL_FLOAT, int tupleSize = 2);
     void bindTexture(GLuint id);
@@ -28,10 +34,22 @@ public:
     void setViewMatrix(const QMatrix4x4 & proj);
     void setProjectionMatrix(const QMatrix4x4 & proj);
 
-    void activated();
+    // New stuff
+    void updateLight();
+    void render(const GLObject* obj);
+    void setMaterial(const Material &m);
+
+    bool bind();
 protected:
-    friend class ShaderManager;
-    ColorShader(Scene *scene);
+    friend class Scene;
+
+    GLPainter(Scene *scene);
+    virtual ~GLPainter();
+    void init(QString vert, QString frag);
+
+    Scene *m_scene;
+
+    std::shared_ptr<QGLShaderProgram> m_program;
 };
 
-#endif // COLORSHADER_H
+#endif // GLPAINTER_H

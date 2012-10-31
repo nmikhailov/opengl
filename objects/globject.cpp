@@ -3,11 +3,33 @@
 
 
 GLObject::GLObject(Scene *scene) {
-    m_position = QVector3D(0, 0, 0);
-    m_scale = QVector3D(1, 1, 1);
-    m_rotation = QQuaternion();
     m_scene = scene;
 }
 
 GLObject::~GLObject() {
 }
+
+
+GLObject::BufferInfo::BufferInfo() {
+}
+
+GLObject::BufferInfo::BufferInfo(bool enabled, GLenum type, int sz, QGLBuffer buff) {
+    this->buff = buff;
+    this->type = type;
+    this->enabled = enabled;
+    this->sz = sz;
+}
+
+
+GLObject::BufferInfo GLObject::indexBuffer() const {
+    return BufferInfo(false);
+}
+
+GLObject::BufferInfo GLObject::normalBuffer() const {
+    return BufferInfo(false);
+}
+
+GLObject::BufferInfo GLObject::texcoordBuffer() const {
+    return BufferInfo(false);
+}
+
