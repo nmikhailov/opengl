@@ -6,6 +6,7 @@
 #include <QtGui>
 #include <QGLWidget>
 #include <QGLShaderProgram>
+#include <QTime>
 
 #include "camera/freelookcamera.h"
 #include "texturemanager.h"
@@ -35,6 +36,7 @@ protected:
     void initializeGL();
     void paintGL();
     void resizeGL(int w, int h);
+    void drawLegend();
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
@@ -43,14 +45,19 @@ protected:
     void wheelEvent(QWheelEvent *event);
 private:
     QColor m_clear_color;
-    QVector2D m_last_mouse_pos;
+    QTime m_time;
 
-    QString m_status; // Status text (top left screen corner)
+    QVector2D m_last_mouse_pos; // For camera controlling
+
     // Context stuff
-    Scene *m_scene;
     QGLContext *m_context;
+
+    // Scene objects
+    Scene *m_scene;
     FreeLookCamera* m_cam;
     AssimpModel * m2;
+
+
 };
 
 #endif

@@ -81,7 +81,7 @@ void GLPainter::updateLight() {
         LightSource *light = m_scene->light(i);
 
         if (m_scene->inLastSceneTree(light)) {
-            QString name = QString("light[%1].").arg(id++);
+            QString name = QString("lights[%1].").arg(id++);
 
             QVector3D pos = (m_scene->modelMatrix(light) * QVector4D(light->position(), 0)).toVector3D();
 

@@ -191,9 +191,5 @@ Rect Group::rect() const {
 }
 
 QMatrix4x4 Group::trMatrix() const {
-    QMatrix4x4 mat;
-    mat.translate(m_position);
-    mat.rotate(m_rotation);
-    mat.scale(m_scale);
-    return mat * m_base_transform;
+    return Transformable::trMatrix() /** m_base_transform*/;
 }

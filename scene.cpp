@@ -120,7 +120,10 @@ void Scene::render() {
     // SM.setActiveShader(x)
     //
     updatePositions();
+
+
     m_painter->bind();
+    m_painter->updateLight();
     m_render_camera->setScreenSize(m_screen_size);
 
     m_painter->setProjectionMatrix(m_render_camera->projectionMatrix());
@@ -143,7 +146,7 @@ void Scene::renderToTexture(Texture *texture) {
 }
 
 void Scene::updatePositions() {
-    m_positions.clear(); // ?
+    m_positions.clear();
 
     std::queue<std::pair<Group*, QMatrix4x4> > q;
     q.push(std::make_pair(m_root, QMatrix4x4()));

@@ -36,9 +36,9 @@ void Transformable::setScale(const QVector3D &vec) {
 
 QMatrix4x4 Transformable::trMatrix() const {
     QMatrix4x4 mat;
-    mat.rotate(m_rotation);
     mat.translate(m_position);
-
     mat.scale(m_scale);
+    //mat.rotate(m_rotation);
+    mat.rotate(m_rotation.scalar(), m_rotation.x(), m_rotation.y(), m_rotation.z());
     return mat;
 }

@@ -14,7 +14,7 @@ GLWidget::GLWidget(QGLContext* context, QWidget *parent, QGLWidget *shareWidget)
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
-    timer->start(1000 / 30); // 60 fps
+    timer->start(1000 / 60); // 60 fps
 
     setFocusPolicy(Qt::StrongFocus);
     setFocus();
@@ -48,6 +48,17 @@ void GLWidget::initializeGL() {
     m_scene->root()->add(m_scene->newGroup<Axes>());
     m_cam->setPosition(QVector3D(1, 1, 1));
     m_cam->setViewVector(QVector3D(-1, -1, -1));
+    LightSource* light = m_scene->newLightSource<LightSource>();
+    m_scene->root()->add(light);
+    light->setPosition(QVector3D(-15, 1, 10));
+    light->setDiffuseColor(Qt::white);
+    light->setAttenuationType(QVector3D(0, 0.3, 0));
+
+    light = m_scene->newLightSource<LightSource>();
+    light->setPosition(QVector3D(-5, 1, 3));
+    light->setAttenuationType(QVector3D(0, 0.3, 0));
+
+    m_scene->root()->add(light);
 
     AssimpModel *model = m_scene->newGroup<AssimpModel>("world.obj");
     m_scene->root()->add(model);
@@ -74,6 +85,8 @@ void GLWidget::initializeGL() {
     m_scene->root()->add(m2);
     m2->setScale(QVector3D(1, 1, 1) * 1e-3);
     m2->setPosition(QVector3D(-3, 0.5, 3));
+
+    m_time.start();
 }
 
 void GLWidget::paintGL() {
@@ -81,11 +94,26 @@ void GLWidget::paintGL() {
 
     m_cam->tick();
     m_scene->render();
+    drawLegend();
 }
 
 void GLWidget::resizeGL(int w, int h) {
     glViewport(0, 0, w, h);
     m_scene->setScreenSize(QVector2D(w, h));
+}
+
+
+void GLWidget::drawLegend() {
+    static int frames = 0;
+    frames++;
+
+    static double fps = 0;
+    if (m_time.elapsed() > 1000) {
+        fps = ((double) frames / m_time.elapsed()) * 1000.;
+        m_time.start();
+        frames = 0;
+        qDebug() << "FPS: " << fps;
+    }
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {
@@ -116,7 +144,7 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
 
 void GLWidget::rotateOneStep() {
     static float x = 0;
-    x += 0.1;
-    //m2->setRotation(QQuaternion(x, 0, 1, 0));
+    x += 0.5;
+    m2->setRotation(QQuaternion(x, 0, 1, 0));
     updateGL();
 }
