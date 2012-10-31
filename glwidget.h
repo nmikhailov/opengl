@@ -50,6 +50,7 @@ private:
     Scene *m_scene;
     QGLContext *m_context;
     FreeLookCamera* m_cam;
+    AssimpModel * m2;
 };
 
 #endif

@@ -59,14 +59,21 @@ void GLWidget::initializeGL() {
              << model->rect().zMin << " "
              << model->rect().zMax << " ";
 
-//    model->setPosition(-QVector3D((model->rect().xMax + model->rect().xMin) / 2.,
-//                 (model->rect().yMax - model->rect().yMin) / 2.,
-//                 (model->rect().zMax - model->rect().zMin) / 2.));
+    model->setPosition(QVector3D((model->rect().xMax + model->rect().xMin) / 2.,
+                 (model->rect().yMax + model->rect().yMin) / 2.,
+                 (model->rect().zMax + model->rect().zMin) / 2.));
+
+    model->setPosition(QVector3D(57.8, 0, 4.4));
+    qDebug() << model->position();
 //    model->setScale(QVector3D(1. / (model->rect().xMax - model->rect().xMin),
 //                 1. / (model->rect().yMax - model->rect().yMin),
 //                 1. / (model->rect().zMax - model->rect().zMin)));
 
 
+    m2 = m_scene->newGroup<AssimpModel>("airplane2.obj");
+    m_scene->root()->add(m2);
+    m2->setScale(QVector3D(1, 1, 1) * 1e-3);
+    m2->setPosition(QVector3D(-3, 0.5, 3));
 }
 
 void GLWidget::paintGL() {
@@ -108,5 +115,8 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
 }
 
 void GLWidget::rotateOneStep() {
+    static float x = 0;
+    x += 0.1;
+    //m2->setRotation(QQuaternion(x, 0, 1, 0));
     updateGL();
 }

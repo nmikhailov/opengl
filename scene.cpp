@@ -121,6 +121,8 @@ void Scene::render() {
     //
     updatePositions();
     m_painter->bind();
+    m_render_camera->setScreenSize(m_screen_size);
+
     m_painter->setProjectionMatrix(m_render_camera->projectionMatrix());
     m_painter->setViewMatrix(m_render_camera->viewMatrix());
     for (GLObject *obj: m_objects) {

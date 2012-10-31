@@ -18,8 +18,9 @@ void main(void) {
     } else {
         color = texture2D(tex, uv);
     }
+    color = cl_color;
 
     // Light
     //float cos = clamp(dot(normal, l.diffuse), 0.2, 1);
-    //color *= light;
+    color *= light;
 }

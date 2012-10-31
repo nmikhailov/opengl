@@ -366,6 +366,7 @@ void AssimpSubMesh::load(aiMesh *mesh, aiScene *obj_scene) {
     m_buff_normal.allocate(m_normals.constData(), m_normals.size() * sizeof(GLfloat));
 
     // Make index buffer
+    m_buff_index = QGLBuffer(QGLBuffer::IndexBuffer);
     m_buff_index.create();
     m_buff_index.bind();
     m_buff_index.allocate(m_indeces.constData(), m_indeces.size() * sizeof(GLuint));
@@ -384,7 +385,8 @@ GLObject::BufferInfo AssimpSubMesh::vertexBuffer() const {
 }
 
 GLObject::BufferInfo AssimpSubMesh::indexBuffer() const {
-    return BufferInfo(true, GL_UNSIGNED_INT, 3, m_buff_index);
+    //return BufferInfo(false);
+    return BufferInfo(true, GL_UNSIGNED_INT, 1, m_buff_index);
 }
 
 GLObject::BufferInfo AssimpSubMesh::normalBuffer() const {

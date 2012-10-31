@@ -134,7 +134,9 @@ void GLPainter::render(const GLObject *obj) {
 
     // Check for index buffer
     if (obj->indexBuffer().enabled) {
-        glDrawElements(obj->primitiveType(), sz / d, obj->vertexBuffer().type, nullptr);
+        //glDrawElements(obj->primitiveType(), sz / d, obj->vertexBuffer().type, nullptr);
+        int ssz = obj->indexBuffer().buff.size() / sizeof(GLuint);
+        glDrawElements(GL_TRIANGLES, ssz, GL_UNSIGNED_INT, nullptr);
     } else {
         glDrawArrays(obj->primitiveType(), 0, sz);
     }
