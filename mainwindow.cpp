@@ -11,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     glFormat.setProfile(QGLFormat::CoreProfile);
     glFormat.setSampleBuffers(true);
 
-
     m_context = new QGLContext(glFormat);
     m_widget = new GLWidget(m_context, this);
     m_widget->setObjectName("centralWidget");
@@ -23,6 +22,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 }
 
 MainWindow::~MainWindow() {
-    delete m_context;
     delete m_widget;
+    //delete m_context;
 }

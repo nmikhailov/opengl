@@ -56,7 +56,7 @@ private:
     Scene *m_scene;
     FreeLookCamera* m_cam;
     AssimpModel * m2;
-
+    LightSource* m_l1;
 
 };
 

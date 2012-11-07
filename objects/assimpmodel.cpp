@@ -15,7 +15,7 @@ QMatrix4x4 conv(const aiMatrix4x4 * m) {
 
 QString prefix = "/home/nsl/Study/s07/graphics/qt_labs/Lab_02/models/";
 
-AssimpModel::AssimpModel(Scene *scene, const QString &file) : Group(scene) {
+AssimpModel::AssimpModel(const QString &file) {
     load(file);
 }
 
@@ -54,12 +54,12 @@ void AssimpModel::load(const QString &file_name) {
         for (size_t mesh_id = 0; mesh_id < cur_node->mNumMeshes; mesh_id++) {
             aiMesh* nmesh = scene->mMeshes[cur_node->mMeshes[mesh_id]];
 
-            AssimpSubMesh *smesh = m_scene->newObject<AssimpSubMesh>(nmesh, scene);
+            AssimpSubMesh *smesh = new AssimpSubMesh(nmesh, scene);
             cur_group->add(smesh);
         }
         // Process all subnodes
         for (size_t node_id = 0; node_id < cur_node->mNumChildren; node_id++) {
-            Group* ngroup = m_scene->newGroup<Group>();
+            Group* ngroup = new Group();
             cur_group->add(ngroup);
 
             q.push(std::make_pair(cur_node->mChildren[node_id], ngroup));
@@ -68,7 +68,7 @@ void AssimpModel::load(const QString &file_name) {
 }
 
 
-AssimpSubMesh::AssimpSubMesh(Scene *scene, aiMesh *mesh, aiScene *obj_scene) : GLObject(scene) {
+AssimpSubMesh::AssimpSubMesh(aiMesh *mesh, aiScene *obj_scene) {
     load(mesh, obj_scene);
 }
 

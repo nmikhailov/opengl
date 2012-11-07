@@ -17,17 +17,15 @@
 class AssimpModel : public Group {
     Q_OBJECT
 public:
-    friend class Scene;
+    AssimpModel(const QString &file);
+
 private:
-    void load(const QString &file_name);
-protected:
-    AssimpModel(Scene *scene, const QString &file);
+    void load(const QString &file_name);    
 };
 
 class AssimpSubMesh : public GLObject {
     Q_OBJECT
 public:
-    friend class Scene;
     friend class AssimpModel;
 
     Material material() const;
@@ -42,7 +40,7 @@ public:
     Rect rect() const;
 //
 protected:
-    AssimpSubMesh(Scene* scene, aiMesh* mesh, aiScene* obj_scene);
+    AssimpSubMesh(aiMesh* mesh, aiScene* obj_scene);
 
 private:
     void load(aiMesh* mesh, aiScene* obj_scene);

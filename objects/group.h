@@ -4,7 +4,7 @@
 #include "globject.h"
 #include "lightsource.h"
 #include "camera/camera.h"
-#include "scene.h"
+
 #include "rect.h"
 #include "transformable.h"
 
@@ -15,7 +15,8 @@ class LightSource;
 class Group : public Transformable {
     Q_OBJECT
 public:
-    friend class Scene;
+    Group();
+    virtual ~Group();
 
     // Add Camera/Object/Light to scene
     // Checks scene ownership
@@ -31,10 +32,17 @@ public:
     virtual bool remove(Group *g);
 
     // Deep remove Camera/Object/Light from scene
-    virtual bool deepRemove(Camera *cam);
-    virtual bool deepRemove(GLObject *obj);
-    virtual bool deepRemove(LightSource *light);
-    virtual bool deepRemove(Group *group);
+    template<class T>
+    bool deepRemove(T* obj) {
+        if (remove(obj))
+            return true;
+
+        for (auto it = m_groups.begin(); it != m_groups.end(); it++) {
+            if ((*it)->deepRemove(obj))
+                return true;
+        }
+        return false;
+    }
 
     // Manage Objects
     virtual int objectCount() const;
@@ -60,21 +68,25 @@ public:
 
     //
     QMatrix4x4 trMatrix() const;
-protected:
-    Group(Scene * scene);
-    virtual ~Group();
-
 
 protected:
-    enum OBJ_TYPE{T_OBJECT, T_GROUP};
-
     std::vector<GLObject*> m_objects;
     std::vector<Group*> m_groups;
     std::vector<LightSource*> m_lights;
     std::vector<Camera*> m_cameras;
 
     QMatrix4x4 m_base_transform;
-    Scene *m_scene;
+
+private:
+    template<class T>
+    bool remove(T* obj, std::vector<T*> vec) {
+        auto it = std::find(vec.begin(), vec.end(), obj);
+        if (it != vec.end()) {
+            vec.erase(it);
+            return true;
+        }
+        return false;
+    }
 };
 
 #endif // GROUP_H

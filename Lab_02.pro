@@ -31,7 +31,9 @@ SOURCES += main.cpp\
     transformable.cpp \
     material.cpp \
     objects/axes.cpp \
-    rect.cpp
+    rect.cpp \
+    objects/sphere.cpp \
+    texturepainter.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
@@ -48,7 +50,9 @@ HEADERS  += mainwindow.h \
     transformable.h \
     material.h \
     objects/axes.h \
-    rect.h
+    rect.h \
+    objects/sphere.h \
+    texturepainter.h
 
 RESOURCES += \
     resources.qrc \
@@ -58,5 +62,7 @@ OTHER_FILES += \
     shaders/f_main.frag \
     shaders/v_main.vert \
     shaders/mtex_landscape.frag \
-    shaders/mtex_landscape.vert
+    shaders/mtex_landscape.vert \
+    shaders/single_tex.frag \
+    shaders/single_tex.vert
 

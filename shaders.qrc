@@ -4,5 +4,7 @@
         <file>shaders/v_main.vert</file>
         <file>shaders/mtex_landscape.vert</file>
         <file>shaders/mtex_landscape.frag</file>
+        <file>shaders/single_tex.vert</file>
+        <file>shaders/single_tex.frag</file>
     </qresource>
 </RCC>

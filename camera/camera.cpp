@@ -18,7 +18,6 @@ QVector2D Camera::screenSize() const {
     return m_screen_size;
 }
 
-Camera::Camera(Scene *scene) {
-    m_scene = scene;
+Camera::Camera() {
     m_screen_size = QVector2D(1, 1);
 }

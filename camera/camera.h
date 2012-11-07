@@ -9,10 +9,13 @@
 /*
  * Camera class
  */
-class Scene;
+
 class Camera : public QObject {
     Q_OBJECT
 public:
+    Camera();
+    virtual ~Camera() {}
+
     virtual void setPosition(const QVector3D & pos);
     virtual QVector3D position() const;
 
@@ -24,11 +27,6 @@ public:
     virtual QVector2D screenSize() const;
 
 protected:
-    friend class Scene;
-    Camera(Scene* scene);
-    virtual ~Camera() {}
-
-    Scene* m_scene;
     QVector3D m_pos;
     QVector2D m_screen_size;
 };

@@ -11,6 +11,7 @@ GLWidget::GLWidget(QGLContext* context, QWidget *parent, QGLWidget *shareWidget)
     : QGLWidget(context, parent, shareWidget) {
     setMouseTracking(true);
     m_clear_color = Qt::black;
+    m_context = context;
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
@@ -43,24 +44,25 @@ void GLWidget::initializeGL() {
     //glEnable(GL_TEXTURE_2D);
 
     m_scene = new Scene(m_context);
-    m_cam = m_scene->newCamera<FreeLookCamera>();
+    m_cam = new FreeLookCamera();
     m_scene->setRenderCamera(m_cam);
-    m_scene->root()->add(m_scene->newGroup<Axes>());
-    m_cam->setPosition(QVector3D(1, 1, 1));
-    m_cam->setViewVector(QVector3D(-1, -1, -1));
-    LightSource* light = m_scene->newLightSource<LightSource>();
+    m_scene->root()->add(new Axes());
+    m_cam->setPosition(QVector3D(-5, 1, 1));
+    m_cam->setViewVector(QVector3D(3, 0, 3));
+    LightSource* light = new LightSource();
     m_scene->root()->add(light);
     light->setPosition(QVector3D(-15, 1, 10));
     light->setDiffuseColor(Qt::white);
     light->setAttenuationType(QVector3D(0, 0.3, 0));
 
-    light = m_scene->newLightSource<LightSource>();
+    light = new LightSource();
     light->setPosition(QVector3D(-5, 1, 3));
     light->setAttenuationType(QVector3D(0, 0.3, 0));
+    m_l1 = light;
 
     m_scene->root()->add(light);
 
-    AssimpModel *model = m_scene->newGroup<AssimpModel>("world.obj");
+    AssimpModel *model = new AssimpModel("world.obj");
     m_scene->root()->add(model);
 
     qDebug() << model->rect().xMin << " "
@@ -81,7 +83,7 @@ void GLWidget::initializeGL() {
 //                 1. / (model->rect().zMax - model->rect().zMin)));
 
 
-    m2 = m_scene->newGroup<AssimpModel>("airplane2.obj");
+    m2 = new AssimpModel("airplane2.obj");
     m_scene->root()->add(m2);
     m2->setScale(QVector3D(1, 1, 1) * 1e-3);
     m2->setPosition(QVector3D(-3, 0.5, 3));
@@ -101,7 +103,6 @@ void GLWidget::resizeGL(int w, int h) {
     glViewport(0, 0, w, h);
     m_scene->setScreenSize(QVector2D(w, h));
 }
-
 
 void GLWidget::drawLegend() {
     static int frames = 0;
@@ -133,6 +134,12 @@ void GLWidget::mouseReleaseEvent(QMouseEvent * /* event */) {
 
 void GLWidget::keyPressEvent(QKeyEvent * event) {
     m_cam->keyPressEvent(event);
+
+    if (event->key() == Qt::Key_Plus) {
+        m_l1->setAttenuationType(m_l1->attenuation() * 0.9);
+    } else if (event->key() == Qt::Key_Minus) {
+        m_l1->setAttenuationType(m_l1->attenuation() * 1.1);
+    }
 }
 
 void GLWidget::keyReleaseEvent(QKeyEvent *event) {

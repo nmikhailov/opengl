@@ -2,8 +2,7 @@
 #include "globject.h"
 
 
-GLObject::GLObject(Scene *scene) {
-    m_scene = scene;
+GLObject::GLObject() {
 }
 
 GLObject::~GLObject() {

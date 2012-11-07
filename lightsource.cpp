@@ -25,8 +25,7 @@ void LightSource::setAttenuationType(const QVector3D &att) {
     m_attenuation = att;
 }
 
-LightSource::LightSource(Scene *scene) {
-    m_scene = scene;
+LightSource::LightSource() {
     m_attenuation = QVector3D(1, 0, 0);
     m_diffuse_color = Qt::white;
     m_position = QVector3D(0, 0, 0);

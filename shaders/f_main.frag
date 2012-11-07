@@ -19,7 +19,7 @@ struct Light {
 
     vec3 att;
 };
-const int max_lights = 10;
+const int max_lights = 20;
 
 uniform int lightCnt;
 uniform Light lights[max_lights];

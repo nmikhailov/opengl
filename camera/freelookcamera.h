@@ -10,6 +10,8 @@
 class FreeLookCamera : public Camera {
     Q_OBJECT
 public:
+    FreeLookCamera();
+    virtual ~FreeLookCamera();
 
     virtual QVector3D viewVector() const;
     virtual void setViewVector(const QVector3D &view);
@@ -28,10 +30,6 @@ public slots:
     void tick();
 
 protected:
-    friend class Scene;
-    FreeLookCamera(Scene* scene);
-    virtual ~FreeLookCamera();
-
     QVector3D m_normal, m_view;
     QVector2D m_last_mouse_pos;
 

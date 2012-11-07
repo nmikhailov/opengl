@@ -3,20 +3,20 @@
 
 #include "globject.h"
 #include "group.h"
-#include "scene.h"
 
 class Axes : public Group {
     Q_OBJECT
-protected:
-    friend class Scene;
-
-    Axes(Scene *scene);
+public:
+    Axes();
 };
 
 class Axis: public GLObject {
     Q_OBJECT
 public:
     enum AXIS_TYPE {X, Y, Z};
+
+    Axis(AXIS_TYPE type);
+    Axis(const QVector3D &vec, const QColor &color);
 
     Material material() const;
     BufferInfo vertexBuffer() const;
@@ -25,11 +25,6 @@ public:
     Rect rect() const;
 
 protected:
-    friend class Scene;
-
-    Axis(Scene* scene, AXIS_TYPE type);
-    Axis(Scene* scene, const QVector3D &vec, const QColor &color);
-
     void init(const QVector3D &vec, const QColor &color);
 
     Material m_mat;

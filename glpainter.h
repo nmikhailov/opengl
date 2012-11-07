@@ -13,6 +13,9 @@
 #include "objects/globject.h"
 
 class GLObject;
+class Scene;
+class Material;
+
 class GLPainter: public QObject {
     Q_OBJECT
 public:
@@ -35,11 +38,12 @@ public:
     void setProjectionMatrix(const QMatrix4x4 & proj);
 
     // New stuff
-    void updateLight();
+    void updateLight(const std::map<LightSource*, QMatrix4x4> &lights);
     void render(const GLObject* obj);
     void setMaterial(const Material &m);
 
     bool bind();
+    void release();
 protected:
     friend class Scene;
 

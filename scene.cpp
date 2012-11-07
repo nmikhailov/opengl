@@ -2,116 +2,16 @@
 #include <queue>
 #include <utility>
 
-Scene::Scene(QGLContext *context) : m_context(context){
-    m_root = newGroup<Group>();
+Scene::Scene(QGLContext *context) : m_context(context) {
+    m_root = new Group();
     m_painter = new GLPainter(this);
+    m_tex_painter = new TexturePainter();
 }
 
 Scene::~Scene() {
     delete m_root;
     delete m_painter;
-
-    for (auto *obj: m_groups) {
-        delete obj;
-    }
-    for (auto *obj: m_objects) {
-        delete obj;
-    }
-    for (auto *obj: m_lights) {
-        delete obj;
-    }
-    for (auto *obj: m_cameras) {
-        delete obj;
-    }
-}
-
-void Scene::dealloc(Camera *cam) {
-    auto it = std::find(m_cameras.begin(), m_cameras.end(), cam);
-
-    if (it != m_cameras.end()) {
-        m_root->deepRemove(cam);
-        m_cameras.erase(it);
-
-        delete cam;
-    } else {
-        qDebug() << "Error. Trying to dealloc wrong object";
-    }
-}
-
-void Scene::dealloc(GLObject *obj) {
-    auto it = std::find(m_objects.begin(), m_objects.end(), obj);
-
-    if (it != m_objects.end()) {
-        m_root->deepRemove(obj);
-        m_objects.erase(it);
-
-        delete obj;
-    } else {
-        qDebug() << "Error. Trying to dealloc wrong cam";
-    }
-}
-
-void Scene::dealloc(LightSource *light) {
-    auto it = std::find(m_lights.begin(), m_lights.end(), light);
-
-    if (it != m_lights.end()) {
-        m_root->deepRemove(light);
-        m_lights.erase(it);
-
-        delete light;
-    } else {
-        qDebug() << "Error. Trying to dealloc wrong light";
-    }
-}
-
-int Scene::objectCount() const {
-    return m_objects.size();
-}
-
-const GLObject *Scene::object(int id) const {
-    return m_objects[id];
-}
-
-GLObject *Scene::object(int id) {
-    return m_objects[id];
-}
-
-int Scene::lightCount() const {
-    return m_lights.size();
-}
-
-const LightSource *Scene::light(int id) const {
-    return m_lights[id];
-}
-
-LightSource *Scene::light(int id) {
-    return m_lights[id];
-}
-
-int Scene::cameraCount() const {
-    return m_cameras.size();
-}
-
-const Camera *Scene::camera(int id) const {
-    return m_cameras[id];
-}
-
-Camera *Scene::camera(int id) {
-    return m_cameras[id];
-}
-
-QMatrix4x4 Scene::modelMatrix(void *obj) const {
-    auto it = m_positions.find(obj) ;
-    if (it == m_positions.end()) {
-        qDebug() << "Error. Requested model matrix is not caclulated";
-        return QMatrix4x4();
-    }
-    return it->second;
-    //return m_positions[obj];
-}
-
-bool Scene::inLastSceneTree(void *obj) const {
-    return m_positions.find(obj) != m_positions.end();
+    delete m_tex_painter;
 }
 
 void Scene::render() {
@@ -120,36 +20,74 @@ void Scene::render() {
     // SM.setActiveShader(x)
     //
     updatePositions();
+    //
+//    GLuint FramebufferName = 0;
+//    glGenFramebuffers(1, &FramebufferName);
+//    glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 
+//    // The texture we're going to render to
+//    GLuint renderedTexture;
+//    glGenTextures(1, &renderedTexture);
+
+//    // "Bind" the newly created texture : all future texture functions will modify this texture
+//    glBindTexture(GL_TEXTURE_2D, renderedTexture);
+
+//    // Give an empty image to OpenGL ( the last "0" )
+//    glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, 1024, 768, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
+
+//    // Poor filtering. Needed !
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+//    //
+//    // The depth buffer
+//    GLuint depthrenderbuffer;
+//    glGenRenderbuffers(1, &depthrenderbuffer);
+//    glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
+//    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 1024, 768);
+//    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
+//    //
+//    // Set "renderedTexture" as our colour attachement #0
+//    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
+
+//    // Set the list of draw buffers.
+//    GLenum DrawBuffers[2] = {GL_COLOR_ATTACHMENT0};
+//    glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
 
     m_painter->bind();
-    m_painter->updateLight();
     m_render_camera->setScreenSize(m_screen_size);
 
+    m_painter->updateLight(m_light_pos);
     m_painter->setProjectionMatrix(m_render_camera->projectionMatrix());
     m_painter->setViewMatrix(m_render_camera->viewMatrix());
-    for (GLObject *obj: m_objects) {
-        if (!inLastSceneTree(obj))
-            continue;
-
-        QMatrix4x4 model = modelMatrix(obj) * obj->trMatrix();
+    for (auto &obj: m_obj_pos) {
+        QMatrix4x4 model = obj.second * obj.first->trMatrix();
         m_painter->setModelMatrix(model);
 
-        m_painter->render(obj);
+        m_painter->render(obj.first);
     }
+    m_painter->release();
+
+    //
+
+//    m_tex_painter->bind();
+//    static int id = m_context->bindTexture(QImage(":/images/rock.png"));
+//    m_tex_painter->renderTexture(id);
+//    m_tex_painter->release();
 }
-
-
 
 void Scene::renderToTexture(Texture *texture) {
     // ?
 }
 
 void Scene::updatePositions() {
-    m_positions.clear();
+    m_obj_pos.clear();
+    m_cam_pos.clear();
+    m_light_pos.clear();
 
+    // bfs
     std::queue<std::pair<Group*, QMatrix4x4> > q;
     q.push(std::make_pair(m_root, QMatrix4x4()));
+
     while(!q.empty()) {
         Group *cur = q.front().first;
         QMatrix4x4 model = q.front().second * cur->trMatrix();
@@ -162,17 +100,17 @@ void Scene::updatePositions() {
 
         // Objects
         for (int i = 0; i < cur->objectCount(); i++) {
-            m_positions[cur->object(i)] = model;
+            m_obj_pos[cur->object(i)] = model;
         }
 
         // Lights
         for (int i = 0; i < cur->lightCount(); i++) {
-            m_positions[cur->light(i)] = model;
+            m_light_pos[cur->light(i)] = model;
         }
 
         // Cameras
         for (int i = 0; i < cur->cameraCount(); i++) {
-            m_positions[cur->camera(i)] = model;
+            m_cam_pos[cur->camera(i)] = model;
         }
     }
 

@@ -3,13 +3,13 @@
 #include <QVector3D>
 
 
-Axes::Axes(Scene *scene) : Group(scene) {
-    this->add(m_scene->newObject<Axis>(Axis::X));
-    this->add(m_scene->newObject<Axis>(Axis::Y));
-    this->add(m_scene->newObject<Axis>(Axis::Z));
+Axes::Axes() {
+    this->add(new Axis(Axis::X));
+    this->add(new Axis(Axis::Y));
+    this->add(new Axis(Axis::Z));
 }
 
-Axis::Axis(Scene *scene, Axis::AXIS_TYPE type) : GLObject(scene) {
+Axis::Axis(Axis::AXIS_TYPE type) {
     if (type == Axis::X) {
         init(QVector3D(1, 0, 0), Qt::red);
     } else if(type == Axis::Y) {
@@ -19,7 +19,7 @@ Axis::Axis(Scene *scene, Axis::AXIS_TYPE type) : GLObject(scene) {
     }
 }
 
-Axis::Axis(Scene *scene, const QVector3D &vec, const QColor &color) : GLObject(scene) {
+Axis::Axis(const QVector3D &vec, const QColor &color) {
     init(vec, color);
 }
 
@@ -27,7 +27,8 @@ void Axis::init(const QVector3D &vec, const QColor &color) {
     m_mat = Material(color);
     QVector3D v = vec.normalized();
     QVector<GLfloat> vt;
-    vt << 0 << 0 << 0 << v.x() << v.y() << v.z();
+    vt << 0 << 0 << 0 << 0
+       << v.x() << v.y() << v.z() << 0;
 
     m_buff.create();
     m_buff.bind();

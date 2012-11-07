@@ -2,7 +2,7 @@
 #include <QMouseEvent>
 #include "freelookcamera.h"
 
-FreeLookCamera::FreeLookCamera(Scene *scene) : Camera(scene) {
+FreeLookCamera::FreeLookCamera() {
     m_normal = QVector3D(0, 1, 0);
     //
     m_keys.resize(6);

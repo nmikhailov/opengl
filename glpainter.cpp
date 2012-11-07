@@ -20,6 +20,10 @@ bool GLPainter::bind() {
     return m_program->bind();
 }
 
+void GLPainter::release() {
+    m_program->release();
+}
+
 void GLPainter::setColor(const QColor &color) {
     m_program->setUniformValue("cl_color", color);
 }
@@ -75,23 +79,20 @@ void GLPainter::setIndexBuffer(QGLBuffer buff) {
     buff.bind();
 }
 
-void GLPainter::updateLight() {
+void GLPainter::updateLight(const std::map<LightSource*, QMatrix4x4>  &lights) {
     int id = 0;
-    for (int i = 0; i < m_scene->lightCount(); i++) {
-        LightSource *light = m_scene->light(i);
+    for (auto rec: lights) {
+        LightSource* light = rec.first;
+        QString name = QString("lights[%1].").arg(id++);
 
-        if (m_scene->inLastSceneTree(light)) {
-            QString name = QString("lights[%1].").arg(id++);
+        QVector3D pos = (rec.second * QVector4D(light->position(), 0)).toVector3D();
 
-            QVector3D pos = (m_scene->modelMatrix(light) * QVector4D(light->position(), 0)).toVector3D();
-
-            m_program->setUniformValue((name + "diffuse").toLatin1().data(),
-                                       light->diffuseColor());
-            m_program->setUniformValue((name + "position").toLatin1().data(),
-                                       pos);
-            m_program->setUniformValue((name + "att").toLatin1().data(),
-                                        light->attenuation());
-        }
+        m_program->setUniformValue((name + "diffuse").toLatin1().data(),
+                                   light->diffuseColor());
+        m_program->setUniformValue((name + "position").toLatin1().data(),
+                                   pos);
+        m_program->setUniformValue((name + "att").toLatin1().data(),
+                                    light->attenuation());
     }
     m_program->setUniformValue("lightCnt", id);
 }
@@ -138,7 +139,7 @@ void GLPainter::render(const GLObject *obj) {
         int ssz = obj->indexBuffer().buff.size() / sizeof(GLuint);
         glDrawElements(GL_TRIANGLES, ssz, GL_UNSIGNED_INT, nullptr);
     } else {
-        glDrawArrays(obj->primitiveType(), 0, sz);
+        //glDrawArrays(obj->primitiveType(), 0, sz / d);
     }
 }
 

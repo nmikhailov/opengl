@@ -7,7 +7,6 @@
 #include <QMatrix4x4>
 #include <QGLBuffer>
 
-#include "scene.h"
 #include "transformable.h"
 #include "material.h"
 #include "rect.h"
@@ -16,22 +15,24 @@
  * Basic drawable opengl object
  */
 
-class Scene;
 class Material;
 
 class GLObject : public Transformable {
     Q_OBJECT
 public:
-    friend class Scene;
+    GLObject();
+    virtual ~GLObject();
+
 
     struct BufferInfo {
         BufferInfo();
         BufferInfo(bool enabled, GLenum type = 0, int sz = 0, QGLBuffer buff = QGLBuffer());
 
         QGLBuffer buff;
+        GLenum type;
+
         bool enabled;
         int sz;
-        GLenum type;
     };
 
     // Get objects material and vertex buffers
@@ -39,18 +40,13 @@ public:
     virtual BufferInfo vertexBuffer() const = 0;
     virtual GLenum primitiveType() const = 0;
 
-    // Get objects index, normal, tex buffers (can be not present)
+    // Get objects index, normal, tex buffers (optional)
     virtual BufferInfo indexBuffer() const;
     virtual BufferInfo normalBuffer() const;
     virtual BufferInfo texcoordBuffer() const;
 
+    // Object bounds
     virtual Rect rect() const = 0;
-
-protected:
-    GLObject(Scene* scene);
-    virtual ~GLObject();
-
-    Scene* m_scene;
 };
 
 #endif // GLOBJECT_H
