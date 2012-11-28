@@ -15,7 +15,7 @@ GLWidget::GLWidget(QGLContext* context, QWidget *parent, QGLWidget *shareWidget)
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(rotateOneStep()));
-    timer->start(1000 / 60); // 60 fps
+    timer->start(0); // 60 fps
 
     setFocusPolicy(Qt::StrongFocus);
     setFocus();

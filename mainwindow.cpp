@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     QGLFormat glFormat;
     glFormat.setVersion(3, 0);
     glFormat.setProfile(QGLFormat::CoreProfile);
-    glFormat.setSampleBuffers(true);
+    //glFormat.setSampleBuffers(true);
 
     m_context = new QGLContext(glFormat);
     m_widget = new GLWidget(m_context, this);

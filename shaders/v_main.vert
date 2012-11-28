@@ -19,5 +19,4 @@ void main() {
     uv = uv_buf;
     vertex = vec4(M * vert).xyz;
     normal = M_N * norm_buf;
-    // Precalc
 }

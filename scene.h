@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QGLContext>
 #include <QVector2D>
+#include <QGLFramebufferObject>
 
 #include <set>
 #include <map>
@@ -52,6 +53,11 @@ protected:
 
     // Update matrices map
     void updatePositions();
+
+
+    // Initialize framebuffer object and texture
+    void initFBO();
+
 private:
     QGLContext *m_context;
 
@@ -70,6 +76,13 @@ private:
     GLPainter *m_painter;
     TexturePainter *m_tex_painter;
     QVector2D m_screen_size;
+
+    // Frambuffer
+    //QGLFramebufferObject *m_fbo;
+    GLuint m_fbo;
+    GLuint m_btex[2];
+    GLuint FramebufferName;
+    GLuint renderedTexture, depthTexture;
 };
 
 #endif // SCENE_H

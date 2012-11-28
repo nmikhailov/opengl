@@ -61,8 +61,8 @@ RESOURCES += \
 OTHER_FILES += \
     shaders/f_main.frag \
     shaders/v_main.vert \
-    shaders/mtex_landscape.frag \
-    shaders/mtex_landscape.vert \
     shaders/single_tex.frag \
-    shaders/single_tex.vert
+    shaders/single_tex.vert \
+    shaders/shadow_map.frag \
+    shaders/shadow_map.vert
 

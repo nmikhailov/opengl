@@ -3,6 +3,7 @@
 
 #include <QGLContext>
 #include <QtOpenGL>
+#include <texture.h>
 
 #include <map>
 
@@ -10,6 +11,9 @@ class TextureManager {
 public:
     TextureManager(QGLContext * context);
     virtual ~TextureManager();
+
+    Texture* createTexture(const QSize &size);
+    void freeTexture(Texture* texture);
 
     GLuint loadTexture(const QImage & img);
     void unloadTexture(GLuint id);

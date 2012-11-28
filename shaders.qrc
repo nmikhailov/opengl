@@ -2,9 +2,9 @@
     <qresource prefix="/s">
         <file>shaders/f_main.frag</file>
         <file>shaders/v_main.vert</file>
-        <file>shaders/mtex_landscape.vert</file>
-        <file>shaders/mtex_landscape.frag</file>
         <file>shaders/single_tex.vert</file>
         <file>shaders/single_tex.frag</file>
+        <file>shaders/shadow_map.vert</file>
+        <file>shaders/shadow_map.frag</file>
     </qresource>
 </RCC>

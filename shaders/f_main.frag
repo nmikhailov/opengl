@@ -11,7 +11,7 @@ uniform sampler2D tex;
 uniform mat4x4 M, V, P;
 uniform mat3x3 M_N;
 
-out vec4 color;
+layout(location=0) out vec4 color;
 
 struct Light {
     vec4 diffuse;
