@@ -9,6 +9,7 @@ TextureManager::~TextureManager() {
 }
 
 GLuint TextureManager::loadTexture(const QImage &img) {
+
     return m_context->bindTexture(img);
 }
 

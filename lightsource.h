@@ -7,14 +7,8 @@
 class LightSource : public QObject {
     Q_OBJECT
 public:
-    enum LIGHT_TYPE {L_DOT};
-
-
     LightSource();
     virtual ~LightSource();
-
-    void setType(LIGHT_TYPE type);
-    LIGHT_TYPE type() const;
 
     void setPosition(const QVector3D &pos);
     QVector3D position() const;
@@ -25,13 +19,18 @@ public:
     QVector3D attenuation() const;
     void setAttenuationType(const QVector3D &att);
 
+    QVector3D direction() const;
+    void setDirection(const QVector3D &dir);
+
+    float spotAngle() const;
+    void setSpotAngle(double angle);
+
 protected:
     QVector3D m_position, m_attenuation;
     QColor m_diffuse_color, m_specular_color;
 
-    LIGHT_TYPE m_type;
-
-    QVector3D m_pos;
+    QVector3D m_pos, m_direction;
+    double m_angle;
 };
 
 #endif // LIGHTSOURCE_H

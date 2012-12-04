@@ -93,6 +93,11 @@ void GLPainter::updateLight(const std::map<LightSource*, QMatrix4x4>  &lights) {
                                    pos);
         m_program->setUniformValue((name + "att").toLatin1().data(),
                                     light->attenuation());
+        m_program->setUniformValue((name + "direction").toLatin1().data(),
+                                    light->direction());
+
+        double cosAngle = cos(M_PI * light->spotAngle() / 180.);
+        m_program->setUniformValue((name + "cosAngle").toLatin1().data(), (float)cosAngle);
     }
     m_program->setUniformValue("lightCnt", id);
 }

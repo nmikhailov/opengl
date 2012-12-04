@@ -153,5 +153,16 @@ void GLWidget::rotateOneStep() {
     static float x = 0;
     x += 0.5;
     m2->setRotation(QQuaternion(x, 0, 1, 0));
+    static double y = m_l1->position().y();
+    double ny = y + 3 * (sin(x / 100) + 1);
+    //m_l1->setPosition(QVector3D(m_l1->position().x(), ny, m_l1->position().z()));
+    //m_l1->setSpotAngle((son(x / 100) + 1) / 2. * 45);
+    m_l1->setSpotAngle(45);
+
+    QVector3D dir = m_l1->direction();
+    dir.setX(sin(x / 300));
+    dir.setZ(cos(x / 300));
+    dir.normalize();
+    m_l1->setDirection(dir);
     updateGL();
 }

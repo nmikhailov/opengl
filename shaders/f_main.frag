@@ -11,11 +11,13 @@ uniform sampler2D tex;
 uniform mat4x4 M, V, P;
 uniform mat3x3 M_N;
 
-layout(location=0) out vec4 color;
+out vec4 color;
 
 struct Light {
     vec4 diffuse;
     vec3 position;
+    vec3 direction;
+    float cosAngle;
 
     vec3 att;
 };
@@ -41,10 +43,16 @@ void main(void) {
         vec3 vertexToLightSource = l.position - vertex;
         vec3 lightDirection = normalize(vertexToLightSource);
 
-        float dist = length(vertexToLightSource);
-        float attenuation = 1.0 / (l.att.x + l.att.y * dist + l.att.z * dist * dist);
+        vec4 diffuseReflection;
+        float ccos = dot(lightDirection, normalize(-l.direction));
+        if (ccos < l.cosAngle) {
+            diffuseReflection = 0.1;
+        } else {
+            float dist = length(vertexToLightSource);
+            float attenuation = 1.0 / (l.att.x + l.att.y * dist + l.att.z * dist * dist);
 
-        vec4 diffuseReflection = l.diffuse * clamp(dot(normal, lightDirection), 0.1, 1) * attenuation;
+            diffuseReflection = l.diffuse * clamp(dot(normal, lightDirection), 0.1, 0.9) * attenuation;
+        }
         if(i == 0) {
             light = diffuseReflection;
         } else {
