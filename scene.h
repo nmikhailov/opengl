@@ -17,6 +17,7 @@
 #include "texture.h"
 #include "glpainter.h"
 #include "texturepainter.h"
+#include "gldepthshader.h"
 
 /*
  * OpenGL scene
@@ -24,6 +25,7 @@
  * Supports AA, complicated effects like mirroring, post effects
  */
 class GLPainter;
+class GLDepthShader;
 class Group;
 
 class Scene : public QObject {
@@ -73,8 +75,11 @@ private:
     std::map<GLObject*, QMatrix4x4> m_obj_pos;
 
 
+    // Shaders
     GLPainter *m_painter;
     TexturePainter *m_tex_painter;
+    GLDepthShader *m_depth_painter;
+
     QVector2D m_screen_size;
 
     // Frambuffer

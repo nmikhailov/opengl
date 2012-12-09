@@ -1,10 +1,13 @@
 #include "scene.h"
+#include "gldepthshader.h"
+
 #include <queue>
 #include <utility>
 
 Scene::Scene(QGLContext *context) : m_context(context) {
     m_root = new Group();
     m_painter = new GLPainter(this);
+    m_depth_painter = new GLDepthShader(this);
     m_tex_painter = new TexturePainter();
     //
     initFBO();
@@ -14,6 +17,7 @@ Scene::~Scene() {
     delete m_root;
     delete m_painter;
     delete m_tex_painter;
+    delete m_depth_painter;
     //delete m_fbo;
 }
 
@@ -29,7 +33,7 @@ void Scene::render() {
     glViewport(0, 0, m_screen_size.x(), m_screen_size.y()); // Render on the whole framebuffer, complete from the lower left corner to the upper right
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //
-    m_painter->bind();
+//    m_painter->bind();
     m_render_camera->setScreenSize(m_screen_size);
 
     m_painter->updateLight(m_light_pos);
@@ -43,16 +47,26 @@ void Scene::render() {
     }
     m_painter->release();
 
-    //
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, m_screen_size.x(), m_screen_size.y()); // Render on the whole framebuffer, complete from the lower left corner to the upper right
 
-    m_tex_painter->bind();
+    //m_tex_painter->bind();
     //static int id = m_context->bindTexture(QImage(":/images/rock.png"));
-    m_tex_painter->renderTexture(renderedTexture);
+    //m_tex_painter->renderTexture(renderedTexture);
     //m_tex_painter->renderTexture(depthTexture);
     //m_tex_painter->renderTexture(id);
-    m_tex_painter->release();
+    //m_tex_painter->release();
+
+    m_depth_painter->bind();
+    m_depth_painter->setProjectionMatrix(m_render_camera->projectionMatrix());
+    m_depth_painter->setViewMatrix(m_render_camera->viewMatrix());
+    for (auto &obj: m_obj_pos) {
+        QMatrix4x4 model = obj.second * obj.first->trMatrix();
+        m_depth_painter->setModelMatrix(model);
+
+        m_depth_painter->render(obj.first);
+    }
+    m_depth_painter->release();
 }
 
 void Scene::renderToTexture(Texture *texture) {
@@ -115,7 +129,7 @@ void Scene::initFBO() {
     glBindTexture(GL_TEXTURE_2D, renderedTexture);
 
     // Give an empty image to OpenGL ( the last "0" )
-    glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, 1280, 1024, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, 1366, 768, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
 
     // Poor filtering
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -133,7 +147,7 @@ void Scene::initFBO() {
     //// Alternative : Depth texture. Slower, but you can sample it later in your shader
     glGenTextures(1, &depthTexture);
     glBindTexture(GL_TEXTURE_2D, depthTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT24, 1280, 1024, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT24, 1366, 768, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

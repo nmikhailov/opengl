@@ -32,3 +32,4 @@ protected:
 };
 
 #endif // CAMERA_H
+

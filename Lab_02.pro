@@ -33,7 +33,8 @@ SOURCES += main.cpp\
     objects/axes.cpp \
     rect.cpp \
     objects/sphere.cpp \
-    texturepainter.cpp
+    texturepainter.cpp \
+    gldepthshader.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
@@ -52,7 +53,8 @@ HEADERS  += mainwindow.h \
     objects/axes.h \
     rect.h \
     objects/sphere.h \
-    texturepainter.h
+    texturepainter.h \
+    gldepthshader.h
 
 RESOURCES += \
     resources.qrc \

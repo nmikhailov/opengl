@@ -1,16 +1,8 @@
 #version 130
 
-layout(location = 0) in vec3 vertexPosition_modelspace;
+in vec4 vert;
+uniform mat4x4 M, V, P;
 
-struct Light {
-    vec4 diffuse;
-    vec3 position;
-
-    vec3 att;
-};
-
-Light light;
-
-void main(){
-    gl_Position =  depthMVP * vec4(vertexPosition_modelspace,1);
+void main() {
+    gl_Position = P * V * M * vert;
 }
