@@ -11,7 +11,7 @@ uniform sampler2D tex;
 uniform mat4x4 M, V, P;
 uniform mat3x3 M_N;
 
-uniform sampler2DShadow shadow;
+uniform sampler2D shadow;
 in vec4 vertex_light;
 
 out vec4 color;
@@ -43,12 +43,12 @@ uniform Light lights[max_lights];
 //        return 1.0;
 //}
 float Epsilon = 0.00001;
-float Epsilon2 = 10;
+float Epsilon2 = 0.001;
 
 float lookup(float x, float y) {
-    float depth = shadow2DProj(shadow, vertex_light + vec4(x, y, 0, 0) * Epsilon, Epsilon2).x;
+    float depth = texture2DProj(shadow, vertex_light.xyw + vec3(x, y, 0) * Epsilon).z;
     //depth = clamp(depth + Epsilon2, 0, 1);
-    return depth != 1.0 ? 0.25 : 1.0;
+    return (depth < (vertex_light.z - Epsilon2) / vertex_light.w ) ? 0. : 1.;
 }
 
 void main(void) {
