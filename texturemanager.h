@@ -3,9 +3,11 @@
 
 #include <QGLContext>
 #include <QtOpenGL>
-#include <texture.h>
+#include <QRect>
 
 #include <map>
+
+#include <texture.h>
 
 class TextureManager {
 public:
@@ -19,6 +21,9 @@ public:
     void unloadTexture(GLuint id);
 
     GLuint getTextureByName(const QString &file_name);
+
+    GLuint genFBTexture(int width, int heigth);
+    GLuint genFBDepthTexture(int width, int heigth);
 private:
     std::map<QString, GLuint> m_file2id;
     QGLContext * m_context;

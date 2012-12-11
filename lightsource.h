@@ -3,6 +3,7 @@
 
 #include <QColor>
 #include <QVector3D>
+#include <QMatrix4x4>
 
 class LightSource : public QObject {
     Q_OBJECT
@@ -25,11 +26,14 @@ public:
     float spotAngle() const;
     void setSpotAngle(double angle);
 
+    QMatrix4x4 projectionMatrix() const;
+    QMatrix4x4 viewMatrix() const;
+
 protected:
     QVector3D m_position, m_attenuation;
     QColor m_diffuse_color, m_specular_color;
 
-    QVector3D m_pos, m_direction;
+    QVector3D m_direction;
     double m_angle;
 };
 

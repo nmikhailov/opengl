@@ -58,6 +58,8 @@ private:
     AssimpModel * m2;
     LightSource* m_l1;
 
+    // Light source rotation
+    bool m_rotation = true;
 };
 
 #endif

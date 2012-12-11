@@ -2,11 +2,11 @@
 
 
 void LightSource::setPosition(const QVector3D &pos) {
-    m_pos = pos;
+    m_position = pos;
 }
 
 QVector3D LightSource::position() const {
-    return m_pos;
+    return m_position;
 }
 
 QColor LightSource::diffuseColor() const {
@@ -30,7 +30,7 @@ QVector3D LightSource::direction() const {
 }
 
 void LightSource::setDirection(const QVector3D &dir) {
-    m_direction = dir;
+    m_direction = dir.normalized();
 }
 
 float LightSource::spotAngle() const {
@@ -39,6 +39,20 @@ float LightSource::spotAngle() const {
 
 void LightSource::setSpotAngle(double angle) {
     m_angle = angle;
+}
+
+QMatrix4x4 LightSource::projectionMatrix() const {
+    QMatrix4x4 mat;
+
+    //mat.ortho(-1, 1, -1, 1, 0.1, 1e5);
+    mat.perspective(45, 1, 0.1, 1e5);
+    return mat;
+}
+
+QMatrix4x4 LightSource::viewMatrix() const {
+    QMatrix4x4 mat;
+    mat.lookAt(m_position, m_position + m_direction, QVector3D(0, 1, 0));
+    return mat;
 }
 
 LightSource::LightSource() {

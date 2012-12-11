@@ -52,7 +52,7 @@ protected:
     void init(QString vert, QString frag);
 
     Scene *m_scene;
-
+public:
     std::shared_ptr<QGLShaderProgram> m_program;
 };
 

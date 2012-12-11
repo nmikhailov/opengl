@@ -9,6 +9,7 @@ Scene::Scene(QGLContext *context) : m_context(context) {
     m_painter = new GLPainter(this);
     m_depth_painter = new GLDepthShader(this);
     m_tex_painter = new TexturePainter();
+    m_texture_manager = new TextureManager(m_context);
     //
     initFBO();
 }
@@ -28,17 +29,43 @@ void Scene::render() {
     //
     updatePositions();
     //
+    m_render_camera->setScreenSize(m_screen_size);
 
+    // Draw shadowmap
+    //m_shadow_fbo->bind();
     glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
     glViewport(0, 0, m_screen_size.x(), m_screen_size.y()); // Render on the whole framebuffer, complete from the lower left corner to the upper right
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //
-//    m_painter->bind();
-    m_render_camera->setScreenSize(m_screen_size);
+
+    m_depth_painter->bind();
+    LightSource *ls = (*m_light_pos.begin()).first;
+    renderShadowMap(ls);
+
+    glCullFace(GL_BACK);
+    // Draw scene
+    //glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+    fbo->bind();
+    glViewport(0, 0, m_screen_size.x(), m_screen_size.y()); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    m_painter->bind();
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, depthTexture);
+    QMatrix4x4 mats(0.5, 0.0, 0.0, 0.0,
+                    0.0, 0.5, 0.0, 0.0,
+                    0.0, 0.0, 0.5, 0.0,
+                    0.5, 0.5, 0.5, 1.0);
+
+    m_painter->m_program->setUniformValue("shadow", 1);
+    m_painter->m_program->setUniformValue("PV_light", ls->projectionMatrix() * ls->viewMatrix());
+    m_painter->m_program->setUniformValue("bias", mats);
 
     m_painter->updateLight(m_light_pos);
     m_painter->setProjectionMatrix(m_render_camera->projectionMatrix());
     m_painter->setViewMatrix(m_render_camera->viewMatrix());
+
+  //  m_painter->setProjectionMatrix(ls->projectionMatrix());
+   // m_painter->setViewMatrix(ls->viewMatrix());
     for (auto &obj: m_obj_pos) {
         QMatrix4x4 model = obj.second * obj.first->trMatrix();
         m_painter->setModelMatrix(model);
@@ -47,19 +74,24 @@ void Scene::render() {
     }
     m_painter->release();
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, m_screen_size.x(), m_screen_size.y()); // Render on the whole framebuffer, complete from the lower left corner to the upper right
+    // Draw textures
+    int w = m_screen_size.x(), h = m_screen_size.y();
+    renderTexture(fbo->texture(), QRect(0, 0, w / 2, h));
+    renderTexture(depthTexture, QRect(w / 2, 0, w, h / 2));
+    renderTexture(renderedTexture, QRect(w / 2, h / 2, w, h));
+}
 
-    //m_tex_painter->bind();
-    //static int id = m_context->bindTexture(QImage(":/images/rock.png"));
-    //m_tex_painter->renderTexture(renderedTexture);
-    //m_tex_painter->renderTexture(depthTexture);
-    //m_tex_painter->renderTexture(id);
-    //m_tex_painter->release();
+void Scene::renderToTexture(Texture *texture) {
+}
 
+void Scene::renderShadowMap(LightSource *light) {
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    //glCullFace(GL_FRONT);
     m_depth_painter->bind();
-    m_depth_painter->setProjectionMatrix(m_render_camera->projectionMatrix());
-    m_depth_painter->setViewMatrix(m_render_camera->viewMatrix());
+    m_depth_painter->setProjectionMatrix(light->projectionMatrix());
+    m_depth_painter->setViewMatrix(light->viewMatrix());
+
     for (auto &obj: m_obj_pos) {
         QMatrix4x4 model = obj.second * obj.first->trMatrix();
         m_depth_painter->setModelMatrix(model);
@@ -69,8 +101,17 @@ void Scene::render() {
     m_depth_painter->release();
 }
 
-void Scene::renderToTexture(Texture *texture) {
-    // ?
+void Scene::renderTexture(GLuint tex_id, const QRect &rect) {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(rect.x(), rect.y(), rect.width(), rect.height());
+
+    m_tex_painter->bind();
+    m_tex_painter->renderTexture(tex_id);
+    m_tex_painter->release();
+}
+
+void Scene::renderTexture(GLuint tex_id) {
+    renderTexture(tex_id, QRect(QPoint(0, 0), m_screen_size.toPoint()));
 }
 
 void Scene::updatePositions() {
@@ -111,9 +152,11 @@ void Scene::updatePositions() {
 }
 
 void Scene::initFBO() {
-//    m_fbo = new QGLFramebufferObject(1024, 1024, QGLFramebufferObject::CombinedDepthStencil);
-//    m_fbo->bind();
-
+    fbo = new QGLFramebufferObject(1024, 1024, QGLFramebufferObject::Depth);
+    m_shadow_fbo = new QGLFramebufferObject(1024, 1024, QGLFramebufferObject::Depth);
+    //m_fbo->bind();
+    //fbo = new QGLFramebufferObject(1366, 768);
+    //fbo->bind();
     // ---------------------------------------------
     // Render to Texture - specific code begins here
     // ---------------------------------------------
@@ -122,47 +165,19 @@ void Scene::initFBO() {
     glGenFramebuffers(1, &FramebufferName);
     glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 
-    // The texture we're going to render to
-    glGenTextures(1, &renderedTexture);
-
-    // "Bind" the newly created texture : all future texture functions will modify this texture
-    glBindTexture(GL_TEXTURE_2D, renderedTexture);
-
-    // Give an empty image to OpenGL ( the last "0" )
-    glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, 1366, 768, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
-
-    // Poor filtering
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-//    // The depth buffer
-//    GLuint depthrenderbuffer;
-//    glGenRenderbuffers(1, &depthrenderbuffer);
-//    glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
-//    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 1366, 768);
-//    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
-
-    //// Alternative : Depth texture. Slower, but you can sample it later in your shader
-    glGenTextures(1, &depthTexture);
-    glBindTexture(GL_TEXTURE_2D, depthTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT24, 1366, 768, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    renderedTexture = m_texture_manager->genFBTexture(1024, 1024);
+    depthTexture = m_texture_manager->genFBDepthTexture(1024, 1024);
 
     // Set "renderedTexture" as our colour attachement #0
     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
 
-    //// Depth texture alternative :
+    // Depth texture alternative :
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture, 0);
-
 
     // Set the list of draw buffers.
     GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-    glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
+    glDrawBuffers(1, DrawBuffers);
+    //glDrawBuffers(0, 0);
 
     // Always check that our framebuffer is ok
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)

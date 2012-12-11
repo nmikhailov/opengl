@@ -18,6 +18,7 @@
 #include "glpainter.h"
 #include "texturepainter.h"
 #include "gldepthshader.h"
+#include "texturemanager.h"
 
 /*
  * OpenGL scene
@@ -52,6 +53,9 @@ public:
 
 protected:
     void renderToTexture(Texture * texture);
+    void renderShadowMap(LightSource* light);
+    void renderTexture(GLuint tex_id);
+    void renderTexture(GLuint tex_id, const QRect &rect);
 
     // Update matrices map
     void updatePositions();
@@ -62,6 +66,7 @@ protected:
 
 private:
     QGLContext *m_context;
+    TextureManager *m_texture_manager;
 
     // Level 0 group
     Group * m_root;
@@ -88,6 +93,7 @@ private:
     GLuint m_btex[2];
     GLuint FramebufferName;
     GLuint renderedTexture, depthTexture;
+    QGLFramebufferObject * fbo, *m_shadow_fbo;
 };
 
 #endif // SCENE_H
