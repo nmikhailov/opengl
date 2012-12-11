@@ -56,8 +56,8 @@ void Scene::render() {
                     0.0, 0.0, 0.5, 0.0,
                     0.5, 0.5, 0.5, 1.0);
 
-    m_painter->m_program->setUniformValue("shadow", 1);
-    m_painter->m_program->setUniformValue("PV_light", ls->projectionMatrix() * ls->viewMatrix());
+    m_painter->m_program->setUniformValue("shadows[0]", 1);
+    m_painter->m_program->setUniformValue("lights[0].PV_light", ls->projectionMatrix() * ls->viewMatrix());
     m_painter->m_program->setUniformValue("bias", mats);
 
     m_painter->updateLight(m_light_pos);
@@ -153,7 +153,7 @@ void Scene::updatePositions() {
 
 void Scene::initFBO() {
     fbo = new QGLFramebufferObject(1024, 1024, QGLFramebufferObject::Depth);
-    m_shadow_fbo = new QGLFramebufferObject(1024, 1024, QGLFramebufferObject::Depth);
+    //m_shadow_fbo = new QGLFramebufferObject(1024, 1024, QGLFramebufferObject::Depth);
     //m_fbo->bind();
     //fbo = new QGLFramebufferObject(1366, 768);
     //fbo->bind();

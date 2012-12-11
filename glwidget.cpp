@@ -57,7 +57,7 @@ void GLWidget::initializeGL() {
 
     light = new LightSource();
     light->setPosition(QVector3D(-5, 1, 3));
-    light->setAttenuationType(QVector3D(0, 0.1, 0));
+    light->setAttenuationType(QVector3D(0, 0.3, 0));
     m_l1 = light;
 
     m_scene->root()->add(light);
@@ -95,6 +95,7 @@ void GLWidget::initializeGL() {
     m2 = new AssimpModel("scene2.obj");
     //m2->setPosition(QVector3D(20, -15, 20));
     m2->setScale(QVector3D(1, 1, 1) * 1e-1);
+    m_l1->setPosition(QVector3D(5, 2, 0));
     m_scene->root()->add(m2);
     m_time.start();
 }
@@ -176,7 +177,7 @@ void GLWidget::rotateOneStep() {
     dir.normalize();
     //m_l1->setDirection(dir);
     static QVector3D base = m_l1->position();
-    m_l1->setPosition(base + QVector3D(0, 1, 0) * cos(x / 300));
-    m_l1->setDirection(m2->position() - m_l1->position());
+    //m_l1->setPosition(base + QVector3D(0, 1, 0) * cos(x / 300));
+    //m_l1->setDirection(m2->position() - m_l1->position());
     updateGL();
 }
