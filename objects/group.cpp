@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <utility>
+#include <QDebug>
 
 Group::Group() : Transformable() {
 }
@@ -92,18 +93,11 @@ Group *Group::group(int id) {
 Rect Group::rect() const {
     Rect r;
     for (GLObject* obj: m_objects) {
-        r.xMax = std::max(obj->rect().xMax, r.xMax);
-        r.xMin = std::min(obj->rect().xMin, r.xMin);
-
-        r.yMax = std::max(obj->rect().yMax, r.yMax);
-        r.yMin = std::min(obj->rect().yMin, r.yMin);
-
-        r.zMax = std::max(obj->rect().zMax, r.zMax);
-        r.zMin = std::min(obj->rect().zMin, r.zMin);
+        r = r.merge(obj->rect() * obj->modelMatrix());
     }
     return r;
 }
 
-QMatrix4x4 Group::trMatrix() const {
-    return Transformable::trMatrix() /** m_base_transform*/;
+QMatrix4x4 Group::modelMatrix() const {
+    return Transformable::modelMatrix() /** m_base_transform*/;
 }

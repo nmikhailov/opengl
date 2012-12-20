@@ -26,7 +26,7 @@ public:
     float spotAngle() const;
     void setSpotAngle(double angle);
 
-    QMatrix4x4 projectionMatrix() const;
+    QMatrix4x4 projectionMatrix(double ar) const;
     QMatrix4x4 viewMatrix() const;
 
 protected:

@@ -4,8 +4,8 @@
 #include "globject.h"
 #include "lightsource.h"
 #include "camera/camera.h"
-
 #include "rect.h"
+
 #include "transformable.h"
 
 class Camera;
@@ -67,7 +67,7 @@ public:
     Rect rect() const;
 
     //
-    QMatrix4x4 trMatrix() const;
+    QMatrix4x4 modelMatrix() const;
 
 protected:
     std::vector<GLObject*> m_objects;

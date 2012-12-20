@@ -35,6 +35,7 @@ public:
     Scene(QGLContext * context);
     virtual ~Scene();
 
+    TextureManager* textureManager();
     // Manage Active camera(Render target)
     Camera* renderCamera();
     const Camera* renderCamera() const;
@@ -52,13 +53,15 @@ public:
     void render();
 
 protected:
-    void renderToTexture(Texture * texture);
+    void renderLights();
     void renderShadowMap(LightSource* light);
     void renderTexture(GLuint tex_id);
     void renderTexture(GLuint tex_id, const QRect &rect);
 
     // Update matrices map
     void updatePositions();
+
+    void bindRenderer(GLRenderer* renderer);
 
 
     // Initialize framebuffer object and texture
@@ -77,6 +80,7 @@ private:
     // Object/light/group -> its postion
     std::map<Camera*, QMatrix4x4> m_cam_pos;
     std::map<LightSource*, QMatrix4x4> m_light_pos;
+    std::map<LightSource*, GLuint> m_light_shadow;
     std::map<GLObject*, QMatrix4x4> m_obj_pos;
 
 
@@ -93,7 +97,14 @@ private:
     GLuint m_btex[2];
     GLuint FramebufferName;
     GLuint renderedTexture, depthTexture;
+
+    static const int max_lights = 20;
+    GLuint m_depth_textures[max_lights];
+    GLuint m_depth_framebuffers[max_lights];
+
     QGLFramebufferObject * fbo, *m_shadow_fbo;
+
+    QSize m_shadow_map_size;
 };
 
 #endif // SCENE_H

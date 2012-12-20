@@ -31,10 +31,13 @@ SOURCES += main.cpp\
     transformable.cpp \
     material.cpp \
     objects/axes.cpp \
-    rect.cpp \
     objects/sphere.cpp \
     texturepainter.cpp \
-    gldepthshader.cpp
+    gldepthshader.cpp \
+    rect.cpp \
+    objects/skybox.cpp \
+    glrenderer.cpp \
+    skycuberenderer.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
@@ -51,10 +54,13 @@ HEADERS  += mainwindow.h \
     transformable.h \
     material.h \
     objects/axes.h \
-    rect.h \
     objects/sphere.h \
     texturepainter.h \
-    gldepthshader.h
+    gldepthshader.h \
+    rect.h \
+    objects/skybox.h \
+    glrenderer.h \
+    skycuberenderer.h
 
 RESOURCES += \
     resources.qrc \
@@ -66,5 +72,7 @@ OTHER_FILES += \
     shaders/single_tex.frag \
     shaders/single_tex.vert \
     shaders/shadow_map.frag \
-    shaders/shadow_map.vert
+    shaders/shadow_map.vert \
+    shaders/skybox.frag \
+    shaders/skybox.vert
 

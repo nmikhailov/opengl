@@ -44,7 +44,7 @@ protected:
     typedef std::function<void(KeyFilter & kf)> fn;
     void forEachFilter(fn f, int key);
 
-    double m_speed = 0.05;
+    double m_speed = 0.005;
 };
 
 #endif // FREELOOKCAMERA_H

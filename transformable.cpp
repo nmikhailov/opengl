@@ -34,7 +34,7 @@ void Transformable::setScale(const QVector3D &vec) {
     m_scale = vec;
 }
 
-QMatrix4x4 Transformable::trMatrix() const {
+QMatrix4x4 Transformable::modelMatrix() const {
     QMatrix4x4 mat;
     mat.translate(m_position);
     mat.scale(m_scale);

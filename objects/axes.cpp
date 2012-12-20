@@ -49,7 +49,6 @@ GLenum Axis::primitiveType() const {
 }
 
 Rect Axis::rect() const {
-    Rect r;
-    r.xMin = r.xMin = r.yMax = r.yMin = r.zMax = r.zMin = 0;
+    Rect r(QVector3D(0, 0, 0), QVector3D(0, 0, 0));
     return r;
 }

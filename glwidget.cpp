@@ -6,6 +6,7 @@
 #include <QtOpenGL>
 
 #include "glwidget.h"
+#include "skycuberenderer.h"
 
 GLWidget::GLWidget(QGLContext* context, QWidget *parent, QGLWidget *shareWidget)
     : QGLWidget(context, parent, shareWidget) {
@@ -41,67 +42,51 @@ void GLWidget::initializeGL() {
     qglClearColor(m_clear_color);
     //glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_TEXTURE_2D);
 
+    // Scene
     m_scene = new Scene(m_context);
+
+    // Camera
     m_cam = new FreeLookCamera();
+    m_cam->setPosition(QVector3D(0, 1, 0));
+    m_cam->setViewVector(QVector3D(1, -1, 0));
     m_scene->setRenderCamera(m_cam);
+
+    // Axes (dont work)
     m_scene->root()->add(new Axes());
-    m_cam->setPosition(QVector3D(-5, 1, 1));
-    m_cam->setViewVector(QVector3D(3, 0, 3));
-    LightSource* light = new LightSource();
-    //m_scene->root()->add(light);
-    light->setPosition(QVector3D(-15, 1, 10));
-    light->setDiffuseColor(Qt::white);
-    light->setAttenuationType(QVector3D(0, 0.3, 0));
 
-    light = new LightSource();
-    light->setPosition(QVector3D(-5, 1, 3));
-    light->setAttenuationType(QVector3D(0, 0.3, 0));
-    m_l1 = light;
+    // Lights
+    m_light1 = new LightSource();
+    m_light1->setPosition(QVector3D(2, 1, 0));
+    m_light1->setDirection(-m_light1->position());
+    m_light1->setDiffuseColor(Qt::white);
+    m_light1->setAttenuationType(QVector3D(0, 0.3, 0));
+    m_scene->root()->add(m_light1);
 
-    m_scene->root()->add(light);
+    // Models
+    // Landscape
+    m_landscape = new AssimpModel("scene2.obj");
+    // m_landscape = new AssimpModel("land1c.obj");
 
-    AssimpModel *model = new AssimpModel("world.obj");
-//    m_scene->root()->add(model);
+    //m_landscape->setPosition(-m_landscape->rect().center());
+    m_landscape->setScale(QVector3D(1, 1, 1) / vec3max(m_landscape->rect().size()) * 2);
 
-    qDebug() << model->rect().xMin << " "
-             << model->rect().xMax << " "
-             << model->rect().yMin << " "
-             << model->rect().yMax << " "
-             << model->rect().zMin << " "
-             << model->rect().zMax << " ";
+    m_scene->root()->add(m_landscape);
 
-    model->setPosition(QVector3D((model->rect().xMax + model->rect().xMin) / 2.,
-                 (model->rect().yMax + model->rect().yMin) / 2.,
-                 (model->rect().zMax + model->rect().zMin) / 2.));
+    // Skycube
+    SkycubeRenderer *cr = new SkycubeRenderer(m_scene);
 
-    model->setPosition(QVector3D(57.8, 0, 4.4));
-    qDebug() << model->position();
-//    model->setScale(QVector3D(1. / (model->rect().xMax - model->rect().xMin),
-//                 1. / (model->rect().yMax - model->rect().yMin),
-//                 1. / (model->rect().zMax - model->rect().zMin)));
+    m_box = new Skybox();
+    m_box->setScale(QVector3D(1, 1, 1) * 1e3);
+    m_box->setRenderer(cr);
 
-
-    m2 = new AssimpModel("airplane2.obj");
-  //  m_scene->root()->add(m2);
-    m2->setScale(QVector3D(1, 1, 1) * 1e-3);
-    m2->setPosition(QVector3D(-3, 0.5, 3));
-
-    m_l1->setPosition(QVector3D(0, 2, 3));
-    m_l1->setDirection(m2->position() - m_l1->position());
-
-    // Scene 2
-    m2 = new AssimpModel("scene2.obj");
-    //m2->setPosition(QVector3D(20, -15, 20));
-    m2->setScale(QVector3D(1, 1, 1) * 1e-1);
-    m_l1->setPosition(QVector3D(5, 2, 0));
-    m_scene->root()->add(m2);
-    m_time.start();
+    m_scene->root()->add(m_box);
 }
 
 void GLWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    m_box->setPosition(m_cam->position());
 
     m_cam->tick();
     m_scene->render();
@@ -109,8 +94,7 @@ void GLWidget::paintGL() {
 }
 
 void GLWidget::resizeGL(int w, int h) {
-    glViewport(0, 0, w, h);
-    m_scene->setScreenSize(QVector2D(1024, 1024));
+    m_scene->setScreenSize(QVector2D(w, h));
 }
 
 void GLWidget::drawLegend() {
@@ -144,11 +128,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent * /* event */) {
 void GLWidget::keyPressEvent(QKeyEvent * event) {
     m_cam->keyPressEvent(event);
 
-    if (event->key() == Qt::Key_Plus) {
-        m_l1->setAttenuationType(m_l1->attenuation() * 0.9);
-    } else if (event->key() == Qt::Key_Minus) {
-        m_l1->setAttenuationType(m_l1->attenuation() * 1.1);
-    } else if(event->key() == Qt::Key_Q) {
+    if(event->key() == Qt::Key_Q) {
         m_rotation = !m_rotation;
     }
 }
@@ -161,23 +141,13 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
 }
 
 void GLWidget::rotateOneStep() {
-    static float x = 0;
+    static double x = 0;
     if (m_rotation)
-        x += 0.5;
-    m2->setRotation(QQuaternion(x, 0, 1, 0));
-    static double y = m_l1->position().y();
-    double ny = y + 3 * (sin(x / 100) + 1);
-    //m_l1->setPosition(QVector3D(m_l1->position().x(), ny, m_l1->position().z()));
-    //m_l1->setSpotAngle((son(x / 100) + 1) / 2. * 45);
-    m_l1->setSpotAngle(45);
+        x += 1e-1;
 
-    QVector3D dir = m_l1->direction();
-    dir.setX(sin(x / 300));
-    dir.setZ(cos(x / 300));
-    dir.normalize();
-    //m_l1->setDirection(dir);
-    static QVector3D base = m_l1->position();
-    //m_l1->setPosition(base + QVector3D(0, 1, 0) * cos(x / 300));
-    //m_l1->setDirection(m2->position() - m_l1->position());
+
+    //m_light1->setPosition(m_light1->position() + QVector3D(0, 0.001, 0));
+    //m_light1->setDirection(-m_light1->position());
+    m_landscape->setRotation(QQuaternion(x, 0, 1, 0));
     updateGL();
 }

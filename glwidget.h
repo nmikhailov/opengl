@@ -12,6 +12,7 @@
 #include "texturemanager.h"
 #include "objects/assimpmodel.h"
 #include "objects/axes.h"
+#include "objects/skybox.h"
 #include "scene.h"
 
 class GLWidget : public QGLWidget {
@@ -55,8 +56,9 @@ private:
     // Scene objects
     Scene *m_scene;
     FreeLookCamera* m_cam;
-    AssimpModel * m2;
-    LightSource* m_l1;
+    Group *m_landscape, *m_heli, *m_tree;
+    Skybox *m_box;
+    LightSource *m_light1, *m_light2;
 
     // Light source rotation
     bool m_rotation = true;

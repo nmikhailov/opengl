@@ -10,6 +10,7 @@
 #include "transformable.h"
 #include "material.h"
 #include "rect.h"
+#include "glrenderer.h"
 
 /*
  * Basic drawable opengl object
@@ -47,6 +48,13 @@ public:
 
     // Object bounds
     virtual Rect rect() const = 0;
+
+    // Wanted render
+    virtual GLRenderer* renderer() const;
+    void setRenderer(GLRenderer* renderer);
+
+protected:
+    GLRenderer* m_renderer;
 };
 
 #endif // GLOBJECT_H

@@ -86,7 +86,11 @@ void AssimpSubMesh::load(aiMesh *mesh, aiScene *obj_scene) {
         qDebug() << "TEX:" << str->C_Str();
         //m_texid = m_context->textureManager()->getTextureByName(prefix + str->C_Str());
 
+
         //m_material.setTexture();
+        Texture t;
+        t.m_name = str->C_Str();
+        m_material.setTexture(t);
         m_material.setType(Material::C_TEXTURE);
     } else {
         m_material.setType(Material::C_UNIFROM);
@@ -102,14 +106,7 @@ void AssimpSubMesh::load(aiMesh *mesh, aiScene *obj_scene) {
         m_vertex << v.x << v.y << v.z;
         m_normals << vn.x << vn.y << vn.z;
 
-        m_rect.xMax = std::max(v.x, m_rect.xMax);
-        m_rect.xMin = std::max(v.x, m_rect.xMin);
-
-        m_rect.yMax = std::max(v.y, m_rect.yMax);
-        m_rect.yMin = std::max(v.y, m_rect.yMin);
-
-        m_rect.zMax = std::max(v.z, m_rect.zMax);
-        m_rect.zMin = std::max(v.z, m_rect.zMin);
+        m_rect = m_rect.merge(QVector3D(v.x, v.y, v.z));
 
         // TODO: Process all textures(currently only first texture is proceeded)
         if (mesh->HasTextureCoords(0)) {
@@ -128,7 +125,7 @@ void AssimpSubMesh::load(aiMesh *mesh, aiScene *obj_scene) {
     mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
     mat->Get(AI_MATKEY_NAME, name);
     QColor qcolor = QColor(color.r * 255., color.g * 255., color.b * 255.);
-    m_material.setType(Material::C_UNIFROM);
+    //m_material.setType(Material::C_UNIFROM);
     m_material.setColor(qcolor);
 
     //qDebug() << name.C_Str() << m_color;

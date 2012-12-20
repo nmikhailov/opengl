@@ -3,6 +3,7 @@
 
 
 GLObject::GLObject() {
+    m_renderer = nullptr;
 }
 
 GLObject::~GLObject() {
@@ -30,5 +31,13 @@ GLObject::BufferInfo GLObject::normalBuffer() const {
 
 GLObject::BufferInfo GLObject::texcoordBuffer() const {
     return BufferInfo(false);
+}
+
+GLRenderer *GLObject::renderer() const {
+    return m_renderer;
+}
+
+void GLObject::setRenderer(GLRenderer *renderer) {
+    m_renderer = renderer;
 }
 

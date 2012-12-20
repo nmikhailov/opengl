@@ -1,4 +1,4 @@
-#version 130
+#version 330
 
 in vec2 uv_coords;
 out vec2 UV;

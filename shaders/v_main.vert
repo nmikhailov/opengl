@@ -1,4 +1,4 @@
-#version 130
+#version 330
 
 in vec4 vert;
 in vec2 uv_buf;

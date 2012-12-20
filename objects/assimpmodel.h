@@ -12,6 +12,7 @@
 #include "objects/group.h"
 #include "scene.h"
 #include "material.h"
+#include "rect.h"
 
 
 class AssimpModel : public Group {

@@ -19,7 +19,7 @@ public:
     virtual QVector3D scale() const;
     virtual void setScale(const QVector3D &vec);
 
-    virtual QMatrix4x4 trMatrix() const;
+    virtual QMatrix4x4 modelMatrix() const;
 protected:
     QVector3D m_position, m_scale;
     QQuaternion m_rotation;

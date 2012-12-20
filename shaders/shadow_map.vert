@@ -1,4 +1,4 @@
-#version 130
+#version 330
 
 in vec4 vert;
 uniform mat4x4 M, V, P;

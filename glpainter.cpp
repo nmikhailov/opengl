@@ -1,19 +1,11 @@
 #include "glpainter.h"
 
-GLPainter::GLPainter(Scene *scene) : m_program(new QGLShaderProgram()) {
+GLPainter::GLPainter(Scene *scene) {
     m_scene = scene;
     init("v_main.vert", "f_main.frag");
 }
 
 GLPainter::~GLPainter() {
-}
-
-void GLPainter::init(QString vert, QString frag) {
-    QString prefix = ":/s/shaders/";
-
-    m_program->addShaderFromSourceFile(QGLShader::Vertex, prefix + vert);
-    m_program->addShaderFromSourceFile(QGLShader::Fragment, prefix + frag);
-    m_program->link();
 }
 
 bool GLPainter::bind() {
@@ -79,11 +71,12 @@ void GLPainter::setIndexBuffer(QGLBuffer buff) {
     buff.bind();
 }
 
-void GLPainter::updateLight(const std::map<LightSource*, QMatrix4x4>  &lights) {
+void GLPainter::updateLight(const std::map<LightSource*, QMatrix4x4>  &lights, const std::map<LightSource*, GLuint>  &lights_tex) {
     int id = 0;
     for (auto rec: lights) {
         LightSource* light = rec.first;
-        QString name = QString("lights[%1].").arg(id++);
+        QString name = QString("lights[%1].").arg(id);
+        QString name_shadow = QString("shadows[%1]").arg(id);
 
         QVector3D pos = (rec.second * QVector4D(light->position(), 0)).toVector3D();
 
@@ -98,11 +91,29 @@ void GLPainter::updateLight(const std::map<LightSource*, QMatrix4x4>  &lights) {
 
         double cosAngle = cos(M_PI * light->spotAngle() / 180. / 2.);
         m_program->setUniformValue((name + "cosAngle").toLatin1().data(), (float)cosAngle);
+
+        QMatrix4x4 pv = light->projectionMatrix(1) * light->viewMatrix();
+        m_program->setUniformValue((name + "PV_light").toLatin1().data(), pv);
+        //
+        glActiveTexture(GL_TEXTURE1 + id);
+        glBindTexture(GL_TEXTURE_2D, lights_tex.at(light));
+        m_program->setUniformValue(name_shadow.toAscii().data(), id + 1);
+        //
+
+        id++;
     }
+
     m_program->setUniformValue("lightCnt", id);
+
 }
 
 void GLPainter::render(const GLObject *obj) {
+    static const QMatrix4x4 mats(0.5, 0.0, 0.0, 0.0,
+                    0.0, 0.5, 0.0, 0.0,
+                    0.0, 0.0, 0.5, 0.0,
+                    0.5, 0.5, 0.5, 1.0);
+    m_program->setUniformValue("bias", mats);
+
     GLObject::BufferInfo bf;
 
     bf = obj->vertexBuffer();
@@ -151,6 +162,12 @@ void GLPainter::render(const GLObject *obj) {
 void GLPainter::setMaterial(const Material &m) {
     if (m.type() == Material::C_TEXTURE) {
         setColorMode(CM_TEXTURE);
+
+        glActiveTexture(GL_TEXTURE0);
+        GLuint id = m_scene->textureManager()->getTextureByName(m.texture());
+        glBindTexture(GL_TEXTURE_2D, id);
+        m_program->setUniformValue("tex", 0);
+
     } else if(m.type() == Material::C_UNIFROM) {
         setColorMode(CM_ONE_COLOR);
         setColor(m.color());

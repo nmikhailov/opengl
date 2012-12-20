@@ -6,5 +6,7 @@
         <file>shaders/single_tex.frag</file>
         <file>shaders/shadow_map.vert</file>
         <file>shaders/shadow_map.frag</file>
+        <file>shaders/skybox.frag</file>
+        <file>shaders/skybox.vert</file>
     </qresource>
 </RCC>
