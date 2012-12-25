@@ -3,7 +3,7 @@
 Material::Material() {
 }
 
-Material::Material(Texture tex) {
+Material::Material(TextureInfo tex) {
     m_type = C_TEXTURE;
     m_texture = tex;
 }
@@ -32,10 +32,10 @@ void Material::setColor(const QColor &color) {
     m_color = color;
 }
 
-Texture Material::texture() const {
+TextureInfo Material::texture() const {
     return m_texture;
 }
 
-void Material::setTexture(const Texture &tex) {
+void Material::setTexture(const TextureInfo &tex) {
     m_texture = tex;
 }

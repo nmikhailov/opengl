@@ -13,7 +13,7 @@ public:
     FreeLookCamera();
     virtual ~FreeLookCamera();
 
-    virtual QVector3D viewVector() const;
+    virtual QVector3D direction() const;
     virtual void setViewVector(const QVector3D &view);
 
     virtual QVector3D normal() const;

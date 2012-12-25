@@ -10,7 +10,7 @@ Scene::Scene(QGLContext *context) : m_context(context) {
     m_depth_painter = new GLDepthShader(this);
     m_tex_painter = new TexturePainter();
     m_texture_manager = new TextureManager(m_context);
-    int sz = 1024;
+    int sz = 4096;
     m_shadow_map_size = QSize(sz, sz);
     //
     initFBO();
@@ -71,8 +71,8 @@ void Scene::render() {
     }
     rnd->release();
     // Draw textures
-    int w = m_screen_size.x(), h = m_screen_size.y();
-    int w2 = 64;
+    //int w = m_screen_size.x(), h = m_screen_size.y();
+    //int w2 = 64;
     //renderTexture(fbo->texture(), QRect(0, 0, w, h));
     //renderTexture(m_depth_textures[0], QRect(w / 2, 0, w, h / 2));
     //renderTexture(m_depth_textures[1], QRect(w / 2, h / 2, w, h));

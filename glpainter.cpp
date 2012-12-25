@@ -2,7 +2,7 @@
 
 GLPainter::GLPainter(Scene *scene) {
     m_scene = scene;
-    init("v_main.vert", "f_main.frag");
+    init("main.vert", "main.frag");
 }
 
 GLPainter::~GLPainter() {
@@ -164,7 +164,7 @@ void GLPainter::setMaterial(const Material &m) {
         setColorMode(CM_TEXTURE);
 
         glActiveTexture(GL_TEXTURE0);
-        GLuint id = m_scene->textureManager()->getTextureByName(m.texture());
+        GLuint id = m_scene->textureManager()->getTexture(m.texture());
         glBindTexture(GL_TEXTURE_2D, id);
         m_program->setUniformValue("tex", 0);
 

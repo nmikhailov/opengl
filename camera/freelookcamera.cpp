@@ -30,7 +30,7 @@ FreeLookCamera::FreeLookCamera() {
 FreeLookCamera::~FreeLookCamera() {
 }
 
-QVector3D FreeLookCamera::viewVector() const {
+QVector3D FreeLookCamera::direction() const {
     return m_view;
 }
 

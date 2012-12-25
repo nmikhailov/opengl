@@ -4,8 +4,8 @@ in vec4 vert;
 in vec2 uv_buf;
 in vec3 norm_buf;
 
-out vec3 vertex;
-out vec3 normal;
+smooth out vec3 vertex;
+smooth out vec3 normal;
 out vec2 uv;
 /// Lights
 struct Light {
@@ -38,11 +38,11 @@ uniform mat3x3 M_N;
 void main() {
     gl_Position = P * V * M * vert;
 
-    //for (int i = 0; i < max_lights; i++) {
+//    for (int i = 0; i < max_lights; i++) {
 //        vertex_light[i] = lights[i].PV_light * M * vert * bias;
-  //  }
+//    }
     vertex_light[0] = lights[0].PV_light * M * vert * bias;
-    vertex_light[1] = lights[1].PV_light * M * vert * bias;
+    //vertex_light[1] = lights[1].PV_light * M * vert * bias;
 
     // To pixel shader
     uv = uv_buf;

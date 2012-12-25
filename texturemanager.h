@@ -6,6 +6,7 @@
 #include <QRect>
 
 #include <map>
+#include <unordered_map>
 
 #include <texture.h>
 
@@ -14,13 +15,12 @@ public:
     TextureManager(QGLContext * context);
     virtual ~TextureManager();
 
-    Texture* createTexture(const QSize &size);
-    void freeTexture(Texture* texture);
+    TextureInfo* createTexture(const QSize &size);
+    void freeTexture(TextureInfo* texture);
 
-    GLuint loadTexture(const QImage & img, int type);
     void unloadTexture(GLuint id);
 
-    GLuint getTextureByName(Texture tex);
+    GLuint getTexture(TextureInfo tex);
 
     GLuint genFBTexture(int width, int heigth);
     GLuint genFBDepthTexture(int width, int heigth);
@@ -28,7 +28,10 @@ public:
     GLuint genDepthFramebuffer(const QSize &size, GLuint &tex_id);
 
 private:
-    std::map<QString, GLuint> m_file2id;
+    GLuint loadTexture(const QImage & img, TextureInfo::T_TYPE type);
+
+    std::unordered_map<TextureInfo, GLuint> m_cache;
+
     QGLContext * m_context;
 };
 

@@ -60,13 +60,13 @@ void GLWidget::initializeGL() {
     m_light1->setPosition(QVector3D(2, 1, 0));
     m_light1->setDirection(-m_light1->position());
     m_light1->setDiffuseColor(Qt::white);
-    m_light1->setAttenuationType(QVector3D(0, 0.3, 0));
+    m_light1->setAttenuationType(QVector3D(0, 3, 0));
     m_scene->root()->add(m_light1);
 
     // Models
     // Landscape
     m_landscape = new AssimpModel("scene2.obj");
-    // m_landscape = new AssimpModel("land1c.obj");
+    m_landscape = new AssimpModel("land1c.obj");
 
     //m_landscape->setPosition(-m_landscape->rect().center());
     m_landscape->setScale(QVector3D(1, 1, 1) / vec3max(m_landscape->rect().size()) * 2);
@@ -84,8 +84,8 @@ void GLWidget::initializeGL() {
 }
 
 void GLWidget::paintGL() {
+    //
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     m_box->setPosition(m_cam->position());
 
     m_cam->tick();
@@ -137,7 +137,7 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event) {
     m_cam->keyReleaseEvent(event);
 }
 
-void GLWidget::wheelEvent(QWheelEvent *event) {
+void GLWidget::wheelEvent(QWheelEvent*) {
 }
 
 void GLWidget::rotateOneStep() {
@@ -149,5 +149,6 @@ void GLWidget::rotateOneStep() {
     //m_light1->setPosition(m_light1->position() + QVector3D(0, 0.001, 0));
     //m_light1->setDirection(-m_light1->position());
     m_landscape->setRotation(QQuaternion(x, 0, 1, 0));
+
     updateGL();
 }

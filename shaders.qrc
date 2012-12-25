@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/s">
-        <file>shaders/f_main.frag</file>
-        <file>shaders/v_main.vert</file>
+        <file>shaders/main.frag</file>
+        <file>shaders/main.vert</file>
         <file>shaders/single_tex.vert</file>
         <file>shaders/single_tex.frag</file>
         <file>shaders/shadow_map.vert</file>

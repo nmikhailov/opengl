@@ -12,7 +12,7 @@ public:
     enum COLORING_TYPE {C_TEXTURE, C_UNIFROM};
 
     Material();
-    Material(Texture tex);
+    Material(TextureInfo tex);
     Material(QColor color);
     ~Material();
 
@@ -25,14 +25,14 @@ public:
     void setColor(const QColor &color);
 
     // get/set texture
-    Texture texture() const;
-    void setTexture(const Texture &tex);
+    TextureInfo texture() const;
+    void setTexture(const TextureInfo &tex);
 
 private:
     COLORING_TYPE m_type;
     QColor m_color;
 
-    Texture m_texture;
+    TextureInfo m_texture;
     // Add support for multiple textures
     //std::vector<Texture> m_textures;
 };

@@ -63,16 +63,16 @@ HEADERS  += mainwindow.h \
     skycuberenderer.h
 
 RESOURCES += \
-    resources.qrc \
     shaders.qrc
 
 OTHER_FILES += \
-    shaders/f_main.frag \
-    shaders/v_main.vert \
+    shaders/main.frag \
+    shaders/main.vert \
     shaders/single_tex.frag \
     shaders/single_tex.vert \
     shaders/shadow_map.frag \
     shaders/shadow_map.vert \
     shaders/skybox.frag \
-    shaders/skybox.vert
-
+    shaders/skybox.vert \
+    shaders/shadow_add.vert \
+    shaders/shadow_add.frag

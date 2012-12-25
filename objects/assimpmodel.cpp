@@ -88,8 +88,7 @@ void AssimpSubMesh::load(aiMesh *mesh, aiScene *obj_scene) {
 
 
         //m_material.setTexture();
-        Texture t;
-        t.m_name = str->C_Str();
+        TextureInfo t(str->C_Str());
         m_material.setTexture(t);
         m_material.setType(Material::C_TEXTURE);
     } else {

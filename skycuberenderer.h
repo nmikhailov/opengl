@@ -23,8 +23,6 @@ public:
     void release();
 
 protected:
-    void init2();
-
     Scene *m_scene;
     GLuint m_tex_id;
     QMatrix4x4 m_model, m_view, m_proj;

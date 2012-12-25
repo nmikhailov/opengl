@@ -5,10 +5,7 @@ Skybox::Skybox() {
 }
 
 Material Skybox::material() const {
-    Texture t;
-    t.m_name = "skybox.png";
-    t.type = GL_TEXTURE_CUBE_MAP;
-
+    TextureInfo t("skybox.png", TextureInfo::T_CUBIC);
     Material m;
     m.setTexture(t);
     m.setType(Material::C_TEXTURE);

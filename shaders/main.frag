@@ -2,8 +2,8 @@
 
 in vec4 v_color;
 in vec2 uv;
-in vec3 vertex;
-in vec3 normal;
+smooth in vec3 vertex;
+smooth in vec3 normal;
 
 uniform vec4 cl_color;
 uniform int color_mode;
@@ -37,8 +37,8 @@ float Epsilon = 0.01;
 float Epsilon2 = 0;
 float BacklightValue = 0.2;
 
-float myShadow2DProj(sampler2D shadow, vec4 vertex_light, float bias) {
-    float depth = texture2DProj(shadow, vertex_light.xyw).z;
+float myShadow2DProj(sampler2D shadow, vec4 vertex_light) {
+    float depth = textureProj(shadow, vertex_light.xyw).z;
     //depth = clamp(depth + Epsilon2, 0, 1);
     return (depth < vertex_light.z / vertex_light.w) ? 0. : 1.;
 }
@@ -72,21 +72,16 @@ void main(void) {
         float ccos = dot(lightDirection, -l.direction);
 
         // on direct light ?
-        bool onLight = true;
-        float visibility = 1.;
+        float visibility = 0.;
 
-        if (ccos < l.cosAngle) {
-            onLight = false;
-            visibility = 0;
-        } else {
-            visibility = myShadow2DProj(shadows[i], vertex_light[i], 0.2);
+        if (ccos > l.cosAngle) {
+            visibility = myShadow2DProj(shadows[i], vertex_light[i]);
         }
 
         float dist = length(vertexToLightSource);
         float attenuation = 1.0 / (l.att.x + l.att.y * dist + l.att.z * dist * dist);
 
-        diffuseReflection = l.diffuse * clamp(dot(normal, lightDirection), 0, 1) * attenuation;
-        visibility = clamp(visibility, BacklightValue, 1);
+        diffuseReflection = l.diffuse * dot(normal, lightDirection) * attenuation;
 
         vec4 cur_val = clamp(diffuseReflection * visibility, BacklightValue, 1);
         //vec4 cur_val = diffuseReflection * visibility;
@@ -95,10 +90,11 @@ void main(void) {
         if(i == 0) {
             light = cur_val;
         } else {
-            light += cur_val;
+            light *= cur_val;
             //light += diffuseReflection;
         }
     }
 
     color *= light;
+    color.a = 0.3;
 }
