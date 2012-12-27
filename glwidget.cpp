@@ -14,7 +14,7 @@
 GLWidget::GLWidget(QGLContext* context, QWidget *parent, QGLWidget *shareWidget)
     : QGLWidget(context, parent, shareWidget) {
     setMouseTracking(true);
-    m_clear_color = Qt::blue;
+    m_clear_color = Qt::black;
     m_context = context;
 
     QTimer *timer = new QTimer(this);
@@ -93,7 +93,7 @@ void GLWidget::paintGL() {
     m_cam->tick();
     m_scene->render();
 
-    assert(glGetError() == 0);
+    //assert(glGetError() == 0);
 }
 
 void GLWidget::resizeGL(int w, int h) {

@@ -1,5 +1,6 @@
 #include "scene.h"
 #include "gldepthshader.h"
+#include "shadowtr.h"
 
 #include <QPainter>
 #include <queue>
@@ -11,7 +12,6 @@ Scene::Scene(QGLContext *context) : m_context(context) {
     m_root = new Group();
     m_painter = new GLPainter(this);
     m_depth_painter = new GLDepthShader(this);
-    m_tex_painter = new TexturePainter();
     m_texture_manager = new TextureManager(m_context);
     m_final = new TextureShader("single_tex.vert", "single_tex.frag");
 
@@ -29,7 +29,6 @@ Scene::Scene(QGLContext *context) : m_context(context) {
 Scene::~Scene() {
     delete m_root;
     delete m_painter;
-    delete m_tex_painter;
     delete m_depth_painter;
 
     delete m_main_fbo;
@@ -54,7 +53,32 @@ void Scene::render() {
     //glDisable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
+    ShadowTr shdw;
+    shdw.bind();
+    shdw.setViewMatrix(m_render_camera->viewMatrix());
+    shdw.setProjectionMatrix(m_render_camera->projectionMatrix());
+    shdw.setViewMatrix(m_render_camera->viewMatrix());
+    shdw.setLight(m_light_pos.begin()->first, m_light_pos.begin()->second);
+
+    shdw.setShadowTexture(m_light_shadow.begin()->second);
+
+    for (auto &obj: m_obj_pos) {
+        if (obj.first->renderer() != nullptr) {
+            continue;
+        }
+
+        QMatrix4x4 model = obj.second * obj.first->modelMatrix();
+        shdw.setModelMatrix(model);
+        shdw.render(obj.first);
+    }
+    shdw.release();
+///
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, m_screen_size.width(), m_screen_size.height());
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+///
     GLRenderer *rnd = m_painter, *nr = m_painter;
+    m_painter->setShadowMap(m_main_fbo->textureBuffer());
     bindRenderer(rnd);
 
     for (auto &obj: m_obj_pos) {
@@ -71,17 +95,18 @@ void Scene::render() {
 
         QMatrix4x4 model = obj.second * obj.first->modelMatrix();
         rnd->setModelMatrix(model);
+        m_painter->setShadowMap(m_main_fbo->textureBuffer());
 
         rnd->render(obj.first);
     }
     rnd->release();
 
     // Final
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, m_screen_size.width(), m_screen_size.height());
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//    glViewport(0, 0, m_screen_size.width(), m_screen_size.height());
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    m_final->render(m_main_fbo->textureBuffer());
+//    m_final->render(m_main_fbo->textureBuffer());
     //
     if (m_debug)
         renderDebugInfo();
@@ -110,7 +135,6 @@ void Scene::renderLights() {
         m_light_shadow[light] = m_shadows[i]->depthBuffer();
 
         // Post process
-
     }
 }
 

@@ -31,6 +31,8 @@ public:
     void render(const GLObject* obj);
     void setMaterial(const Material &m);
 
+    void setShadowMap(GLuint id);
+
     bool bind();
     void release();
 protected:
@@ -52,6 +54,8 @@ protected:
     virtual ~GLPainter();
 
     Scene *m_scene;
+
+    QGLBuffer m_buff;
 };
 
 #endif // GLPAINTER_H

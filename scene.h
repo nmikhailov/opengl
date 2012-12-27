@@ -16,7 +16,6 @@
 #include "lightsource.h"
 #include "texture.h"
 #include "glpainter.h"
-#include "texturepainter.h"
 #include "gldepthshader.h"
 #include "texturemanager.h"
 #include "textureshader.h"
@@ -93,7 +92,6 @@ private:
 
     // Shaders
     GLPainter *m_painter;
-    TexturePainter *m_tex_painter;
     GLDepthShader *m_depth_painter;
 
     QSize m_screen_size;

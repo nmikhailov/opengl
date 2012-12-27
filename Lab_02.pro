@@ -32,14 +32,14 @@ SOURCES += main.cpp\
     material.cpp \
     objects/axes.cpp \
     objects/sphere.cpp \
-    texturepainter.cpp \
     gldepthshader.cpp \
     rect.cpp \
     objects/skybox.cpp \
     glrenderer.cpp \
     skycuberenderer.cpp \
     textureshader.cpp \
-    framebuffer.cpp
+    framebuffer.cpp \
+    shadowtr.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
@@ -57,14 +57,14 @@ HEADERS  += mainwindow.h \
     material.h \
     objects/axes.h \
     objects/sphere.h \
-    texturepainter.h \
     gldepthshader.h \
     rect.h \
     objects/skybox.h \
     glrenderer.h \
     skycuberenderer.h \
     textureshader.h \
-    framebuffer.h
+    framebuffer.h \
+    shadowtr.h
 
 RESOURCES += \
     shaders.qrc

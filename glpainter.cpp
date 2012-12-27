@@ -2,9 +2,25 @@
 
 #include <cassert>
 
+namespace {
+const GLfloat vertices[] = {
+    0, 0,
+    1, 0,
+    0,  1,
+
+    0,  1,
+     1, 0,
+     1,  1,
+};
+}
+
 GLPainter::GLPainter(Scene *scene) {
     m_scene = scene;
     init("main.vert", "main.frag");
+
+    m_buff.create();
+    m_buff.bind();
+    m_buff.allocate(vertices, sizeof(vertices));
 }
 
 GLPainter::~GLPainter() {
@@ -49,7 +65,7 @@ void GLPainter::setUVBuffer(QGLBuffer buff, GLenum type, int tupleSize) {
 
     m_program->setAttributeBuffer("uv_buf", type, 0, tupleSize);
     m_program->enableAttributeArray("uv_buf");
-    assert(glGetError() == 0);
+    //assert(glGetError() == 0);
 }
 
 void GLPainter::bindTexture(GLuint id) {
@@ -80,7 +96,7 @@ void GLPainter::updateLight(const std::map<LightSource*, QMatrix4x4>  &lights, c
     for (auto rec: lights) {
         LightSource* light = rec.first;
         QString name = QString("lights[%1].").arg(id);
-        QString name_shadow = QString("shadows[%1]").arg(id);
+//        QString name_shadow = QString("shadows[%1]").arg(id);
 
         QVector3D pos = (rec.second * QVector4D(light->position(), 0)).toVector3D();
 
@@ -99,9 +115,9 @@ void GLPainter::updateLight(const std::map<LightSource*, QMatrix4x4>  &lights, c
         QMatrix4x4 pv = light->projectionMatrix() * light->viewMatrix();
         m_program->setUniformValue((name + "PV_light").toLatin1().data(), pv);
         //
-        glActiveTexture(GL_TEXTURE1 + id);
-        glBindTexture(GL_TEXTURE_2D, lights_tex.at(light));
-        m_program->setUniformValue(name_shadow.toAscii().data(), id + 1);
+//        glActiveTexture(GL_TEXTURE1 + id);
+//        glBindTexture(GL_TEXTURE_2D, lights_tex.at(light));
+//        m_program->setUniformValue(name_shadow.toAscii().data(), id + 1);
         //
 
         id++;
@@ -112,6 +128,12 @@ void GLPainter::updateLight(const std::map<LightSource*, QMatrix4x4>  &lights, c
 }
 
 void GLPainter::render(const GLObject *obj) {
+    m_program->bind();
+    m_buff.bind();
+    m_program->setAttributeArray("shUV", GL_FLOAT, 0, 2);
+    m_program->enableAttributeArray("shUV");
+
+
     static const QMatrix4x4 mats(0.5, 0.0, 0.0, 0.0,
                     0.0, 0.5, 0.0, 0.0,
                     0.0, 0.0, 0.5, 0.0,
@@ -178,4 +200,10 @@ void GLPainter::setMaterial(const Material &m) {
         setColorMode(CM_ONE_COLOR);
         setColor(m.color());
     }
+}
+
+void GLPainter::setShadowMap(GLuint id) {
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, id);
+    m_program->setUniformValue("shadowmap", 1);
 }
