@@ -3,7 +3,7 @@
 #include "objects/globject.h"
 
 
-void SkycubeRenderer::updateLight(const std::map<LightSource *, QMatrix4x4> &lights, const std::map<LightSource *, GLuint> &lights_tex) {
+void SkycubeRenderer::updateLight(const std::map<LightSource *, QMatrix4x4>&, const std::map<LightSource *, GLuint> &) {
     // Nothing to do
 }
 

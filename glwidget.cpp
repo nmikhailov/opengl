@@ -5,6 +5,8 @@
 #include <Qt>
 #include <QtGui>
 #include <QtOpenGL>
+#include <QImage>
+#include <QPixmap>
 
 #include "glwidget.h"
 #include "skycuberenderer.h"
@@ -61,13 +63,13 @@ void GLWidget::initializeGL() {
     m_light1->setPosition(QVector3D(2, 1, 0));
     m_light1->setDirection(-m_light1->position());
     m_light1->setDiffuseColor(Qt::white);
-    m_light1->setAttenuationType(QVector3D(0, 0.3, 0));
+    m_light1->setAttenuationType(QVector3D(1, 0, 0));
     m_scene->root()->add(m_light1);
 
     // Models
     // Landscape
-    //m_landscape = new AssimpModel("land1e.obj");
-    m_landscape = new AssimpModel("scene2.obj");
+    m_landscape = new AssimpModel("land1c.obj");
+    //m_landscape = new AssimpModel("scene2.obj");
 
     //m_landscape->setPosition(-m_landscape->rect().center());
     m_landscape->setScale(QVector3D(1, 1, 1) / vec3max(m_landscape->rect().size()) * 2);
@@ -90,26 +92,12 @@ void GLWidget::paintGL() {
 
     m_cam->tick();
     m_scene->render();
-    drawLegend();
 
     assert(glGetError() == 0);
 }
 
 void GLWidget::resizeGL(int w, int h) {
     m_scene->setScreenSize(QSize(w, h));
-}
-
-void GLWidget::drawLegend() {
-    static int frames = 0;
-    frames++;
-
-    static double fps = 0;
-    if (m_time.elapsed() > 1000) {
-        fps = ((double) frames / m_time.elapsed()) * 1000.;
-        m_time.start();
-        frames = 0;
-        qDebug() << "FPS: " << fps;
-    }
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event) {
@@ -130,8 +118,11 @@ void GLWidget::mouseReleaseEvent(QMouseEvent * /* event */) {
 void GLWidget::keyPressEvent(QKeyEvent * event) {
     m_cam->keyPressEvent(event);
 
-    if(event->key() == Qt::Key_Q) {
+    if (event->key() == Qt::Key_Q) {
         m_rotation = !m_rotation;
+    } else if (event->key() == Qt::Key_F1) {
+        m_shadow_sizes_id = (m_shadow_sizes_id + 1) % (sizeof(m_shadow_sizes) / sizeof(int));
+        m_scene->setShadowMapSize(QSize(m_shadow_sizes[m_shadow_sizes_id], m_shadow_sizes[m_shadow_sizes_id]));
     }
 }
 

@@ -37,7 +37,6 @@ protected:
     void initializeGL();
     void paintGL();
     void resizeGL(int w, int h);
-    void drawLegend();
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
@@ -45,8 +44,8 @@ protected:
     void keyReleaseEvent(QKeyEvent *);
     void wheelEvent(QWheelEvent *event);
 private:
+    QPainter m_painter;
     QColor m_clear_color;
-    QTime m_time;
 
     QVector2D m_last_mouse_pos; // For camera controlling
 
@@ -62,6 +61,9 @@ private:
 
     // Light source rotation
     bool m_rotation = true;
+
+    int m_shadow_sizes[7] = {64, 128, 256, 512, 1024, 2048, 4096};
+    int m_shadow_sizes_id = 0;
 };
 
 #endif

@@ -41,7 +41,7 @@ void LightSource::setSpotAngle(double angle) {
     m_angle = angle;
 }
 
-QMatrix4x4 LightSource::projectionMatrix(double ar) const {
+QMatrix4x4 LightSource::projectionMatrix() const {
     QMatrix4x4 mat;
 
     //mat.ortho(-1, 1, -1, 1, 0.1, 1e5);

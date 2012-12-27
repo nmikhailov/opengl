@@ -59,7 +59,8 @@ void GLDepthShader::render(const GLObject *obj) {
     }
 
     bf = obj->indexBuffer();
-    setIndexBuffer(bf.buff);
+    if (bf.enabled)
+        setIndexBuffer(bf.buff);
 
     // Calc buffer size
     int sz = obj->vertexBuffer().buff.size(), d;
@@ -81,6 +82,6 @@ void GLDepthShader::render(const GLObject *obj) {
         int ssz = obj->indexBuffer().buff.size() / sizeof(GLuint);
         glDrawElements(GL_TRIANGLES, ssz, GL_UNSIGNED_INT, nullptr);
     } else {
-        //glDrawArrays(obj->primitiveType(), 0, sz / d);
+        glDrawArrays(obj->primitiveType(), 0, sz / d);
     }
 }

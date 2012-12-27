@@ -8,5 +8,7 @@
         <file>shaders/shadow_map.frag</file>
         <file>shaders/skybox.frag</file>
         <file>shaders/skybox.vert</file>
+        <file>shaders/blur.frag</file>
+        <file>shaders/blur.vert</file>
     </qresource>
 </RCC>

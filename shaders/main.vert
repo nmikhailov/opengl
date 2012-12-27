@@ -4,8 +4,8 @@ in vec4 vert;
 in vec2 uv_buf;
 in vec3 norm_buf;
 
-smooth out vec3 vertex;
-smooth out vec3 normal;
+out vec3 vertex;
+out vec3 normal;
 out vec2 uv;
 /// Lights
 struct Light {

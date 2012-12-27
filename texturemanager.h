@@ -21,9 +21,9 @@ public:
     void unloadTexture(GLuint id);
 
     GLuint getTexture(TextureInfo tex);
-private:
-    GLuint loadTexture(const QImage & img, TextureInfo::T_TYPE type);
 
+    GLuint loadTexture(const QImage & img, TextureInfo::T_TYPE type);
+private:
     std::unordered_map<TextureInfo, GLuint> m_cache;
 
     QGLContext * m_context;

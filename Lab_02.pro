@@ -79,4 +79,6 @@ OTHER_FILES += \
     shaders/skybox.frag \
     shaders/skybox.vert \
     shaders/shadow_add.vert \
-    shaders/shadow_add.frag
+    shaders/shadow_add.frag \
+    shaders/blur.vert \
+    shaders/blur.frag

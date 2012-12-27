@@ -96,7 +96,7 @@ void GLPainter::updateLight(const std::map<LightSource*, QMatrix4x4>  &lights, c
         double cosAngle = cos(M_PI * light->spotAngle() / 180. / 2.);
         m_program->setUniformValue((name + "cosAngle").toLatin1().data(), (float)cosAngle);
 
-        QMatrix4x4 pv = light->projectionMatrix(1) * light->viewMatrix();
+        QMatrix4x4 pv = light->projectionMatrix() * light->viewMatrix();
         m_program->setUniformValue((name + "PV_light").toLatin1().data(), pv);
         //
         glActiveTexture(GL_TEXTURE1 + id);

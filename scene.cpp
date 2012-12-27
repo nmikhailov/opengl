@@ -1,6 +1,7 @@
 #include "scene.h"
 #include "gldepthshader.h"
 
+#include <QPainter>
 #include <queue>
 #include <cassert>
 #include <utility>
@@ -13,10 +14,16 @@ Scene::Scene(QGLContext *context) : m_context(context) {
     m_tex_painter = new TexturePainter();
     m_texture_manager = new TextureManager(m_context);
     m_final = new TextureShader("single_tex.vert", "single_tex.frag");
-    int sz = 512;
+
+    // Shadows
+    for (int i = 0; i < max_lights; i++) {
+        m_shadows[i] = nullptr;
+    }
+
+    int sz = 64;
     m_shadow_map_size = QSize(sz, sz);
     //
-    initFBO();
+    reinitFBO();
 }
 
 Scene::~Scene() {
@@ -44,7 +51,8 @@ void Scene::render() {
     // Scene
     m_main_fbo->bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glDisable(GL_CULL_FACE);
+    //glDisable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     GLRenderer *rnd = m_painter, *nr = m_painter;
     bindRenderer(rnd);
@@ -74,6 +82,18 @@ void Scene::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_final->render(m_main_fbo->textureBuffer());
+    //
+    if (m_debug)
+        renderDebugInfo();
+}
+
+QSize Scene::shadowMapSize() const {
+    return m_shadow_map_size;
+}
+
+void Scene::setShadowMapSize(const QSize &sz) {
+    m_shadow_map_size = sz;
+    reinitFBO();
 }
 
 void Scene::renderLights() {
@@ -88,6 +108,9 @@ void Scene::renderLights() {
         renderShadowMap(light);
 
         m_light_shadow[light] = m_shadows[i]->depthBuffer();
+
+        // Post process
+
     }
 }
 
@@ -96,7 +119,7 @@ void Scene::renderShadowMap(LightSource *light) {
     glCullFace(GL_FRONT);
 
     m_depth_painter->bind();
-    m_depth_painter->setProjectionMatrix(light->projectionMatrix(1));
+    m_depth_painter->setProjectionMatrix(light->projectionMatrix());
     m_depth_painter->setViewMatrix(light->viewMatrix());
 
     for (auto &obj: m_obj_pos) {
@@ -155,12 +178,55 @@ void Scene::bindRenderer(GLRenderer *renderer) {
     renderer->setViewMatrix(m_render_camera->viewMatrix());
 }
 
-void Scene::initFBO() {
+void Scene::reinitFBO() {
+    delete m_main_fbo;
     m_main_fbo = new Framebuffer(m_screen_size);
 
     for (int i = 0; i < max_lights; i++) {
+        delete m_shadows[i];
         m_shadows[i] = new Framebuffer(m_shadow_map_size, false);
     }
+}
+
+void Scene::renderDebugInfo() {
+    static QTime time(0, 1);
+    static int frames = 0;
+    frames++;
+
+    static double fps = 0;
+    if (time.elapsed() > 1000) {
+        fps = ((double) frames / time.elapsed()) * 1000.;
+        time.start();
+        frames = 0;
+    }
+
+    QSize size(m_screen_size.width(), 128);
+    QRect rect(QPoint(0, 0), size);
+
+    static QImage img(size, QImage::Format_RGB32);
+    if (img.size() != m_screen_size) {
+        img = QImage(size, QImage::Format_RGB32);
+    }
+    static QPainter painter;
+    painter.begin(&img);
+    painter.setBrush(Qt::SolidPattern);
+    painter.setPen(Qt::black);
+    painter.fillRect(rect, Qt::lightGray);
+
+    QString text = "FPS: %1\nShadow map size: %2 x %3\nScreen size: %4 x %5";
+    text = text.arg(fps);
+    text = text.arg(m_shadow_map_size.width()).arg(m_shadow_map_size.height());
+    text = text.arg(m_screen_size.width()).arg(m_screen_size.height());
+
+    painter.drawText(rect, text);
+
+    painter.end();
+
+    glViewport(0, m_screen_size.height() - size.height(), size.width(), size.height());
+    GLuint id = m_texture_manager->loadTexture(img, TextureInfo::T_2D);
+    m_final->render(id);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDeleteTextures(1, &id);
 }
 
 const Group *Scene::root() const {

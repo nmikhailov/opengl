@@ -54,6 +54,10 @@ public:
     // Render scene to screen
     void render();
 
+    // Manage shadow map buffer size
+    QSize shadowMapSize() const;
+    void setShadowMapSize(const QSize &sz);
+
 protected:
     void renderLights();
     void renderShadowMap(LightSource* light);
@@ -65,9 +69,12 @@ protected:
 
 
     // Initialize framebuffer object and texture
-    void initFBO();
+    void reinitFBO();
 
 private:
+    void renderDebugInfo();
+    bool m_debug = true;
+
     QGLContext *m_context;
     TextureManager *m_texture_manager;
 
