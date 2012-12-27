@@ -19,6 +19,8 @@
 #include "texturepainter.h"
 #include "gldepthshader.h"
 #include "texturemanager.h"
+#include "textureshader.h"
+#include "framebuffer.h"
 
 /*
  * OpenGL scene
@@ -46,8 +48,8 @@ public:
     Group* root();
 
     // Manage screen size
-    void setScreenSize(const QVector2D &rect);
-    QVector2D screenSize() const;
+    void setScreenSize(const QSize &rect);
+    QSize screenSize() const;
 
     // Render scene to screen
     void render();
@@ -55,8 +57,6 @@ public:
 protected:
     void renderLights();
     void renderShadowMap(LightSource* light);
-    void renderTexture(GLuint tex_id);
-    void renderTexture(GLuint tex_id, const QRect &rect);
 
     // Update matrices map
     void updatePositions();
@@ -89,22 +89,18 @@ private:
     TexturePainter *m_tex_painter;
     GLDepthShader *m_depth_painter;
 
-    QVector2D m_screen_size;
+    QSize m_screen_size;
 
     // Frambuffer
     //QGLFramebufferObject *m_fbo;
-    GLuint m_fbo;
-    GLuint m_btex[2];
-    GLuint FramebufferName;
-    GLuint renderedTexture, depthTexture;
 
     static const int max_lights = 20;
-    GLuint m_depth_textures[max_lights];
-    GLuint m_depth_framebuffers[max_lights];
-
-    QGLFramebufferObject * fbo, *m_shadow_fbo;
 
     QSize m_shadow_map_size;
+
+    TextureShader * m_final;
+    Framebuffer * m_main_fbo;
+    Framebuffer * m_shadows[max_lights];
 };
 
 #endif // SCENE_H

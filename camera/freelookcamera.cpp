@@ -48,7 +48,7 @@ void FreeLookCamera::setNormal(const QVector3D &normal) {
 
 QMatrix4x4 FreeLookCamera::projectionMatrix() const {
     QMatrix4x4 mat;
-    mat.perspective(45, m_screen_size.x() / m_screen_size.y(), 1e-2, 1e6);
+    mat.perspective(45, m_screen_size.width() / m_screen_size.height(), 1e-1, 1e3);
     return mat;
 }
 

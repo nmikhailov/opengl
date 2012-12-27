@@ -4,6 +4,7 @@
 #include <QVector3D>
 #include <QTimer>
 #include <functional>
+#include <cassert>
 
 #include "camera.h"
 

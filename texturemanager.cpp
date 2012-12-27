@@ -1,5 +1,6 @@
 #include "texturemanager.h"
 #include <QtOpenGL>
+#include <cassert>
 
 TextureManager::TextureManager(QGLContext *context) {
     m_context = context;
@@ -9,11 +10,10 @@ TextureManager::~TextureManager() {
 }
 
 GLuint TextureManager::loadTexture(const QImage &img, TextureInfo::T_TYPE type) {
-    QImage image = QGLWidget::convertToGLFormat(img);
+    QImage image = img;
 
     GLuint id;// = m_context->bindTexture(img, type);
     glGenTextures(1, &id);
-    glBindTexture(GL_TEXTURE_2D, id);
 
     GLuint internal;
     switch (type) {
@@ -31,7 +31,7 @@ GLuint TextureManager::loadTexture(const QImage &img, TextureInfo::T_TYPE type) 
     glBindTexture(internal, id);
 
     if (type == TextureInfo::T_2D) {
-        glTexImage2D(internal, 0, GL_RGBA, image.width(), image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+        glTexImage2D(internal, 0, GL_RGBA, image.width(), image.height(), 0, GL_BGRA, GL_UNSIGNED_BYTE, image.bits());
     } else if (type == TextureInfo::T_CUBIC) {
         QImage images[12];
         int width = image.width() / 4;
@@ -52,7 +52,7 @@ GLuint TextureManager::loadTexture(const QImage &img, TextureInfo::T_TYPE type) 
         }
     }
 
-    glTexParameteri(internal, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(internal, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(internal, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(internal, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(internal, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -73,79 +73,4 @@ GLuint TextureManager::getTexture(TextureInfo tex) {
     }
 
     return m_cache[tex];
-}
-
-GLuint TextureManager::genFBTexture(int width, int heigth) {
-    GLuint res;
-    glGenTextures(1, &res);
-    glBindTexture(GL_TEXTURE_2D, res);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, heigth, 0, GL_RGBA, GL_FLOAT, 0);
-
-    // Poor filtering
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    return res;
-}
-
-GLuint TextureManager::genFBDepthTexture(int width, int heigth) {
-    GLuint res;
-    glGenTextures(1, &res);
-    glBindTexture(GL_TEXTURE_2D, res);
-
-
-//    glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT24, width, heigth, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-//    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
-//    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
-
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, heigth, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-   // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-    //glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
-
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, res, 0);
-
-    return res;
-}
-
-GLuint TextureManager::genDepthFramebuffer(const QSize &size, GLuint &tex_id) {
-    GLuint FramebufferName = 0;
-    glGenFramebuffers(1, &FramebufferName);
-    glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-
-    //renderedTexture = m_texture_manager->genFBTexture(1024, 1024);
-    tex_id = genFBDepthTexture(size.width(), size.height());
-
-
-    //glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
-
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, tex_id, 0);
-
-    // Set the list of draw buffers.
-    //GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-    //glDrawBuffers(1, DrawBuffers);
-    glDrawBuffers(0, 0);
-
-    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        qDebug() << "Framebuffer isn't complete";
-
-    return FramebufferName;
 }

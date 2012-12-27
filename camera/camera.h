@@ -23,12 +23,12 @@ public:
     virtual QMatrix4x4 viewMatrix() const = 0;
 
     // Manage screen size
-    virtual void setScreenSize(const QVector2D &rect);
-    virtual QVector2D screenSize() const;
+    virtual void setScreenSize(const QSize &rect);
+    virtual QSize screenSize() const;
 
 protected:
     QVector3D m_pos;
-    QVector2D m_screen_size;
+    QSize m_screen_size;
 };
 
 #endif // CAMERA_H

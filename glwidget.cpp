@@ -1,5 +1,6 @@
 #include <sstream>
 #include <iostream>
+#include <cassert>
 
 #include <Qt>
 #include <QtGui>
@@ -42,31 +43,31 @@ void GLWidget::initializeGL() {
     qglClearColor(m_clear_color);
     //glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-
+    glDepthFunc(GL_LEQUAL);
     // Scene
     m_scene = new Scene(m_context);
 
     // Camera
     m_cam = new FreeLookCamera();
-    m_cam->setPosition(QVector3D(0, 1, 0));
-    m_cam->setViewVector(QVector3D(1, -1, 0));
+    m_cam->setPosition(QVector3D(2, 1, 0));
+    m_cam->setViewVector(QVector3D(-2, -1, 0));
     m_scene->setRenderCamera(m_cam);
 
     // Axes (dont work)
-    m_scene->root()->add(new Axes());
+    // m_scene->root()->add(new Axes());
 
     // Lights
     m_light1 = new LightSource();
     m_light1->setPosition(QVector3D(2, 1, 0));
     m_light1->setDirection(-m_light1->position());
     m_light1->setDiffuseColor(Qt::white);
-    m_light1->setAttenuationType(QVector3D(0, 3, 0));
+    m_light1->setAttenuationType(QVector3D(0, 0.3, 0));
     m_scene->root()->add(m_light1);
 
     // Models
     // Landscape
+    //m_landscape = new AssimpModel("land1e.obj");
     m_landscape = new AssimpModel("scene2.obj");
-    m_landscape = new AssimpModel("land1c.obj");
 
     //m_landscape->setPosition(-m_landscape->rect().center());
     m_landscape->setScale(QVector3D(1, 1, 1) / vec3max(m_landscape->rect().size()) * 2);
@@ -77,7 +78,7 @@ void GLWidget::initializeGL() {
     SkycubeRenderer *cr = new SkycubeRenderer(m_scene);
 
     m_box = new Skybox();
-    m_box->setScale(QVector3D(1, 1, 1) * 1e3);
+    m_box->setScale(QVector3D(1, 1, 1) * 1e2);
     m_box->setRenderer(cr);
 
     m_scene->root()->add(m_box);
@@ -85,16 +86,17 @@ void GLWidget::initializeGL() {
 
 void GLWidget::paintGL() {
     //
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_box->setPosition(m_cam->position());
 
     m_cam->tick();
     m_scene->render();
     drawLegend();
+
+    assert(glGetError() == 0);
 }
 
 void GLWidget::resizeGL(int w, int h) {
-    m_scene->setScreenSize(QVector2D(w, h));
+    m_scene->setScreenSize(QSize(w, h));
 }
 
 void GLWidget::drawLegend() {

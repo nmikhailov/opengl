@@ -56,7 +56,10 @@ void main(void) {
    //     discard;
 
     if (color.rgb == vec3(62, 88, 59) / 255) {
-        discard;
+       discard;
+    }
+    if (length(color.rgb - vec3(255, 255, 255) / 255) < 0.8) {
+       discard;
     }
 
     //
@@ -96,5 +99,4 @@ void main(void) {
     }
 
     color *= light;
-    color.a = 0.3;
 }

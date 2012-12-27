@@ -1,5 +1,7 @@
 #include "glpainter.h"
 
+#include <cassert>
+
 GLPainter::GLPainter(Scene *scene) {
     m_scene = scene;
     init("main.vert", "main.frag");
@@ -44,8 +46,10 @@ void GLPainter::setNormalBuffer(QGLBuffer buff, GLenum type, int tupleSize) {
 
 void GLPainter::setUVBuffer(QGLBuffer buff, GLenum type, int tupleSize) {
     buff.bind();
+
     m_program->setAttributeBuffer("uv_buf", type, 0, tupleSize);
     m_program->enableAttributeArray("uv_buf");
+    assert(glGetError() == 0);
 }
 
 void GLPainter::bindTexture(GLuint id) {
@@ -113,7 +117,6 @@ void GLPainter::render(const GLObject *obj) {
                     0.0, 0.0, 0.5, 0.0,
                     0.5, 0.5, 0.5, 1.0);
     m_program->setUniformValue("bias", mats);
-
     GLObject::BufferInfo bf;
 
     bf = obj->vertexBuffer();
@@ -125,13 +128,16 @@ void GLPainter::render(const GLObject *obj) {
     }
 
     bf = obj->indexBuffer();
-    setIndexBuffer(bf.buff);
+    if (bf.enabled)
+        setIndexBuffer(bf.buff);
 
     bf = obj->texcoordBuffer();
-    setUVBuffer(bf.buff, bf.type, bf.sz);
+    if (bf.enabled)
+        setUVBuffer(bf.buff, bf.type, bf.sz);
 
     bf = obj->normalBuffer();
-    setNormalBuffer(bf.buff, bf.type, bf.sz);
+    if (bf.enabled)
+        setNormalBuffer(bf.buff, bf.type, bf.sz);
 
     // Calc buffer size
     int sz = obj->vertexBuffer().buff.size(), d;
@@ -153,9 +159,9 @@ void GLPainter::render(const GLObject *obj) {
     if (obj->indexBuffer().enabled) {
         //glDrawElements(obj->primitiveType(), sz / d, obj->vertexBuffer().type, nullptr);
         int ssz = obj->indexBuffer().buff.size() / sizeof(GLuint);
-        glDrawElements(GL_TRIANGLES, ssz, GL_UNSIGNED_INT, nullptr);
+        glDrawElements(obj->primitiveType(), ssz, GL_UNSIGNED_INT, nullptr);
     } else {
-        //glDrawArrays(obj->primitiveType(), 0, sz / d);
+        glDrawArrays(obj->primitiveType(), 0, sz / d);
     }
 }
 

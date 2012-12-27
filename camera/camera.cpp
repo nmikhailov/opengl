@@ -10,14 +10,14 @@ QVector3D Camera::position() const {
     return m_pos;
 }
 
-void Camera::setScreenSize(const QVector2D &rect) {
+void Camera::setScreenSize(const QSize &rect) {
     m_screen_size = rect;
 }
 
-QVector2D Camera::screenSize() const {
+QSize Camera::screenSize() const {
     return m_screen_size;
 }
 
 Camera::Camera() {
-    m_screen_size = QVector2D(1, 1);
+    m_screen_size = QSize(1, 1);
 }

@@ -37,7 +37,9 @@ SOURCES += main.cpp\
     rect.cpp \
     objects/skybox.cpp \
     glrenderer.cpp \
-    skycuberenderer.cpp
+    skycuberenderer.cpp \
+    textureshader.cpp \
+    framebuffer.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
@@ -60,7 +62,9 @@ HEADERS  += mainwindow.h \
     rect.h \
     objects/skybox.h \
     glrenderer.h \
-    skycuberenderer.h
+    skycuberenderer.h \
+    textureshader.h \
+    framebuffer.h
 
 RESOURCES += \
     shaders.qrc

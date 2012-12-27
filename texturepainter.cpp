@@ -37,10 +37,11 @@ void TexturePainter::renderTexture(GLuint texid) {
     m_uv.bind();
     m_shader.setAttributeBuffer("uv_coords", GL_FLOAT, 0, 2);
     m_shader.enableAttributeArray("uv_coords");
-    m_shader.setUniformValue("tex", 0);
-\
+
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texid);
+    m_shader.setUniformValue("tex", 0);
 
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+   // glDrawArrays(GL_TRIANGLES, 0, 3);
 }

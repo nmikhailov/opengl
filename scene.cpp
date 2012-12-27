@@ -2,15 +2,18 @@
 #include "gldepthshader.h"
 
 #include <queue>
+#include <cassert>
 #include <utility>
 
 Scene::Scene(QGLContext *context) : m_context(context) {
+    m_screen_size = QSize(100, 100);
     m_root = new Group();
     m_painter = new GLPainter(this);
     m_depth_painter = new GLDepthShader(this);
     m_tex_painter = new TexturePainter();
     m_texture_manager = new TextureManager(m_context);
-    int sz = 4096;
+    m_final = new TextureShader("single_tex.vert", "single_tex.frag");
+    int sz = 512;
     m_shadow_map_size = QSize(sz, sz);
     //
     initFBO();
@@ -21,7 +24,11 @@ Scene::~Scene() {
     delete m_painter;
     delete m_tex_painter;
     delete m_depth_painter;
-    //delete m_fbo;
+
+    delete m_main_fbo;
+    for (int i = 0; i < max_lights; i++) {
+        delete m_shadows[i];
+    }
 }
 
 TextureManager *Scene::textureManager() {
@@ -30,28 +37,18 @@ TextureManager *Scene::textureManager() {
 
 void Scene::render() {
     updatePositions();
-
     // Lights
     m_render_camera->setScreenSize(m_screen_size);
-
     renderLights();
 
-    glCullFace(GL_BACK);
-
-
     // Scene
-    //glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-    //fbo->bind();
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, m_screen_size.x(), m_screen_size.y());
-    //glViewport(0, 0, 1024, 1024);
+    m_main_fbo->bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDisable(GL_CULL_FACE);
 
     GLRenderer *rnd = m_painter, *nr = m_painter;
     bindRenderer(rnd);
 
-    glDisable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
     for (auto &obj: m_obj_pos) {
         if (obj.first->renderer() != nullptr) {
             nr = obj.first->renderer();
@@ -70,12 +67,13 @@ void Scene::render() {
         rnd->render(obj.first);
     }
     rnd->release();
-    // Draw textures
-    //int w = m_screen_size.x(), h = m_screen_size.y();
-    //int w2 = 64;
-    //renderTexture(fbo->texture(), QRect(0, 0, w, h));
-    //renderTexture(m_depth_textures[0], QRect(w / 2, 0, w, h / 2));
-    //renderTexture(m_depth_textures[1], QRect(w / 2, h / 2, w, h));
+
+    // Final
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, m_screen_size.width(), m_screen_size.height());
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    m_final->render(m_main_fbo->textureBuffer());
 }
 
 void Scene::renderLights() {
@@ -84,13 +82,12 @@ void Scene::renderLights() {
     for (auto rec = m_light_pos.begin(); rec != m_light_pos.end(); rec++, i++) {
         LightSource* light = rec->first;
         //
-        glBindFramebuffer(GL_FRAMEBUFFER, m_depth_framebuffers[i]);
-        glViewport(0, 0, m_shadow_map_size.width(), m_shadow_map_size.height());
+        m_shadows[i]->bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderShadowMap(light);
 
-        m_light_shadow[light] = m_depth_textures[i];
+        m_light_shadow[light] = m_shadows[i]->depthBuffer();
     }
 }
 
@@ -111,19 +108,6 @@ void Scene::renderShadowMap(LightSource *light) {
         }
     }
     m_depth_painter->release();
-}
-
-void Scene::renderTexture(GLuint tex_id, const QRect &rect) {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(rect.x(), rect.y(), rect.width(), rect.height());
-
-    m_tex_painter->bind();
-    m_tex_painter->renderTexture(tex_id);
-    m_tex_painter->release();
-}
-
-void Scene::renderTexture(GLuint tex_id) {
-    renderTexture(tex_id, QRect(QPoint(0, 0), m_screen_size.toPoint()));
 }
 
 void Scene::updatePositions() {
@@ -172,10 +156,10 @@ void Scene::bindRenderer(GLRenderer *renderer) {
 }
 
 void Scene::initFBO() {
-    fbo = new QGLFramebufferObject(m_shadow_map_size, QGLFramebufferObject::Depth);
+    m_main_fbo = new Framebuffer(m_screen_size);
 
-    for(int i = 0; i < max_lights; i++) {
-        m_depth_framebuffers[i] = m_texture_manager->genDepthFramebuffer(m_shadow_map_size, m_depth_textures[i]);
+    for (int i = 0; i < max_lights; i++) {
+        m_shadows[i] = new Framebuffer(m_shadow_map_size, false);
     }
 }
 
@@ -187,11 +171,14 @@ Group *Scene::root() {
     return m_root;
 }
 
-void Scene::setScreenSize(const QVector2D &rect) {
+void Scene::setScreenSize(const QSize &rect) {
     m_screen_size = rect;
+
+    delete m_main_fbo;
+    m_main_fbo = new Framebuffer(m_screen_size);
 }
 
-QVector2D Scene::screenSize() const {
+QSize Scene::screenSize() const {
     return m_screen_size;
 }
 

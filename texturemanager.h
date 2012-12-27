@@ -21,12 +21,6 @@ public:
     void unloadTexture(GLuint id);
 
     GLuint getTexture(TextureInfo tex);
-
-    GLuint genFBTexture(int width, int heigth);
-    GLuint genFBDepthTexture(int width, int heigth);
-
-    GLuint genDepthFramebuffer(const QSize &size, GLuint &tex_id);
-
 private:
     GLuint loadTexture(const QImage & img, TextureInfo::T_TYPE type);
 
